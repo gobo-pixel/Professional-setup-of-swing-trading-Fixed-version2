@@ -1,0 +1,1 @@
+# Professional-setup-of-swing-trading-Fixed-version2
