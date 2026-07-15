@@ -158,23 +158,23 @@ class AnalysisEngine:
 
         print(f"\n--- Tier-1 pass rate ---\n{r['tier1_pass_rate']}")
         print(f"\n--- Tier-2/3 contribution (avg score) ---\n{r['tier_contribution']}")
-        print(f"\n--- Tier-4 rejection reasons (top 10) ---")
+        print("\n--- Tier-4 rejection reasons (top 10) ---")
         for reason, count in r["tier4_rejection_reasons"].items():
             print(f"  {count:5d}  {reason}")
 
-        print(f"\n--- Top rejection reasons (top 10) ---")
+        print("\n--- Top rejection reasons (top 10) ---")
         for reason, count in r["top_rejection_reasons"].items():
             print(f"  {count:5d}  {reason}")
 
-        print(f"\n--- Sector-wise signal counts ---")
+        print("\n--- Sector-wise signal counts ---")
         for sector, counts in sorted(r["sector_stats"].items()):
             print(f"  {sector:20s} {counts}")
 
-        print(f"\n--- Market-regime signal counts ---")
+        print("\n--- Market-regime signal counts ---")
         for regime, counts in r["regime_stats"].items():
             print(f"  {regime:12s} {counts}")
 
-        print(f"\n--- Daily summary ---")
+        print("\n--- Daily summary ---")
         for date, counts in r["daily_summary"].items():
             print(f"  {date:12s} {counts}")
 
