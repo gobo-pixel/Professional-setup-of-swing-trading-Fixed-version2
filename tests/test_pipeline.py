@@ -7,7 +7,7 @@ def test_imports():
 
 
 def test_init():
-    # Professionally mocking the DataEngine instantiation to ensure orchestration unit tests 
+    # Professionally mocking the DataEngine instantiation to ensure orchestration unit tests
     # run cleanly without physical environment dependencies.
     with patch('data.data_engine.DataEngine') as mock_engine:
         orch = WiredOrchestrator(mode="BACKTEST")
