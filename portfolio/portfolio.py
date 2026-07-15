@@ -296,7 +296,7 @@ class PortfolioEngine:
 
         self.state.used_capital = used
 
-        self.state.available_capital = self.state.total_capital - used
+        self.state.available_capital = self.state.total_capital + self.state.total_pnl - used
 
         self.state.exposure = used / max(self.state.total_capital, 1e-9)
 
