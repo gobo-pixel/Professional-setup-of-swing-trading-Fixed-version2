@@ -1,0 +1,1205 @@
+2026-07-07 19:05:14 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-07 19:05:14 | INFO     | execution.scanner | scanner.py:73 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-07 19:05:14 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-07 19:13:55 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-07 19:13:55 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: TEST
+2026-07-07 19:13:55 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-07 19:13:55 | INFO     | features.technical_features | technical_features.py:47 | Running MovingAverageIndicators
+2026-07-07 19:13:55 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-07 19:13:55 | INFO     | features.technical_features | technical_features.py:47 | Running MomentumIndicators
+2026-07-07 19:13:55 | INFO     | features.indicators.momentum | momentum.py:78 | Momentum indicators calculated.
+2026-07-07 19:13:55 | INFO     | features.technical_features | technical_features.py:47 | Running VolatilityIndicators
+2026-07-07 19:13:55 | INFO     | features.indicators.volatility | volatility.py:72 | Volatility indicators calculated.
+2026-07-07 19:13:55 | INFO     | features.technical_features | technical_features.py:47 | Running VolumeIndicators
+2026-07-07 19:13:55 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-07 19:13:55 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-07 19:13:55 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-07 19:13:55 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-07 19:13:55 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-07 19:13:55 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-07 19:13:55 | ERROR    | execution.scanner | scanner.py:301 | Scanner compilation error for TEST
+Traceback (most recent call last):
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/execution/scanner.py", line 171, in scan_symbol
+    buy_decision = self.buy_strat.evaluate(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/strategy/buy_strategy.py", line 121, in evaluate
+    raise StrategyError(f"Missing columns: {sorted(missing)}")
+core.exceptions.StrategyError: Missing columns: ['adx_14', 'cloud_trend', 'is_breakout', 'is_pullback', 'market_regime', 'supertrend', 'volatility_state']
+2026-07-07 19:15:19 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-07 19:15:19 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: TEST
+2026-07-07 19:15:19 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.momentum | momentum.py:105 | Momentum indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-07 19:15:19 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-07 19:15:19 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-07 19:15:19 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-07 19:15:19 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-07 19:15:19 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-07 19:15:19 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-07 19:15:19 | ERROR    | execution.scanner | scanner.py:302 | Scanner compilation error for TEST
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.12/dist-packages/pandas/core/indexes/base.py", line 3641, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pandas/_libs/index.pyx", line 168, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 197, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7668, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7676, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'williams_r'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/execution/scanner.py", line 172, in scan_symbol
+    buy_decision = self.buy_strat.evaluate(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/strategy/buy_strategy.py", line 281, in evaluate
+    checks["williams_r"] = row["williams_r"] > -50
+                           ~~~^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/pandas/core/series.py", line 959, in __getitem__
+    return self._get_value(key)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/pandas/core/series.py", line 1046, in _get_value
+    loc = self.index.get_loc(label)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/pandas/core/indexes/base.py", line 3648, in get_loc
+    raise KeyError(key) from err
+KeyError: 'williams_r'
+2026-07-07 19:15:28 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-07 19:15:28 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-07 19:15:28 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-07 19:15:28 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-07 19:15:28 | INFO     | features.indicators.momentum | momentum.py:105 | Momentum indicators calculated.
+2026-07-07 19:15:28 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-07 19:15:29 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-07 19:15:29 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-07 19:15:29 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-07 19:15:29 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-07 19:15:29 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-07 19:15:29 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-07 19:15:29 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-07 19:15:29 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-07 19:15:29 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-07 19:15:29 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-07 19:15:29 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-07 19:15:29 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-07 19:15:29 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-07 19:16:28 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-07 19:16:28 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: TEST
+2026-07-07 19:16:28 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-07 19:16:28 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-07 19:16:29 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-07 19:16:29 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-07 19:16:29 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-07 19:16:29 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-07 19:16:29 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-07 19:16:29 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-07 19:16:29 | INFO     | strategy.buy_strategy | buy_strategy.py:663 | BUY Strategy | Action=NO_TRADE | Confidence=51.28 | Passed=20/39
+2026-07-07 19:16:29 | INFO     | strategy.sell_strategy | sell_strategy.py:689 | SELL Strategy | Action=NO_TRADE | Confidence=20.51 | Passed=8/39
+2026-07-07 19:16:29 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 60.62
+2026-07-07 19:16:29 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 35.75
+2026-07-07 19:16:29 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 74.31%
+2026-07-07 19:16:29 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 19.39%
+2026-07-07 19:16:29 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-07 19:16:29 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-07 19:16:29 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-07 19:16:29 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-07 19:16:29 | ERROR    | execution.scanner | scanner.py:308 | Scanner compilation error for TEST
+Traceback (most recent call last):
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/execution/scanner.py", line 230, in scan_symbol
+    diagnostics["decision"] = final_decision.action
+                              ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'action'
+2026-07-08 16:50:08 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-08 16:50:08 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: TEST
+2026-07-08 16:50:08 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-08 16:50:08 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-08 16:50:08 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-08 16:50:08 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-08 16:50:08 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-08 16:50:08 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-08 16:50:08 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-08 16:50:08 | INFO     | strategy.buy_strategy | buy_strategy.py:663 | BUY Strategy | Action=NO_TRADE | Confidence=51.28 | Passed=20/39
+2026-07-08 16:50:08 | INFO     | strategy.sell_strategy | sell_strategy.py:689 | SELL Strategy | Action=NO_TRADE | Confidence=20.51 | Passed=8/39
+2026-07-08 16:50:08 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 60.62
+2026-07-08 16:50:08 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 35.75
+2026-07-08 16:50:08 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 74.31%
+2026-07-08 16:50:08 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 19.39%
+2026-07-08 16:50:08 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-08 16:50:08 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-08 16:50:08 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-08 16:50:08 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-08 16:50:08 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-08 16:50:08 | INFO     | execution.scanner | scanner.py:247 | TEST rejected by Validation Engine.
+2026-07-08 16:50:08 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-08 16:50:08 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-11 14:58:02 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 14:58:02 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 14:58:02 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 14:58:02 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 14:58:02 | INFO     | orchestrator | orchestrator.py:85 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 14:58:14 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 14:58:14 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 14:58:14 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 14:58:14 | INFO     | orchestrator | orchestrator.py:85 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 14:58:14 | INFO     | orchestrator | orchestrator.py:97 | --- Triggering Execution Matrix Sequence for Cycle: 1 ---
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:329 | Starting scan pass of 2 target nodes.
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:334 | [1/2] Sizing target context: AAPL
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: AAPL
+2026-07-11 14:58:14 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-11 14:58:14 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-11 14:58:14 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-11 14:58:14 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-11 14:58:14 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-11 14:58:14 | INFO     | strategy.buy_strategy | buy_strategy.py:663 | BUY Strategy | Action=NO_TRADE | Confidence=53.85 | Passed=21/39
+2026-07-11 14:58:14 | INFO     | strategy.sell_strategy | sell_strategy.py:689 | SELL Strategy | Action=NO_TRADE | Confidence=35.90 | Passed=14/39
+2026-07-11 14:58:14 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 67.12
+2026-07-11 14:58:14 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 45.00
+2026-07-11 14:58:14 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 84.71%
+2026-07-11 14:58:14 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 37.75%
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-11 14:58:14 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:247 | AAPL rejected by Validation Engine.
+2026-07-11 14:58:14 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-11 14:58:14 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:334 | [2/2] Sizing target context: MSFT
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: MSFT
+2026-07-11 14:58:14 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-11 14:58:14 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-11 14:58:14 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-11 14:58:14 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-11 14:58:14 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-11 14:58:14 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-11 14:58:14 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-11 14:58:14 | INFO     | strategy.buy_strategy | buy_strategy.py:663 | BUY Strategy | Action=NO_TRADE | Confidence=53.85 | Passed=21/39
+2026-07-11 14:58:14 | INFO     | strategy.sell_strategy | sell_strategy.py:689 | SELL Strategy | Action=NO_TRADE | Confidence=35.90 | Passed=14/39
+2026-07-11 14:58:14 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 67.12
+2026-07-11 14:58:14 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 45.00
+2026-07-11 14:58:14 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 84.71%
+2026-07-11 14:58:14 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 37.75%
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-11 14:58:14 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-11 14:58:14 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-11 14:58:14 | INFO     | execution.scanner | scanner.py:247 | MSFT rejected by Validation Engine.
+2026-07-11 14:58:14 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-11 14:58:14 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-11 14:58:14 | INFO     | orchestrator | orchestrator.py:218 | System execution pass complete. Status -> Cycle: 1 | Equity: 100000.00 | Realized PnL: 0.00
+2026-07-11 14:58:26 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 14:58:26 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 14:58:26 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 14:58:26 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 14:58:26 | INFO     | orchestrator | orchestrator.py:85 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 14:58:26 | INFO     | orchestrator | orchestrator.py:97 | --- Triggering Execution Matrix Sequence for Cycle: 1 ---
+2026-07-11 14:58:26 | INFO     | execution.scanner | scanner.py:329 | Starting scan pass of 1 target nodes.
+2026-07-11 14:58:26 | INFO     | execution.scanner | scanner.py:334 | [1/1] Sizing target context: AAPL
+2026-07-11 14:58:26 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: AAPL
+2026-07-11 14:58:26 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-11 14:58:26 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-11 14:58:26 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-11 14:58:26 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-11 14:58:26 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-11 14:58:26 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-11 14:58:26 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-11 14:58:26 | INFO     | strategy.buy_strategy | buy_strategy.py:663 | BUY Strategy | Action=NO_TRADE | Confidence=66.67 | Passed=26/39
+2026-07-11 14:58:26 | INFO     | strategy.sell_strategy | sell_strategy.py:689 | SELL Strategy | Action=NO_TRADE | Confidence=23.08 | Passed=9/39
+2026-07-11 14:58:26 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 63.25
+2026-07-11 14:58:26 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 35.00
+2026-07-11 14:58:26 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 79.00%
+2026-07-11 14:58:26 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 18.24%
+2026-07-11 14:58:26 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-11 14:58:26 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-11 14:58:26 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-11 14:58:26 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-11 14:58:26 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-11 14:58:26 | INFO     | execution.scanner | scanner.py:247 | AAPL rejected by Validation Engine.
+2026-07-11 14:58:26 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-11 14:58:26 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-11 14:58:26 | INFO     | orchestrator | orchestrator.py:218 | System execution pass complete. Status -> Cycle: 1 | Equity: 100000.00 | Realized PnL: 0.00
+2026-07-11 14:59:03 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 14:59:03 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-11 14:59:03 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 14:59:03 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 14:59:03 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 14:59:03 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 14:59:03 | INFO     | orchestrator | orchestrator.py:87 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 14:59:14 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 14:59:14 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-11 14:59:14 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 14:59:14 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 14:59:14 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 14:59:14 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 14:59:14 | INFO     | orchestrator | orchestrator.py:87 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 14:59:14 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-11 14:59:14 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-11 14:59:14 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-11 14:59:14 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-11 14:59:14 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-11 21:58:45 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 21:58:45 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 21:58:45 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 21:58:45 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 21:58:45 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 21:58:45 | INFO     | orchestrator | orchestrator.py:91 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 21:58:45 | INFO     | orchestrator | orchestrator.py:103 | --- Triggering Execution Matrix Sequence for Cycle: 1 ---
+2026-07-11 21:58:45 | INFO     | execution.scanner | scanner.py:329 | Starting scan pass of 1 target nodes.
+2026-07-11 21:58:45 | INFO     | execution.scanner | scanner.py:334 | [1/1] Sizing target context: AAPL
+2026-07-11 21:58:45 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: AAPL
+2026-07-11 21:58:45 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-11 21:58:45 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-11 21:58:45 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-11 21:58:45 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-11 21:58:45 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-11 21:58:45 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-11 21:58:45 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-11 21:58:45 | INFO     | strategy.buy_strategy | buy_strategy.py:663 | BUY Strategy | Action=NO_TRADE | Confidence=66.67 | Passed=26/39
+2026-07-11 21:58:45 | INFO     | strategy.sell_strategy | sell_strategy.py:689 | SELL Strategy | Action=NO_TRADE | Confidence=23.08 | Passed=9/39
+2026-07-11 21:58:45 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 63.25
+2026-07-11 21:58:45 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 35.00
+2026-07-11 21:58:45 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 79.00%
+2026-07-11 21:58:45 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 18.24%
+2026-07-11 21:58:45 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-11 21:58:45 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-11 21:58:45 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-11 21:58:45 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-11 21:58:45 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-11 21:58:45 | INFO     | execution.scanner | scanner.py:247 | AAPL rejected by Validation Engine.
+2026-07-11 21:58:45 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-11 21:58:45 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-11 21:58:45 | INFO     | output.report_generator | report_generator.py:41 | Report generated
+2026-07-11 21:58:45 | INFO     | output.report_generator | report_generator.py:83 | Master report updated at storage/reports/master_report.csv
+2026-07-11 21:58:45 | INFO     | orchestrator | orchestrator.py:302 | System execution pass complete. Status -> Cycle: 1 | Equity: 100000.00 | Realized PnL: 0.00
+2026-07-11 21:58:56 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 21:58:56 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 21:58:56 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 21:58:56 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 21:58:56 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 21:58:56 | INFO     | orchestrator | orchestrator.py:91 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 21:58:56 | INFO     | orchestrator | orchestrator.py:103 | --- Triggering Execution Matrix Sequence for Cycle: 1 ---
+2026-07-11 21:58:56 | INFO     | execution.broker | broker.py:129 | Placing order AAPL BUY x10
+2026-07-11 21:58:56 | INFO     | execution.broker | broker.py:400 | Order executed AAPL FILLED | qty=10 | price=151.0372
+2026-07-11 21:58:56 | INFO     | output.report_generator | report_generator.py:41 | Report generated
+2026-07-11 21:58:56 | INFO     | output.report_generator | report_generator.py:83 | Master report updated at storage/reports/master_report.csv
+2026-07-11 21:58:56 | INFO     | orchestrator | orchestrator.py:302 | System execution pass complete. Status -> Cycle: 1 | Equity: 100000.00 | Realized PnL: -10.37
+2026-07-11 21:59:04 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 21:59:04 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 21:59:04 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 21:59:04 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 21:59:04 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 21:59:04 | INFO     | orchestrator | orchestrator.py:91 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 21:59:04 | INFO     | orchestrator | orchestrator.py:103 | --- Triggering Execution Matrix Sequence for Cycle: 1 ---
+2026-07-11 21:59:04 | INFO     | execution.broker | broker.py:129 | Placing order AAPL SELL x10
+2026-07-11 21:59:04 | INFO     | execution.broker | broker.py:400 | Order executed AAPL FILLED | qty=10 | price=158.9950
+2026-07-11 21:59:04 | INFO     | output.report_generator | report_generator.py:41 | Report generated
+2026-07-11 21:59:04 | INFO     | output.report_generator | report_generator.py:83 | Master report updated at storage/reports/master_report.csv
+2026-07-11 21:59:04 | INFO     | orchestrator | orchestrator.py:302 | System execution pass complete. Status -> Cycle: 1 | Equity: 100000.00 | Realized PnL: 89.95
+2026-07-11 22:17:53 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 22:17:53 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-11 22:17:53 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 22:17:53 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 22:17:53 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 22:17:53 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 22:17:53 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 22:17:53 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-11 22:17:53 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-11 22:17:53 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-11 22:17:53 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-11 22:17:53 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-11 22:18:43 | INFO     | data.watchlist | watchlist.py:41 | Loaded 105 symbols.
+2026-07-11 22:18:47 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-11 22:18:47 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-11 22:18:47 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-11 22:18:47 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-11 22:18:47 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-11 22:18:47 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-11 22:18:47 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-11 22:18:47 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-11 22:18:47 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-11 22:18:47 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-11 22:18:47 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-11 22:18:47 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 05:50:20 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 05:50:20 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 05:50:20 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 05:50:20 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 05:50:20 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 05:50:20 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 05:50:20 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 05:50:20 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 05:50:20 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 05:50:20 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 05:50:20 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 05:50:20 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 05:50:28 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 05:50:28 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: IRCTC.NS
+2026-07-12 05:50:28 | INFO     | data.data_engine | data_engine.py:56 | Loading data for IRCTC.NS
+2026-07-12 05:50:28 | ERROR    | execution.scanner | scanner.py:308 | Scanner compilation error for IRCTC.NS
+Traceback (most recent call last):
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/execution/scanner.py", line 128, in scan_symbol
+    bundle = self.data_engine.fetch(symbol=symbol)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/data/data_engine.py", line 64, in fetch
+    fundamentals = self.fundamental_provider.fetch(symbol)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/claude/repo/Professional-setup-of-swing-trading-main/data/fundamental_data.py", line 51, in fetch
+    raise DataError(f"No fundamental data available for '{symbol}'.")
+core.exceptions.DataError: No fundamental data available for 'IRCTC.NS'.
+2026-07-12 05:50:39 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 05:50:39 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: IRCTC.NS
+2026-07-12 05:50:39 | INFO     | data.data_engine | data_engine.py:56 | Loading data for IRCTC.NS
+2026-07-12 05:50:39 | INFO     | data.fundamental_data | fundamental_data.py:58 | Loaded fundamentals for IRCTC.NS
+2026-07-12 05:50:39 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for IRCTC.NS
+2026-07-12 05:50:39 | INFO     | data.data_engine | data_engine.py:71 | Completed data load for IRCTC.NS
+2026-07-12 05:50:39 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 05:50:39 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-12 05:50:39 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 05:50:39 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 05:50:39 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 05:50:39 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 05:50:39 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 05:50:39 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=35.90 | Passed=14/39
+2026-07-12 05:50:39 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=48.72 | Passed=19/39
+2026-07-12 05:50:39 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 55.75
+2026-07-12 05:50:39 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 41.50
+2026-07-12 05:50:39 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 63.99%
+2026-07-12 05:50:39 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 29.94%
+2026-07-12 05:50:39 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-12 05:50:39 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 05:50:39 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-12 05:50:39 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-12 05:50:39 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 05:50:39 | INFO     | execution.scanner | scanner.py:247 | IRCTC.NS rejected by Validation Engine.
+2026-07-12 05:50:39 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 05:50:39 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 06:00:52 | INFO     | data.watchlist | watchlist.py:41 | Loaded 105 symbols.
+2026-07-12 06:00:52 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 06:00:52 | INFO     | daily_scan | daily_scan.py:56 | [1/3] Scanning AAA.NS
+2026-07-12 06:00:52 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: AAA.NS
+2026-07-12 06:00:52 | INFO     | data.data_engine | data_engine.py:56 | Loading data for AAA.NS
+2026-07-12 06:00:52 | INFO     | data.fundamental_data | fundamental_data.py:58 | Loaded fundamentals for AAA.NS
+2026-07-12 06:00:52 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for AAA.NS
+2026-07-12 06:00:52 | INFO     | data.data_engine | data_engine.py:71 | Completed data load for AAA.NS
+2026-07-12 06:00:52 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 06:00:52 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 06:00:53 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 06:00:53 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 06:00:53 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 06:00:53 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=15.38 | Passed=6/39
+2026-07-12 06:00:53 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=56.41 | Passed=22/39
+2026-07-12 06:00:53 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 37.75
+2026-07-12 06:00:53 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 56.00
+2026-07-12 06:00:53 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 22.71%
+2026-07-12 06:00:53 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 64.57%
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-12 06:00:53 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 06:00:53 | INFO     | execution.scanner | scanner.py:247 | AAA.NS rejected by Validation Engine.
+2026-07-12 06:00:53 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 06:00:53 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 06:00:53 | INFO     | daily_scan | daily_scan.py:56 | [2/3] Scanning BBB.NS
+2026-07-12 06:00:53 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: BBB.NS
+2026-07-12 06:00:53 | INFO     | data.data_engine | data_engine.py:56 | Loading data for BBB.NS
+2026-07-12 06:00:53 | INFO     | data.fundamental_data | fundamental_data.py:58 | Loaded fundamentals for BBB.NS
+2026-07-12 06:00:53 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for BBB.NS
+2026-07-12 06:00:53 | INFO     | data.data_engine | data_engine.py:71 | Completed data load for BBB.NS
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 06:00:53 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 06:00:53 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 06:00:53 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 06:00:53 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=15.38 | Passed=6/39
+2026-07-12 06:00:53 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=56.41 | Passed=22/39
+2026-07-12 06:00:53 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 37.75
+2026-07-12 06:00:53 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 56.00
+2026-07-12 06:00:53 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 22.71%
+2026-07-12 06:00:53 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 64.57%
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-12 06:00:53 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 06:00:53 | INFO     | execution.scanner | scanner.py:247 | BBB.NS rejected by Validation Engine.
+2026-07-12 06:00:53 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 06:00:53 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 06:00:53 | INFO     | daily_scan | daily_scan.py:56 | [3/3] Scanning CCC.NS
+2026-07-12 06:00:53 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: CCC.NS
+2026-07-12 06:00:53 | INFO     | data.data_engine | data_engine.py:56 | Loading data for CCC.NS
+2026-07-12 06:00:53 | INFO     | data.fundamental_data | fundamental_data.py:58 | Loaded fundamentals for CCC.NS
+2026-07-12 06:00:53 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for CCC.NS
+2026-07-12 06:00:53 | INFO     | data.data_engine | data_engine.py:71 | Completed data load for CCC.NS
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.momentum | momentum.py:108 | Momentum indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.volume | volume.py:76 | Volume indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 06:00:53 | INFO     | features.indicators.pattern | pattern.py:74 | Pattern indicators calculated.
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 06:00:53 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 06:00:53 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 06:00:53 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 06:00:53 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 06:00:53 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=15.38 | Passed=6/39
+2026-07-12 06:00:53 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=56.41 | Passed=22/39
+2026-07-12 06:00:53 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 37.75
+2026-07-12 06:00:53 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 56.00
+2026-07-12 06:00:53 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 22.71%
+2026-07-12 06:00:53 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 64.57%
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:142 | Starting AI decision engine.
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:488 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:687 | Decision diagnostics prepared.
+2026-07-12 06:00:53 | INFO     | decision.decision_engine | decision_engine.py:785 | Final decision object created.
+2026-07-12 06:00:53 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 06:00:53 | INFO     | execution.scanner | scanner.py:247 | CCC.NS rejected by Validation Engine.
+2026-07-12 06:00:53 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 06:00:53 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 06:01:02 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 06:01:02 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 06:01:02 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 06:01:02 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 06:01:02 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 06:01:02 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 06:01:02 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 06:01:02 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 06:01:02 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 06:01:02 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 06:01:02 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 06:01:02 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 06:25:44 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 06:25:53 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 06:25:53 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 06:25:53 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 06:25:53 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 06:25:53 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 06:25:53 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 06:25:53 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 06:25:53 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 06:25:53 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 06:25:53 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 06:25:53 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 06:25:53 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 06:26:24 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 06:26:24 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 06:26:32 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 06:26:32 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 06:26:32 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 06:26:32 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 06:26:32 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 06:26:32 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 06:26:32 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 06:26:32 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 06:26:32 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 06:26:32 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 06:26:32 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 06:26:32 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 06:37:01 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 06:37:01 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 06:37:01 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 06:37:01 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 06:37:01 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 06:37:01 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 06:37:01 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 06:37:01 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 06:37:01 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 06:37:01 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 06:37:01 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 06:37:01 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 06:47:20 | INFO     | data.data_engine | data_engine.py:56 | Loading data for APOLLOTYRE.NS
+2026-07-12 06:47:20 | WARNING  | data.data_engine | data_engine.py:73 | Fundamentals unavailable for APOLLOTYRE.NS: Unable to fetch fundamentals for 'APOLLOTYRE.NS'.
+2026-07-12 06:47:20 | WARNING  | data.data_engine | data_engine.py:82 | News unavailable for APOLLOTYRE.NS: Unable to fetch news for 'APOLLOTYRE.NS'.
+2026-07-12 06:47:20 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for APOLLOTYRE.NS
+2026-07-12 06:47:27 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 06:47:27 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 06:47:27 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 06:47:27 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 06:47:27 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 06:47:27 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 06:47:27 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 06:47:27 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 06:47:27 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 06:47:27 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 06:47:27 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 06:47:27 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 07:13:13 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 07:13:13 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=BUY | Grade=B+ | Rank=82.50 | Confidence=86.00
+2026-07-12 07:13:13 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 07:13:13 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 07:13:23 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 07:13:23 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 07:13:23 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 07:13:23 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 07:13:23 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 07:13:23 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 07:13:23 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 07:13:23 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 07:13:23 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 07:13:23 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 07:13:23 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 07:13:23 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 12:33:02 | INFO     | data.watchlist | watchlist.py:41 | Loaded 105 symbols.
+2026-07-12 12:33:02 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:33:02 | INFO     | generate_full_report | generate_full_report.py:157 | [1/1] Full report scan: TESTSTOCK.NS
+2026-07-12 12:33:02 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: TESTSTOCK.NS
+2026-07-12 12:33:02 | INFO     | data.data_engine | data_engine.py:56 | Loading data for TESTSTOCK.NS
+2026-07-12 12:33:02 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for TESTSTOCK.NS
+2026-07-12 12:33:02 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for TESTSTOCK.NS
+2026-07-12 12:33:02 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for TESTSTOCK.NS
+2026-07-12 12:33:02 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 12:33:02 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 12:33:03 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 12:33:03 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 12:33:03 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 12:33:03 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 12:33:03 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 12:33:03 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 12:33:03 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=15.38 | Passed=6/39
+2026-07-12 12:33:03 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=66.67 | Passed=26/39
+2026-07-12 12:33:03 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 37.75
+2026-07-12 12:33:03 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 57.75
+2026-07-12 12:33:03 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 22.71%
+2026-07-12 12:33:03 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 68.46%
+2026-07-12 12:33:03 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 12:33:03 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 12:33:03 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 12:33:03 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 12:33:03 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 12:33:03 | INFO     | execution.scanner | scanner.py:294 | TESTSTOCK.NS rejected by Validation Engine.
+2026-07-12 12:33:03 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 12:33:03 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 12:33:03 | INFO     | generate_full_report | generate_full_report.py:176 | Wrote 1 rows to reports/full_report.csv
+2026-07-12 12:33:13 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 12:33:13 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 12:33:13 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:33:13 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 12:33:13 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 12:33:13 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 12:33:13 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 12:33:13 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 12:33:13 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 12:33:13 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 12:33:13 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 12:33:13 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 12:50:35 | INFO     | data.watchlist | watchlist.py:41 | Loaded 105 symbols.
+2026-07-12 12:50:35 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:50:35 | INFO     | generate_full_report | generate_full_report.py:190 | [1/1] Full report scan: TESTSTOCK.NS
+2026-07-12 12:50:35 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: TESTSTOCK.NS
+2026-07-12 12:50:35 | INFO     | data.data_engine | data_engine.py:56 | Loading data for TESTSTOCK.NS
+2026-07-12 12:50:35 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for TESTSTOCK.NS
+2026-07-12 12:50:35 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for TESTSTOCK.NS
+2026-07-12 12:50:35 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for TESTSTOCK.NS
+2026-07-12 12:50:35 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 12:50:35 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 12:50:36 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 12:50:36 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 12:50:36 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 12:50:36 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 12:50:36 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 12:50:36 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 12:50:36 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=28.21 | Passed=11/39
+2026-07-12 12:50:36 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=48.72 | Passed=19/39
+2026-07-12 12:50:36 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 59.25
+2026-07-12 12:50:36 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 52.75
+2026-07-12 12:50:36 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 71.61%
+2026-07-12 12:50:36 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 56.83%
+2026-07-12 12:50:36 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 12:50:36 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 12:50:36 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 12:50:36 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 12:50:36 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 12:50:36 | INFO     | execution.scanner | scanner.py:294 | TESTSTOCK.NS rejected by Validation Engine.
+2026-07-12 12:50:36 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 12:50:36 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 12:50:36 | INFO     | generate_full_report | generate_full_report.py:209 | Wrote 1 rows to reports/full_report.csv
+2026-07-12 12:50:44 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 12:50:44 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 12:50:44 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:50:44 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 12:50:44 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 12:50:44 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 12:50:44 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 12:50:44 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 12:50:44 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 12:50:44 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 12:50:44 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 12:50:44 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 12:59:07 | INFO     | data.watchlist | watchlist.py:41 | Loaded 105 symbols.
+2026-07-12 12:59:07 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:59:07 | INFO     | generate_full_report | generate_full_report.py:197 | [1/2] Full report scan: STOCK_A.NS
+2026-07-12 12:59:07 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: STOCK_A.NS
+2026-07-12 12:59:07 | INFO     | data.data_engine | data_engine.py:56 | Loading data for STOCK_A.NS
+2026-07-12 12:59:07 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for STOCK_A.NS
+2026-07-12 12:59:07 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for STOCK_A.NS
+2026-07-12 12:59:07 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for STOCK_A.NS
+2026-07-12 12:59:07 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 12:59:07 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 12:59:08 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 12:59:08 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 12:59:08 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 12:59:08 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 55.75
+2026-07-12 12:59:08 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 43.25
+2026-07-12 12:59:08 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 63.99%
+2026-07-12 12:59:08 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 33.74%
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 12:59:08 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:294 | STOCK_A.NS rejected by Validation Engine.
+2026-07-12 12:59:08 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 12:59:08 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 12:59:08 | INFO     | generate_full_report | generate_full_report.py:197 | [2/2] Full report scan: STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.data_engine | data_engine.py:56 | Loading data for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 12:59:08 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 12:59:08 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 12:59:08 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 12:59:08 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 55.75
+2026-07-12 12:59:08 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 43.25
+2026-07-12 12:59:08 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 63.99%
+2026-07-12 12:59:08 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 33.74%
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 12:59:08 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:294 | STOCK_B.NS rejected by Validation Engine.
+2026-07-12 12:59:08 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 12:59:08 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 12:59:08 | INFO     | generate_full_report | generate_full_report.py:220 | Wrote 2 rows to reports/full_report.csv
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:59:08 | INFO     | generate_full_report | generate_full_report.py:197 | [1/2] Full report scan: STOCK_A.NS
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: STOCK_A.NS
+2026-07-12 12:59:08 | INFO     | data.data_engine | data_engine.py:56 | Loading data for STOCK_A.NS
+2026-07-12 12:59:08 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for STOCK_A.NS
+2026-07-12 12:59:08 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for STOCK_A.NS
+2026-07-12 12:59:08 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for STOCK_A.NS
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 12:59:08 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 12:59:08 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 12:59:08 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 12:59:08 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 55.75
+2026-07-12 12:59:08 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 43.25
+2026-07-12 12:59:08 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 63.99%
+2026-07-12 12:59:08 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 33.74%
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 12:59:08 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:294 | STOCK_A.NS rejected by Validation Engine.
+2026-07-12 12:59:08 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 12:59:08 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 12:59:08 | INFO     | generate_full_report | generate_full_report.py:197 | [2/2] Full report scan: STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:120 | Scanning asset node: STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.data_engine | data_engine.py:56 | Loading data for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for STOCK_B.NS
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 12:59:08 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 12:59:08 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 12:59:08 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 12:59:08 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 12:59:08 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 12:59:08 | INFO     | strategy.buy_strategy | buy_strategy.py:653 | BUY Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.sell_strategy | sell_strategy.py:679 | SELL Strategy | Action=NO_TRADE | Confidence=41.03 | Passed=16/39
+2026-07-12 12:59:08 | INFO     | strategy.buy_scoring | buy_scoring.py:178 | BUY SCORE = 55.75
+2026-07-12 12:59:08 | INFO     | strategy.sell_scoring | sell_scoring.py:144 | SELL SCORE = 43.25
+2026-07-12 12:59:08 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 63.99%
+2026-07-12 12:59:08 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 33.74%
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 12:59:08 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 12:59:08 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 12:59:08 | INFO     | execution.scanner | scanner.py:294 | STOCK_B.NS rejected by Validation Engine.
+2026-07-12 12:59:08 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 12:59:08 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-12 12:59:09 | INFO     | generate_full_report | generate_full_report.py:220 | Wrote 2 rows to reports/full_report.csv
+2026-07-12 12:59:36 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 12:59:36 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 12:59:36 | INFO     | execution.scanner | scanner.py:79 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 12:59:36 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 12:59:36 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 12:59:36 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 12:59:36 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 12:59:36 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 12:59:36 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 12:59:36 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 12:59:36 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 12:59:36 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 23:09:54 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 23:09:54 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 23:09:54 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 23:09:54 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 23:09:54 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 23:09:54 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 23:09:54 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 23:09:54 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 23:09:54 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 23:09:54 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 23:09:54 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 23:09:54 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 23:10:36 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-12 23:10:36 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-12 23:10:36 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 23:10:36 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-12 23:10:36 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-12 23:10:36 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-12 23:10:36 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-12 23:10:36 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-12 23:10:36 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-12 23:10:36 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-12 23:10:36 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-12 23:10:36 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-12 23:24:50 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-12 23:24:50 | INFO     | execution.scanner | scanner.py:136 | Scanning asset node: BEARSTOCK.NS
+2026-07-12 23:24:50 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-12 23:24:50 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-12 23:24:51 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-12 23:24:51 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-12 23:24:51 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-12 23:24:51 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-12 23:24:51 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-12 23:24:51 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-12 23:24:51 | INFO     | strategy.buy_strategy | buy_strategy.py:666 | BUY Strategy | Action=NO_TRADE | Confidence=31.81 | Passed=10/39
+2026-07-12 23:24:51 | INFO     | strategy.sell_strategy | sell_strategy.py:692 | SELL Strategy | Action=SELL | Confidence=61.33 | Passed=25/39
+2026-07-12 23:24:51 | INFO     | strategy.buy_scoring | buy_scoring.py:179 | BUY SCORE = 40.90
+2026-07-12 23:24:51 | INFO     | strategy.sell_scoring | sell_scoring.py:145 | SELL SCORE = 65.85
+2026-07-12 23:24:51 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 28.70%
+2026-07-12 23:24:51 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 82.99%
+2026-07-12 23:24:51 | INFO     | decision.decision_engine | decision_engine.py:170 | Starting AI decision engine.
+2026-07-12 23:24:51 | INFO     | decision.decision_engine | decision_engine.py:516 | Decision=NO_TRADE | Grade=REJECT | Rank=0.00 | Confidence=0.00
+2026-07-12 23:24:51 | INFO     | decision.decision_engine | decision_engine.py:715 | Decision diagnostics prepared.
+2026-07-12 23:24:51 | INFO     | decision.decision_engine | decision_engine.py:813 | Final decision object created.
+2026-07-12 23:24:51 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-12 23:24:51 | INFO     | execution.scanner | scanner.py:319 | BEARSTOCK.NS rejected by Validation Engine.
+2026-07-12 23:24:51 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-12 23:24:51 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-13 08:48:05 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-13 08:48:05 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-13 08:48:05 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-13 08:48:05 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-13 08:48:05 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-13 08:48:05 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-13 08:48:05 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-13 08:48:05 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-13 08:48:05 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-13 08:48:05 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-13 08:48:05 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-13 08:48:05 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-13 08:48:44 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-13 08:48:44 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-13 08:48:44 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-13 08:48:44 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-13 08:48:44 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-13 08:48:44 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-13 08:48:44 | INFO     | strategy.buy_scoring | buy_scoring.py:186 | BUY SCORE = 68.89
+2026-07-13 08:48:44 | INFO     | strategy.buy_scoring | buy_scoring.py:186 | BUY SCORE = 67.00
+2026-07-13 08:48:54 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-13 08:48:54 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-13 08:48:54 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-13 08:48:54 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-13 08:48:54 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-13 08:48:54 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-13 08:48:54 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-13 08:48:54 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-13 08:48:54 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-13 08:48:54 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-13 08:48:54 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-13 08:48:54 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-13 23:02:05 | INFO     | data.watchlist | watchlist.py:41 | Loaded 105 symbols.
+2026-07-13 23:02:05 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-13 23:02:05 | INFO     | generate_full_report | generate_full_report.py:226 | [1/1] Full report scan: TESTBANK.NS
+2026-07-13 23:02:05 | INFO     | execution.scanner | scanner.py:136 | Scanning asset node: TESTBANK.NS
+2026-07-13 23:02:05 | INFO     | data.data_engine | data_engine.py:56 | Loading data for TESTBANK.NS
+2026-07-13 23:02:05 | INFO     | data.fundamental_data | fundamental_data.py:60 | Loaded fundamentals for TESTBANK.NS
+2026-07-13 23:02:05 | INFO     | data.news_data | news_data.py:65 | Loaded 0 news items for TESTBANK.NS
+2026-07-13 23:02:05 | INFO     | data.data_engine | data_engine.py:85 | Completed data load for TESTBANK.NS
+2026-07-13 23:02:05 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-13 23:02:05 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-13 23:02:05 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-13 23:02:05 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-13 23:02:05 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-13 23:02:05 | INFO     | news.sentiment_engine | sentiment_engine.py:75 | Processed sentiment for 0 news items.
+2026-07-13 23:02:05 | INFO     | market.market_regime | market_regime.py:64 | Market regime evaluated.
+2026-07-13 23:02:05 | INFO     | strategy.buy_strategy | buy_strategy.py:692 | BUY Strategy | Action=NO_TRADE | Confidence=40.94 | Passed=6/39
+2026-07-13 23:02:05 | INFO     | strategy.sell_strategy | sell_strategy.py:720 | SELL Strategy | Action=NO_TRADE | Confidence=52.24 | Passed=26/39
+2026-07-13 23:02:05 | INFO     | strategy.buy_scoring | buy_scoring.py:186 | BUY SCORE = 32.86
+2026-07-13 23:02:05 | INFO     | strategy.sell_scoring | sell_scoring.py:149 | SELL SCORE = 56.86
+2026-07-13 23:02:05 | INFO     | strategy.buy_probability | buy_probability.py:74 | BUY probability 15.26%
+2026-07-13 23:02:05 | INFO     | strategy.sell_probability | sell_probability.py:74 | SELL probability 66.51%
+2026-07-13 23:02:05 | INFO     | decision.decision_engine | decision_engine.py:178 | Starting AI decision engine.
+2026-07-13 23:02:05 | INFO     | decision.decision_engine | decision_engine.py:538 | Decision=NO_TRADE | Grade=REJECT | Rank=61.69 | Confidence=52.24
+2026-07-13 23:02:05 | INFO     | decision.decision_engine | decision_engine.py:737 | Decision diagnostics prepared.
+2026-07-13 23:02:05 | INFO     | decision.decision_engine | decision_engine.py:835 | Final decision object created.
+2026-07-13 23:02:05 | INFO     | decision.validation_engine | validation_engine.py:117 | Starting validation engine.
+2026-07-13 23:02:05 | INFO     | execution.scanner | scanner.py:344 | TESTBANK.NS rejected by Validation Engine.
+2026-07-13 23:02:05 | INFO     | risk.position_sizing | position_sizing.py:114 | Starting Position Sizing Engine.
+2026-07-13 23:02:05 | INFO     | risk.portfolio_rules | portfolio_rules.py:108 | Starting Portfolio Rules Engine.
+2026-07-13 23:02:05 | INFO     | generate_full_report | generate_full_report.py:249 | Wrote 1 rows to reports/full_report.csv
+2026-07-13 23:02:16 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-13 23:02:17 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-13 23:02:17 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-13 23:02:17 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-13 23:02:17 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-13 23:02:17 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-13 23:02:17 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-13 23:02:17 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-13 23:02:17 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-13 23:02:17 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-13 23:02:17 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-13 23:02:17 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-14 20:27:45 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-14 20:27:45 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-14 20:27:45 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-14 20:27:45 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-14 20:27:45 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-14 20:27:45 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-14 20:27:45 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-14 20:27:45 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-14 20:27:45 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-14 20:27:45 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-14 20:27:45 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-14 20:27:45 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-14 20:27:53 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-14 20:28:22 | INFO     | features.feature_engineering | feature_engineering.py:55 | Generating technical features...
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running MovingAverageIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.moving_average | moving_average.py:67 | Moving average indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running MomentumIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.momentum | momentum.py:110 | Momentum indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running VolatilityIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.volatility | volatility.py:121 | Volatility indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running VolumeIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.volume | volume.py:78 | Volume indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running BreakoutIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.breakout | breakout.py:76 | Breakout indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running IchimokuIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.ichimoku | ichimoku.py:61 | Ichimoku indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.technical_features | technical_features.py:53 | Running PatternIndicators
+2026-07-14 20:28:22 | INFO     | features.indicators.pattern | pattern.py:76 | Pattern indicators calculated.
+2026-07-14 20:28:22 | INFO     | features.feature_engineering | feature_engineering.py:58 | Generating multi-timeframe features...
+2026-07-14 20:28:22 | INFO     | features.multi_timeframe | multi_timeframe.py:61 | Multi-timeframe features generated.
+2026-07-14 20:28:22 | INFO     | features.feature_engineering | feature_engineering.py:61 | Feature engineering complete.
+2026-07-14 20:30:16 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:26:48 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:28:54 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:30:24 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:31:43 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:31:51 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:31:51 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-15 01:31:51 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-15 01:31:51 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-15 01:31:51 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-15 01:31:51 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-15 01:31:51 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-15 01:31:51 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-15 01:31:51 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-15 01:31:51 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-15 01:31:51 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-15 01:31:51 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
+2026-07-15 01:44:53 | INFO     | execution.broker | broker.py:1162 | Broker Engine fully initialized and operational.
+2026-07-15 01:44:53 | INFO     | deployment.phase | phase.py:57 | Deployment Controller initialized
+2026-07-15 01:44:53 | INFO     | execution.scanner | scanner.py:83 | Market Scanner Engine initialized under professional pipeline contracts.
+2026-07-15 01:44:53 | INFO     | execution.broker | broker.py:116 | Broker Engine initialized.
+2026-07-15 01:44:53 | INFO     | analytics.analytics | analytics.py:55 | Analytics Engine initialized.
+2026-07-15 01:44:53 | INFO     | execution.tracker | tracker.py:124 | Position Tracker Engine initialized successfully.
+2026-07-15 01:44:53 | INFO     | orchestrator | orchestrator.py:92 | WIRED ORCHESTRATOR successfully initialized in BACKTEST mode
+2026-07-15 01:44:53 | INFO     | risk.risk_manager | risk_manager.py:171 | Starting Risk Manager.
+2026-07-15 01:44:53 | INFO     | risk.risk_manager | risk_manager.py:639 | Risk evaluation passed.
+2026-07-15 01:44:53 | INFO     | risk.risk_manager | risk_manager.py:883 | Risk recommendations prepared.
+2026-07-15 01:44:53 | INFO     | risk.risk_manager | risk_manager.py:967 | Risk analytics completed.
+2026-07-15 01:44:53 | INFO     | risk.risk_manager | risk_manager.py:1057 | RiskResult created successfully.
