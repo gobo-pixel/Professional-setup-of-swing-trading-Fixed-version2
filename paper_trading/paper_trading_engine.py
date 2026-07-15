@@ -22,6 +22,7 @@ from datetime import date
 from typing import Any
 
 from core.logger import get_logger
+from core.notifications import notify, severity_from_magnitude
 from core.trading_calendar import is_trading_day
 from execution.scanner import MarketScanner
 from paper_trading.virtual_portfolio import VirtualPortfolio
@@ -140,6 +141,36 @@ class PaperTradingEngine:
             )
             monitored.append({"symbol": symbol, "action": exit_eval.action, "exit_score": exit_eval.exit_score})
 
+            # "Existing Position Updated" — only notify on a MEANINGFUL
+            # change vs the last logged values (prevents spamming every
+            # trivial fluctuation), and dedup by (symbol, today's date)
+            # so this fires at most once per position per day.
+            prev_log = diary_record["daily_log"][-1] if diary_record and diary_record["daily_log"] else None
+            new_buy_conf = result.diagnostics.get("buy_decision_confidence", 0.0)
+            new_sell_conf = result.diagnostics.get("sell_decision_confidence", 0.0)
+            CHANGE_THRESHOLD = 10.0
+            meaningfully_changed = prev_log is None or (
+                abs(new_buy_conf - prev_log.get("current_buy_confidence", 0.0)) >= CHANGE_THRESHOLD
+                or abs(new_sell_conf - prev_log.get("current_sell_confidence", 0.0)) >= CHANGE_THRESHOLD
+                or abs(exit_eval.exit_score - prev_log.get("current_exit_score", 0.0)) >= CHANGE_THRESHOLD
+                or exit_eval.action != prev_log.get("recommendation")
+            )
+            if meaningfully_changed:
+                position_status = "EXIT" if exit_eval.action == "EXIT" else (
+                    "REVIEW" if exit_eval.exit_score >= exit_eval.threshold * 0.7 else "HOLD"
+                )
+                notify(
+                    event_type="position_updated",
+                    message=(
+                        f"Existing Position Updated: {symbol} ({pos.direction})\n"
+                        f"BUY Confidence: {new_buy_conf:.1f} | SELL Confidence: {new_sell_conf:.1f}\n"
+                        f"Exit Score: {exit_eval.exit_score:.1f}/100 | Status: {position_status}\n"
+                        f"Current P&L: {pos.unrealized_pnl:.2f}"
+                    ),
+                    severity=severity_from_magnitude(exit_eval.exit_score / 100.0),
+                    dedup_key=f"position_updated::{symbol}::{today}",
+                )
+
             if exit_eval.action == "EXIT":
                 closed = self.portfolio.engine.close_position(symbol=symbol, exit_price=current_price)
                 if closed is not None:
@@ -166,6 +197,19 @@ class PaperTradingEngine:
                     )
                     closed_today.append({"symbol": symbol, "pnl": closed.realized_pnl})
                     open_symbols.discard(symbol)
+
+                    pnl_pct = (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
+                    notify(
+                        event_type="trade_closed",
+                        message=(
+                            f"Virtual Trade Closed: {symbol} ({closed.direction})\n"
+                            f"Entry: {closed.entry_price} -> Exit: {current_price}\n"
+                            f"Realized P&L: {closed.realized_pnl:.2f} ({pnl_pct:.2f}%)\n"
+                            f"Reason: {exit_eval.hard_risk_reason or exit_eval.reasons[-1] if exit_eval.reasons else 'N/A'}"
+                        ),
+                        severity=severity_from_magnitude(min(abs(pnl_pct) / 10.0, 1.0)),
+                        dedup_key=f"trade_closed::{symbol}::{today}",
+                    )
 
         self.portfolio.engine.mark_to_market()
 
@@ -208,6 +252,16 @@ class PaperTradingEngine:
                     "confidence": candidate.confidence, "reasons": "",
                 })
                 opened_today.append({"symbol": candidate.symbol, "action": candidate.action, "price": price})
+                notify(
+                    event_type="trade_opened",
+                    message=(
+                        f"New {candidate.action} Signal — Virtual Trade Opened: {candidate.symbol}\n"
+                        f"Entry Price: {price} | Quantity: {candidate.position_size}\n"
+                        f"Confidence: {candidate.confidence:.1f} | Probability: {candidate.probability:.1f}"
+                    ),
+                    severity=severity_from_magnitude(candidate.confidence / 100.0),
+                    dedup_key=f"trade_opened::{candidate.symbol}::{today}",
+                )
 
         self.portfolio.save()
 
