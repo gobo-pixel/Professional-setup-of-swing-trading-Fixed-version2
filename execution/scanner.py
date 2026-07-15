@@ -201,6 +201,15 @@ class MarketScanner:
                 latest_regime, 50.0
             )
             diagnostics["market_regime"] = latest_regime
+
+            # Internal passthrough (not used by the report) so callers
+            # like the Paper Trading Engine can re-evaluate an existing
+            # position (via ExitEngine) using the SAME already-computed
+            # dataframe/fundamentals/news_score, instead of re-fetching
+            # or re-deriving them.
+            diagnostics["_dataframe"] = dataframe
+            diagnostics["_fundamentals"] = fundamentals
+            diagnostics["_news_score"] = news_score
             diagnostics["market_score"] = market_score
 
             # Raw indicator snapshot (latest row) for reporting.
