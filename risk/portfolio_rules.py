@@ -117,7 +117,7 @@ class PortfolioRulesEngine:
                 allowed=False,
                 allocation_allowed=0.0,
                 portfolio_score=0.0,
-                rejection_reason="Validation failed.",
+                rejection_reason=validation.rejection_reason or "Validation failed.",
                 warnings=["Trade rejected before portfolio evaluation."],
             )
 
