@@ -12,7 +12,7 @@ Purpose: research, monitoring, and early warning ONLY.
         |
     Research (this module)
         |
-    Telegram Alert (advisory text only)
+    Telegram Alert (advisory text only, via core.notifications)
         |
     Human review — the human (or the existing Exit Engine, on its own
     separate schedule) decides what, if anything, to do about it.
@@ -26,22 +26,23 @@ Reuses existing infrastructure rather than duplicating it:
     - market/macro_intelligence.py's sector_bias() for theme detection
     - data/news_data.py for news fetching (same provider as the scanner)
     - news/sentiment_engine.py for sentiment scoring
-    - output/telegram_alert.py for sending the advisory message
+    - core/notifications.py for severity classification + dedup + sending
+      (the SAME shared helper every other module uses — no separate copy)
 """
 
 from __future__ import annotations
 
 import json
-import os
 import time
 from pathlib import Path
 from typing import Any
 
 from core.logger import get_logger
+from core.notifications import notify, severity_from_magnitude
+from core.trading_calendar import now_ist
 from data.news_data import NewsDataProvider
 from market import macro_intelligence
 from news.sentiment_engine import SentimentEngine
-from output.telegram_alert import TelegramAlert
 
 logger = get_logger(__name__)
 
@@ -77,9 +78,9 @@ def _signed_bias(scored_item: dict[str, Any]) -> float:
 
 class MarketIntelligenceEngine:
     """
-    Research-only. Call run() once per day (or on any schedule) with the
-    list of currently open positions (symbol + direction) — it never
-    reads or writes the Virtual Portfolio/Trade Diary itself, keeping it
+    Research-only. Call run() once per scheduled run with the list of
+    currently open positions (symbol + direction) — it never reads or
+    writes the Virtual Portfolio/Trade Diary itself, keeping it
     decoupled; the caller supplies the position list.
     """
 
@@ -87,23 +88,9 @@ class MarketIntelligenceEngine:
         self,
         news_provider: NewsDataProvider | None = None,
         sentiment_engine: SentimentEngine | None = None,
-        telegram: TelegramAlert | None = None,
     ):
         self.news_provider = news_provider or NewsDataProvider()
         self.sentiment_engine = sentiment_engine or SentimentEngine()
-        self.telegram = telegram or self._build_telegram_from_env()
-
-    @staticmethod
-    def _build_telegram_from_env() -> TelegramAlert | None:
-        token = os.environ.get("TELEGRAM_BOT_TOKEN")
-        chat_id = os.environ.get("TELEGRAM_CHAT_ID")
-        if token and chat_id:
-            return TelegramAlert(bot_token=token, chat_id=chat_id)
-        logger.warning(
-            "TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not set — Market "
-            "Intelligence alerts will be logged only, not sent."
-        )
-        return None
 
     # ==========================================================
     # MAIN ENTRY POINT
@@ -114,6 +101,30 @@ class MarketIntelligenceEngine:
         open_positions: [{"symbol": "INFY.NS", "direction": "BUY", "sector": "IT"}, ...]
         Read-only input — this engine never mutates portfolio state.
         """
+        ist_now = now_ist()
+        notify(
+            event_type="market_intelligence_started",
+            message=(
+                f"🧠 Market Intelligence Started\n"
+                f"Time (IST): {ist_now.strftime('%H:%M:%S')}\n"
+                f"Monitoring Window\n"
+                f"Checking:\n"
+                f"• Company News\n"
+                f"• Company Results\n"
+                f"• Exchange Announcements\n"
+                f"• Global Markets\n"
+                f"• Macro Events\n"
+                f"• Sector News\n"
+                f"This is an advisory-only research cycle.\n"
+                f"No trading decisions will be made."
+            ),
+            # Timestamp-precision dedup key (not date-only) — this cycle
+            # runs 6x/day, and each of those 6 runs should get its own
+            # start notification, not be suppressed as a "duplicate" of
+            # an earlier run from the same day.
+            dedup_key=f"mi_started::{ist_now.strftime('%Y-%m-%d %H:%M:%S.%f')}",
+        )
+
         macro_headlines = self._safe_fetch_market_news()
         macro_observation = self._analyze_macro(macro_headlines)
 
@@ -123,8 +134,14 @@ class MarketIntelligenceEngine:
             obs = self._analyze_position(pos, macro_headlines)
             position_observations.append(obs)
             if obs["alert_triggered"]:
-                self._send_alert(obs["alert_message"])
-                alerts_sent.append(obs["alert_message"])
+                sent = notify(
+                    event_type="market_intelligence",
+                    message=obs["alert_body"],
+                    severity=obs["severity"],
+                    dedup_key=obs["signature"],
+                )
+                if sent:
+                    alerts_sent.append(obs["alert_body"])
 
         record = {
             "timestamp": time.time(),
@@ -154,12 +171,8 @@ class MarketIntelligenceEngine:
         text = " ".join(h.lower() for h in headlines)
         critical_events = [kw for kw in MACRO_KEYWORDS if kw in text]
 
-        # Macro Risk Score: simple presence-based heuristic (0-100) — a
-        # research signal for humans/Analysis Engine, not a trading input.
         macro_risk_score = min(100.0, len(critical_events) * 20.0)
 
-        # Overall sentiment across whatever headlines exist, reusing the
-        # same sentiment engine the scanner uses (no duplicate logic).
         scored = self.sentiment_engine.evaluate([{"title": h} for h in headlines]) if headlines else []
         if scored:
             avg_bias = sum(_signed_bias(s) for s in scored) / len(scored)
@@ -202,29 +215,37 @@ class MarketIntelligenceEngine:
             sum(_signed_bias(n) for n in scored_news) / len(scored_news)
             if scored_news else 0.0
         )
+        top_headline = ""
+        if scored_news:
+            top_headline = max(scored_news, key=lambda n: abs(_signed_bias(n))).get("title", "")
 
         macro_bias = macro_intelligence.sector_bias(macro_headlines, sector) if sector else 0.0
 
         alert_triggered = False
-        alert_message = None
+        alert_body = None
+        signature = None
+        severity = None
 
-        # A BUY position is hurt by NEGATIVE news/macro; a SELL (short)
-        # position is hurt by POSITIVE news/macro. Advisory-only — no
-        # action is taken here regardless of the outcome.
         adverse_signal = -avg_impact if direction == "BUY" else avg_impact
         adverse_macro = -macro_bias if direction == "BUY" else macro_bias
 
         if avg_impact != 0.0 and abs(avg_impact) >= NEWS_ALERT_THRESHOLD and adverse_signal > 0:
             polarity = "Negative" if direction == "BUY" else "Positive"
+            signature = f"news::{symbol}::{top_headline}"
             alert_triggered = True
-            alert_message = (
-                f"{polarity} news detected for {symbol}.\n"
-                f"Please review this {direction} position.\n"
+            severity = severity_from_magnitude(avg_impact)
+            alert_body = (
+                f"{polarity} news detected for {symbol}"
+                + (f": {top_headline}" if top_headline else ".") + "\n"
+                f"You currently hold a {direction} position.\n"
+                f"Please review this position.\n"
                 f"No automatic action has been taken."
             )
         elif macro_bias != 0.0 and abs(macro_bias) >= 0.3 and adverse_macro > 0 and sector:
+            signature = f"macro::{sector}::{symbol}"
             alert_triggered = True
-            alert_message = (
+            severity = severity_from_magnitude(macro_bias)
+            alert_body = (
                 f"Macro development detected affecting the {sector} sector.\n"
                 f"This may affect your {direction} position in {symbol}.\n"
                 f"No automatic action has been taken."
@@ -237,18 +258,10 @@ class MarketIntelligenceEngine:
             "news_impact_score": round(avg_impact, 3),
             "macro_bias": macro_bias,
             "alert_triggered": alert_triggered,
-            "alert_message": alert_message,
+            "alert_body": alert_body,
+            "severity": severity,
+            "signature": signature,
         }
-
-    # ==========================================================
-    # NOTIFICATION (advisory only)
-    # ==========================================================
-
-    def _send_alert(self, message: str) -> None:
-        if self.telegram is not None:
-            self.telegram.send(message, level="ADVISORY")
-        else:
-            logger.info("[Market Intelligence — advisory, no Telegram configured] %s", message)
 
     # ==========================================================
     # STORAGE (for future Analysis/Learning/Optimizer consumption)
