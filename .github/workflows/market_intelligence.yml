@@ -1,0 +1,48 @@
+name: Market Intelligence
+
+on:
+  schedule:
+    # Post-market-close monitoring, 6x per day (IST -> UTC):
+    - cron: "5 10 * * *"    # 15:35 IST
+    - cron: "30 11 * * *"   # 17:00 IST
+    - cron: "30 13 * * *"   # 19:00 IST
+    - cron: "30 15 * * *"   # 21:00 IST
+    - cron: "30 17 * * *"   # 23:00 IST
+    - cron: "30 19 * * *"   # 01:00 IST (next day) — final overnight scan
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  market_intelligence:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Market Intelligence (research only, advisory Telegram alerts)
+        # The Python script itself is the authoritative trading-day gate
+        # (core/trading_calendar.py) — cron does not understand NSE
+        # holidays, so this is a no-op on weekends/holidays regardless
+        # of the schedule firing.
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: PYTHONPATH=. python scripts/run_market_intelligence.py
+
+      - name: Commit updated research logs back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- storage/reports/
+          git diff --staged --quiet || git commit -m "Market intelligence update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
