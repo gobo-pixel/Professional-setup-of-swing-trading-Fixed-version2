@@ -17,7 +17,9 @@ Source: https://www.nseindia.com/resources/exchange-communication-holidays
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
+
+IST_OFFSET = timedelta(hours=5, minutes=30)
 
 # NSE 2026 trading holidays (weekday ones only — the 4 that fall on a
 # Saturday/Sunday are already non-trading days and listed separately by
@@ -53,6 +55,27 @@ def is_trading_day(d: date | None = None) -> bool:
     if d in ALL_NSE_HOLIDAYS:
         return False
     return True
+
+
+def skip_reason(d: date | None = None) -> str | None:
+    """Why `d` is not an NSE trading day: "Saturday", "Sunday", "NSE
+    Holiday", or None if it IS a trading day. Used only for notification
+    text — is_trading_day() remains the single source of truth for the
+    actual skip decision."""
+    d = d or date.today()
+    if d.weekday() == 5:
+        return "Saturday"
+    if d.weekday() == 6:
+        return "Sunday"
+    if d in ALL_NSE_HOLIDAYS:
+        return "NSE Holiday"
+    return None
+
+
+def now_ist() -> datetime:
+    """Current wall-clock time in IST (UTC+5:30), for notification
+    timestamps only — not used anywhere in trading-day logic."""
+    return datetime.now(timezone.utc) + IST_OFFSET
 
 
 def previous_trading_day(d: date | None = None) -> date:
