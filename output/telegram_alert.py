@@ -14,11 +14,13 @@ class TelegramAlert:
 
         self.base_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-    def send(self, message: str, level: str = "INFO"):
+    def send(self, message: str, level: str = "INFO", raw: bool = False):
+
+        text = message if raw else f"[{level}] {message}"
 
         payload = {
             "chat_id": self.chat_id,
-            "text": f"[{level}] {message}",
+            "text": text,
         }
 
         try:
