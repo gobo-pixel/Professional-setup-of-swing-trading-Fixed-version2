@@ -1,0 +1,53 @@
+name: Paper Trading
+
+on:
+  workflow_run:
+    workflows: ["Daily Scan"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  paper_trade:
+    runs-on: ubuntu-latest
+    # Only proceed if triggered manually, or if the Daily Scan run it's
+    # chained after actually succeeded (not on scan failure/skip).
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Paper Trading Cycle
+        # The Python script itself is the authoritative trading-day gate
+        # (core/trading_calendar.py) — cron/workflow_run triggers do not
+        # understand NSE holidays, so PaperTradingEngine.run_cycle()
+        # checks the calendar and skips the whole cycle on non-trading
+        # days (no new entries, no monitoring) regardless of how/when
+        # this workflow itself was triggered.
+        run: PYTHONPATH=. python scripts/run_paper_trading.py
+
+      - name: Run Market Intelligence (research only, advisory Telegram alerts)
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: PYTHONPATH=. python scripts/run_market_intelligence.py
+
+      - name: Commit updated paper-trading state back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- reports/ storage/trades/ storage/reports/
+          git diff --staged --quiet || git commit -m "Paper trading update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
