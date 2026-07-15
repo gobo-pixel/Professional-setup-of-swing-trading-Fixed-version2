@@ -18,6 +18,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.logger import get_logger  # noqa: E402
+from core.trading_calendar import is_trading_day  # noqa: E402
 from market_intelligence.market_intelligence_engine import MarketIntelligenceEngine  # noqa: E402
 from paper_trading.virtual_portfolio import VirtualPortfolio  # noqa: E402
 
@@ -25,6 +26,11 @@ logger = get_logger(__name__)
 
 
 def main() -> None:
+    if not is_trading_day():
+        logger.info("Not an NSE trading day — Market Intelligence run skipped.")
+        print("Not an NSE trading day. Skipping (no run until the next trading day).")
+        return
+
     portfolio = VirtualPortfolio()
     open_positions = [
         {
