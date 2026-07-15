@@ -346,6 +346,7 @@ class MarketScanner:
             diagnostics["validation_passed"] = validation.passed
             diagnostics["validation_action"] = validation.action
             diagnostics["validation_warnings"] = len(validation.warnings)
+            diagnostics["validation_rejection_reason"] = validation.rejection_reason
 
             if not validation.passed:
                 logger.info("%s rejected by Validation Engine.", symbol)
