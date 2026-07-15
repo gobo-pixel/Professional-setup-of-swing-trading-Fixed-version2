@@ -95,7 +95,7 @@ class RegressionValidator:
             verdict = "KEEP_WITH_TRADEOFFS"
             verdict_reason = (
                 f"{improved} metric(s) improved vs {worsened} that got worse — net positive, "
-                f"but review the regressed metric(s) before fully committing."
+                "but review the regressed metric(s) before fully committing."
             )
         else:
             verdict = "NO_MEASURABLE_CHANGE"
