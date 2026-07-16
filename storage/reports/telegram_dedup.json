@@ -13,6 +13,7 @@
     "trade_opened::BAJFINANCE.NS::2026-07-16",
     "trade_opened::CHOLAFIN.NS::2026-07-16",
     "portfolio_summary::2026-07-16",
-    "analysis_summary::2026-07-16"
+    "analysis_summary::2026-07-16",
+    "mi_started::2026-07-16 17:13:57.384714"
   ]
 }
