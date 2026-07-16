@@ -1,0 +1,18 @@
+{
+  "symbol": "TVSMOTOR.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 2,
+  "entry_price": 3612.3,
+  "exit_price": NaN,
+  "status": "CLOSED",
+  "realized_pnl": NaN,
+  "realized_pnl_percent": NaN,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 0.0,
+  "regime": "SIDEWAYS",
+  "confidence": 48.42,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784228140641",
+  "timestamp": 1784228140.6413097
+}

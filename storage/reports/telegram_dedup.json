@@ -18,6 +18,26 @@
     "mi_started::2026-07-16 18:27:09.844817",
     "mi_started::2026-07-16 20:48:03.381664",
     "mi_started::2026-07-16 22:18:06.448237",
-    "mi_started::2026-07-17 00:08:11.327760"
+    "mi_started::2026-07-17 00:08:11.327760",
+    "position_updated::BAJFINANCE.NS::2026-07-16",
+    "trade_closed::BAJFINANCE.NS::2026-07-16",
+    "position_updated::FEDERALBNK.NS::2026-07-16",
+    "trade_closed::FEDERALBNK.NS::2026-07-16",
+    "position_updated::TVSMOTOR.NS::2026-07-16",
+    "trade_closed::TVSMOTOR.NS::2026-07-16",
+    "position_updated::INDUSINDBK.NS::2026-07-16",
+    "trade_closed::INDUSINDBK.NS::2026-07-16",
+    "position_updated::SBIN.NS::2026-07-16",
+    "trade_closed::SBIN.NS::2026-07-16",
+    "position_updated::TORNTPHARM.NS::2026-07-16",
+    "trade_closed::TORNTPHARM.NS::2026-07-16",
+    "position_updated::SUNPHARMA.NS::2026-07-16",
+    "trade_closed::SUNPHARMA.NS::2026-07-16",
+    "position_updated::BIOCON.NS::2026-07-16",
+    "trade_closed::BIOCON.NS::2026-07-16",
+    "position_updated::CHOLAFIN.NS::2026-07-16",
+    "trade_closed::CHOLAFIN.NS::2026-07-16",
+    "position_updated::ADANIENT.NS::2026-07-16",
+    "trade_closed::ADANIENT.NS::2026-07-16"
   ]
 }
