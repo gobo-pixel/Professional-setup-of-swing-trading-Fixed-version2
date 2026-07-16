@@ -1,6 +1,18 @@
 {
   "2026-07-16": [
     "scan_started::2026-07-16",
-    "scan_completed::2026-07-16"
+    "scan_completed::2026-07-16",
+    "trade_opened::BIOCON.NS::2026-07-16",
+    "trade_opened::TORNTPHARM.NS::2026-07-16",
+    "trade_opened::SUNPHARMA.NS::2026-07-16",
+    "trade_opened::INDUSINDBK.NS::2026-07-16",
+    "trade_opened::FEDERALBNK.NS::2026-07-16",
+    "trade_opened::TVSMOTOR.NS::2026-07-16",
+    "trade_opened::SBIN.NS::2026-07-16",
+    "trade_opened::ADANIENT.NS::2026-07-16",
+    "trade_opened::BAJFINANCE.NS::2026-07-16",
+    "trade_opened::CHOLAFIN.NS::2026-07-16",
+    "portfolio_summary::2026-07-16",
+    "analysis_summary::2026-07-16"
   ]
 }

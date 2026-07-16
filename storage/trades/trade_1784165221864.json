@@ -1,0 +1,16 @@
+{
+  "symbol": "BIOCON.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 30,
+  "entry_price": 434.6,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 79.69,
+  "reasons": "",
+  "id": "trade_1784165221864",
+  "timestamp": 1784165221.864819
+}
