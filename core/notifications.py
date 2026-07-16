@@ -1,0 +1,123 @@
+"""
+NOTIFICATIONS (shared Telegram helper)
+
+Single canonical implementation of "send an advisory Telegram message,
+with a severity level, without repeating the same event" — reused by
+every module that needs to notify (Daily Scan, Paper Trading, Exit
+Engine observations, Trade Diary, Analysis/Learning/Optimizer/
+Regression, Market Intelligence).
+
+Telegram is ONLY a notification channel. Nothing in this module (or any
+of its callers) opens/closes trades, executes BUY/SELL/EXIT, or
+modifies any probability, confidence, or weight — it only reports what
+the production engine or research modules have already decided/observed.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import time
+from pathlib import Path
+
+from core.logger import get_logger
+from output.telegram_alert import TelegramAlert
+
+logger = get_logger(__name__)
+
+DEDUP_STORE_PATH = "storage/reports/telegram_dedup.json"
+
+SEVERITY_LOW = "🟢 LOW"
+SEVERITY_MEDIUM = "🟡 MEDIUM"
+SEVERITY_HIGH = "🟠 HIGH"
+SEVERITY_CRITICAL = "🔴 CRITICAL"
+
+
+def severity_from_magnitude(magnitude: float) -> str:
+    """Classify an unsigned 0-1 magnitude into the 4 required severity
+    levels. Advisory labeling only — does not affect any decision."""
+    magnitude = abs(magnitude)
+    if magnitude >= 0.85:
+        return SEVERITY_CRITICAL
+    if magnitude >= 0.65:
+        return SEVERITY_HIGH
+    if magnitude >= 0.45:
+        return SEVERITY_MEDIUM
+    return SEVERITY_LOW
+
+
+_telegram_singleton: TelegramAlert | None = None
+_telegram_checked = False
+
+
+def _get_telegram() -> TelegramAlert | None:
+    global _telegram_singleton, _telegram_checked
+    if not _telegram_checked:
+        _telegram_checked = True
+        token = os.environ.get("TELEGRAM_BOT_TOKEN")
+        chat_id = os.environ.get("TELEGRAM_CHAT_ID")
+        if token and chat_id:
+            _telegram_singleton = TelegramAlert(bot_token=token, chat_id=chat_id)
+        else:
+            logger.warning(
+                "TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not set — "
+                "notifications will be logged only, not sent."
+            )
+    return _telegram_singleton
+
+
+def _load_dedup_store() -> dict[str, list[str]]:
+    path = Path(DEDUP_STORE_PATH)
+    if not path.exists():
+        return {}
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+    today_key = time.strftime("%Y-%m-%d")
+    return {today_key: data.get(today_key, [])}
+
+
+def _save_dedup_store(store: dict[str, list[str]]) -> None:
+    Path(DEDUP_STORE_PATH).parent.mkdir(parents=True, exist_ok=True)
+    with open(DEDUP_STORE_PATH, "w") as f:
+        json.dump(store, f, indent=2)
+
+
+def notify(
+    event_type: str,
+    message: str,
+    severity: str = SEVERITY_LOW,
+    dedup_key: str | None = None,
+) -> bool:
+    """
+    Send an advisory Telegram notification (or log it if no Telegram
+    credentials are configured). Returns True if actually sent/logged,
+    False if suppressed as a duplicate.
+
+    dedup_key: a stable string identifying "this specific event" (e.g.
+    f"trade_opened::{symbol}::{price}"). If the SAME dedup_key was
+    already notified today, this call is a no-op — prevents repeatedly
+    notifying the same event across multiple runs in one day.
+    If dedup_key is None, event_type alone is used (so at most one
+    notification per event_type per day, e.g. "daily_scan_started").
+    """
+    key = dedup_key or event_type
+    today_key = time.strftime("%Y-%m-%d")
+    store = _load_dedup_store()
+
+    if key in store.get(today_key, []):
+        logger.info("Notification suppressed (duplicate today): %s", key)
+        return False
+
+    full_message = f"{severity}\n{message}"
+    telegram = _get_telegram()
+    if telegram is not None:
+        telegram.send(full_message, level=event_type.upper())
+    else:
+        logger.info("[Notification — no Telegram configured] %s", full_message)
+
+    store.setdefault(today_key, []).append(key)
+    _save_dedup_store(store)
+    return True
