@@ -101,30 +101,6 @@ class MarketIntelligenceEngine:
         open_positions: [{"symbol": "INFY.NS", "direction": "BUY", "sector": "IT"}, ...]
         Read-only input — this engine never mutates portfolio state.
         """
-        ist_now = now_ist()
-        notify(
-            event_type="market_intelligence_started",
-            message=(
-                f"🧠 Market Intelligence Started\n"
-                f"Time (IST): {ist_now.strftime('%H:%M:%S')}\n"
-                f"Monitoring Window\n"
-                f"Checking:\n"
-                f"• Company News\n"
-                f"• Company Results\n"
-                f"• Exchange Announcements\n"
-                f"• Global Markets\n"
-                f"• Macro Events\n"
-                f"• Sector News\n"
-                f"This is an advisory-only research cycle.\n"
-                f"No trading decisions will be made."
-            ),
-            # Timestamp-precision dedup key (not date-only) — this cycle
-            # runs 6x/day, and each of those 6 runs should get its own
-            # start notification, not be suppressed as a "duplicate" of
-            # an earlier run from the same day.
-            dedup_key=f"mi_started::{ist_now.strftime('%Y-%m-%d %H:%M:%S.%f')}",
-        )
-
         macro_headlines = self._safe_fetch_market_news()
         macro_observation = self._analyze_macro(macro_headlines)
 
@@ -150,11 +126,60 @@ class MarketIntelligenceEngine:
             "alerts_sent": alerts_sent,
         }
         self._store(record)
+
+        # Final clean summary (Telegram beautification) — built entirely
+        # from fields already computed above (alert_triggered, severity,
+        # macro_risk_score, global_risk_level). No new calculations.
+        if open_positions:
+            notify(
+                event_type="market_intelligence_summary",
+                message=self._build_summary(position_observations, macro_observation),
+                dedup_key=f"mi_summary::{now_ist().strftime('%Y-%m-%d %H:%M:%S.%f')}",
+            )
+
         logger.info(
             "Market Intelligence run complete: %d positions checked, %d alerts sent.",
             len(open_positions), len(alerts_sent),
         )
         return record
+
+    def _build_summary(
+        self, position_observations: list[dict[str, Any]], macro_observation: dict[str, Any]
+    ) -> str:
+        """Clean final summary — uses only pre-existing fields
+        (alert_triggered, severity, macro_risk_score/global_risk_level).
+        No new metrics, no new scoring."""
+        safe = [o["symbol"] for o in position_observations if not o["alert_triggered"]]
+        watch = [
+            o["symbol"] for o in position_observations
+            if o["alert_triggered"] and o["severity"] in ("🟢 LOW", "🟡 MEDIUM")
+        ]
+        high_risk = [
+            o["symbol"] for o in position_observations
+            if o["alert_triggered"] and o["severity"] in ("🟠 HIGH", "🔴 CRITICAL")
+        ]
+
+        lines = [
+            "📊 Market Intelligence Summary",
+            "",
+            f"Open Positions Checked: {len(position_observations)}",
+            f"Safe Holdings: {len(safe)}" + (f" ({', '.join(safe)})" if safe else ""),
+            f"Watchlist Holdings: {len(watch)}" + (f" ({', '.join(watch)})" if watch else ""),
+            f"High Risk Holdings: {len(high_risk)}" + (f" ({', '.join(high_risk)})" if high_risk else ""),
+        ]
+
+        flagged = [o for o in position_observations if o["alert_triggered"]]
+        if flagged:
+            lines.append("")
+            lines.append("Negative News:")
+            for o in flagged:
+                lines.append(f"• {o['symbol']} — {o['severity']}")
+
+        lines.append("")
+        lines.append(f"Macro Risk: {macro_observation['global_risk_level']} "
+                     f"({macro_observation['macro_risk_score']}/100)")
+
+        return "\n".join(lines)
 
     # ==========================================================
     # MACRO ANALYSIS (research only — no signals)
