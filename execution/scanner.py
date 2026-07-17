@@ -126,6 +126,279 @@ class MarketScanner:
                 self._market_headlines = []
         return self._market_headlines
 
+    def _evaluate_market_context(self, symbol: str, bundle: Any = None) -> dict[str, Any]:
+        """
+        SINGLE SOURCE OF TRUTH for market analysis: data fetch, feature
+        engineering, fundamentals/news/regime scoring, BUY/SELL strategy
+        evaluation, scoring, probability, and the final decision.
+
+        Used by BOTH:
+          - scan_symbol() (new-entry path — unchanged behavior)
+          - evaluate_position() (monitoring path — existing positions only)
+
+        This is a pure extraction of what was previously inlined at the
+        top of scan_symbol() — no scoring/probability/confidence/decision
+        logic was changed, only moved, so both callers get IDENTICAL
+        market analysis with zero duplicated logic.
+        """
+        diagnostics: dict[str, Any] = {}
+
+        # 1. DOWNLOAD DATA (market OHLCV + fundamentals + news, in one bundle)
+        # A caller (e.g. the backtester, replaying history day-by-day)
+        # can pass a pre-fetched, correctly time-sliced `bundle` here to
+        # skip the live fetch entirely — this is what makes real
+        # historical backtesting possible instead of every simulated
+        # day silently re-fetching today's live data.
+        if bundle is None:
+            if self.data_engine is None:
+                raise ValueError("DataEngine unavailable; cannot fetch market data.")
+            bundle = self.data_engine.fetch(symbol=symbol)
+
+        dataframe = bundle.market
+        if dataframe is None or dataframe.empty:
+            raise ValueError("No market data received.")
+
+        diagnostics["candles"] = len(dataframe)
+        diagnostics["symbol"] = symbol
+        diagnostics["sector"] = bundle.fundamentals.get("sector") if bundle.fundamentals else None
+        diagnostics["industry"] = bundle.fundamentals.get("industry") if bundle.fundamentals else None
+        diagnostics["highest"] = round(float(dataframe["high"].max()), 2)
+        diagnostics["lowest"] = round(float(dataframe["low"].min()), 2)
+
+        # 2. FEATURE ENGINEERING
+        dataframe = self.features.generate(dataframe)
+        latest = dataframe.iloc[-1]
+        diagnostics["latest_close"] = round(float(latest["close"]), 2)
+
+        # 2b. FUNDAMENTALS / NEWS SENTIMENT / MARKET REGIME
+        # These feed the strategy + scoring engines (news_score / market_score /
+        # sector_score are 0-100 normalized inputs).
+        fundamentals = bundle.fundamentals or {}
+
+        news_items = self.sentiment.evaluate(bundle.news or [])
+        if news_items:
+            # KNOWN LIMITATION (see CHANGELOG.md "Known Limitations" #1):
+            # SentimentEngine.impact_score is an UNSIGNED 0-100
+            # magnitude, not a signed [-1,+1] bias as this formula
+            # assumes — news_score below almost always clips to 100
+            # (positive) whenever any news exists. A correct signed
+            # conversion already exists in
+            # market_intelligence/market_intelligence_engine.py's
+            # _signed_bias() but has NOT been ported here, since
+            # doing so changes BUY/SELL scoring behavior and needs
+            # backtesting/regression first.
+            avg_impact = sum(i.get("impact_score", 0.0) for i in news_items) / len(
+                news_items
+            )
+            news_score = max(0.0, min(100.0, 50.0 + avg_impact * 50.0))
+        else:
+            news_score = None  # genuinely no news -> must NOT interfere with score/confidence/probability
+
+        # Macro/geopolitical sector bias (e.g. "Strait of Hormuz closed"
+        # -> Energy/Defence positive, Airlines/Paints negative). This is
+        # a nudge on top of company-specific news, not a replacement.
+        macro_bias = macro_intelligence.sector_bias(
+            self._get_market_headlines(), diagnostics.get("sector")
+        )
+        if macro_bias != 0.0:
+            # A macro event counts as "news" even if this specific
+            # company had none — it's a real, directional signal.
+            base = news_score if news_score is not None else 50.0
+            news_score = max(0.0, min(100.0, base + macro_bias * 20.0))
+        diagnostics["macro_bias"] = macro_bias
+        diagnostics["news_score"] = news_score if news_score is not None else ""
+        diagnostics["has_news"] = news_score is not None
+
+        dataframe = self.regime.evaluate(dataframe)
+        latest = dataframe.iloc[-1]
+        latest_regime = latest["market_regime"]
+        market_score = {"BULL": 75.0, "SIDEWAYS": 50.0, "BEAR": 25.0}.get(
+            latest_regime, 50.0
+        )
+        diagnostics["market_regime"] = latest_regime
+
+        # Internal passthrough (not used by the report) so callers
+        # like the Paper Trading Engine can re-evaluate an existing
+        # position (via ExitEngine) using the SAME already-computed
+        # dataframe/fundamentals/news_score, instead of re-fetching
+        # or re-deriving them.
+        diagnostics["_dataframe"] = dataframe
+        diagnostics["_fundamentals"] = fundamentals
+        diagnostics["_news_score"] = news_score
+        diagnostics["market_score"] = market_score
+
+        # Raw indicator snapshot (latest row) for reporting.
+        diagnostics["ema_20"] = round(float(latest.get("ema_20", 0) or 0), 2)
+        diagnostics["ema_50"] = round(float(latest.get("ema_50", 0) or 0), 2)
+        diagnostics["ema_200"] = round(float(latest.get("ema_200", 0) or 0), 2)
+        diagnostics["rsi_14"] = round(float(latest.get("rsi_14", 0) or 0), 2)
+        diagnostics["macd"] = round(float(latest.get("macd", 0) or 0), 2)
+        diagnostics["adx_14"] = round(float(latest.get("adx_14", 0) or 0), 2)
+        diagnostics["atr_14"] = round(float(latest.get("atr_14", 0) or 0), 2)
+        vol = float(latest.get("volume", 0) or 0)
+        vol_sma = float(latest.get("volume_sma_20", 0) or 0)
+        diagnostics["volume_ratio"] = round(vol / vol_sma, 2) if vol_sma else 0.0
+        diagnostics["relative_strength"] = round(
+            float(latest.get("relative_strength", 0) or 0), 2
+        )
+        diagnostics["is_breakout"] = bool(latest.get("is_breakout", False))
+        diagnostics["is_pullback"] = bool(latest.get("is_pullback", False))
+        diagnostics["stoch_k"] = round(float(latest.get("stoch_k", 0) or 0), 2)
+        diagnostics["cmf_20"] = round(float(latest.get("cmf_20", 0) or 0), 2)
+        diagnostics["mfi_14"] = round(float(latest.get("mfi_14", 0) or 0), 2)
+        diagnostics["supertrend"] = bool(latest.get("supertrend", False))
+        diagnostics["cloud_trend"] = latest.get("cloud_trend", "")
+        diagnostics["bullish_engulfing"] = bool(latest.get("bullish_engulfing", False))
+        diagnostics["bearish_engulfing"] = bool(latest.get("bearish_engulfing", False))
+
+        # NOTE: Sector rotation needs a cross-symbol sector-index dataframe
+        # (see market/sector_rotation.py) which this per-symbol scan does not
+        # have available. Using a neutral placeholder until sector index data
+        # is wired into DataEngine.
+        sector_score = 50.0
+
+        # NOTE: "breadth" (market breadth) is also a market-wide metric
+        # (see market/market_breadth.py) that needs advance/decline data
+        # across the whole market, not a single symbol. Using a neutral
+        # placeholder for the same reason as sector_score above.
+        dataframe["breadth"] = 50.0
+
+        # 3. STRATEGIES EVALUATION
+        buy_decision = self.buy_strat.evaluate(
+            dataframe=dataframe,
+            fundamentals=fundamentals,
+            news_score=news_score,
+            market_score=market_score,
+            sector_score=sector_score,
+        )
+        sell_decision = self.sell_strat.evaluate(
+            dataframe=dataframe,
+            fundamentals=fundamentals,
+            news_score=news_score,
+            market_score=market_score,
+            sector_score=sector_score,
+        )
+        diagnostics["buy_signal"] = buy_decision.action
+        diagnostics["sell_signal"] = sell_decision.action
+
+        # EXPLAINABILITY: full tier breakdown for both engines, for
+        # every outcome (BUY/SELL/NO_TRADE) — not just the winner.
+        diagnostics["buy_tier1_checks"] = buy_decision.tier1_checks
+        diagnostics["buy_tier1_passed"] = buy_decision.tier1_passed
+        diagnostics["buy_tier2_score"] = buy_decision.tier2_score
+        diagnostics["buy_tier3_score"] = buy_decision.tier3_score
+        diagnostics["buy_overall_score"] = buy_decision.overall_score
+        diagnostics["buy_qualify_threshold"] = buy_decision.qualify_threshold
+        diagnostics["buy_fundamental_health"] = buy_decision.fundamental_health
+        diagnostics["buy_news_health"] = buy_decision.news_health
+
+        diagnostics["sell_tier1_checks"] = sell_decision.tier1_checks
+        diagnostics["sell_tier1_passed"] = sell_decision.tier1_passed
+        diagnostics["sell_tier2_score"] = sell_decision.tier2_score
+        diagnostics["sell_tier3_score"] = sell_decision.tier3_score
+        diagnostics["sell_overall_score"] = sell_decision.overall_score
+        diagnostics["sell_qualify_threshold"] = sell_decision.qualify_threshold
+        diagnostics["sell_fundamental_weakness"] = sell_decision.fundamental_weakness
+        diagnostics["sell_news_negativity"] = sell_decision.news_negativity
+        diagnostics["buy_checks_passed"] = sum(
+            bool(v) for v in buy_decision.technical_checks.values()
+        )
+        diagnostics["buy_checks_total"] = len(buy_decision.technical_checks)
+        diagnostics["sell_checks_passed"] = sum(
+            bool(v) for v in sell_decision.technical_checks.values()
+        )
+        diagnostics["sell_checks_total"] = len(sell_decision.technical_checks)
+        diagnostics["buy_decision_confidence"] = round(buy_decision.confidence, 2)
+        diagnostics["sell_decision_confidence"] = round(sell_decision.confidence, 2)
+
+        # 4. SCORING MATRIX
+        buy_score = self.buy_score.score(
+            dataframe=dataframe,
+            fundamentals=fundamentals,
+            news_score=news_score,
+            market_score=market_score,
+            sector_score=sector_score,
+        )
+        sell_score = self.sell_score.score(
+            dataframe=dataframe,
+            fundamentals=fundamentals,
+            news_score=news_score,
+            market_score=market_score,
+            sector_score=sector_score,
+        )
+        diagnostics["buy_score"] = round(buy_score.overall, 2)
+        diagnostics["sell_score"] = round(sell_score.overall, 2)
+        diagnostics["buy_technical_score"] = round(buy_score.technical, 2)
+        diagnostics["buy_fundamental_score"] = round(buy_score.fundamental, 2)
+        diagnostics["buy_news_score"] = round(buy_score.news, 2)
+        diagnostics["sell_technical_score"] = round(sell_score.technical, 2)
+
+        # 5. PROBABILITY ENGINES
+        buy_probability = self.buy_prob.evaluate(score=buy_score)
+        sell_probability = self.sell_prob.evaluate(score=sell_score)
+        diagnostics["buy_probability"] = round(buy_probability.win_probability, 2)
+        diagnostics["sell_probability"] = round(
+            sell_probability.success_probability, 2
+        )
+
+        # 6. DECISION ENGINE
+        final_decision = self.decision_engine.evaluate(
+            buy_decision=buy_decision,
+            sell_decision=sell_decision,
+            buy_score=buy_score,
+            sell_score=sell_score,
+            buy_probability=buy_probability,
+            sell_probability=sell_probability,
+        )
+        diagnostics["decision"] = final_decision.action
+        diagnostics["ranking"] = round(final_decision.ranking, 2)
+        diagnostics["confidence"] = round(final_decision.confidence, 2)
+        diagnostics["decision_reasons"] = " | ".join(final_decision.reasons)
+        diagnostics["expected_return"] = round(final_decision.expected_return, 2)
+        diagnostics["expected_drawdown"] = round(final_decision.expected_drawdown, 2)
+        diagnostics["expected_hold_days"] = final_decision.expected_hold_days
+        diagnostics["trade_grade"] = final_decision.diagnostics.get("trade_grade", "")
+
+        return {
+            "dataframe": dataframe,
+            "fundamentals": fundamentals,
+            "news_score": news_score,
+            "final_decision": final_decision,
+            "diagnostics": diagnostics,
+        }
+
+    def _compute_stop_loss_targets(
+        self, direction: str, close_price: float, atr: float
+    ) -> tuple[float, float, float, float]:
+        """
+        Shared stop-loss/target projection — same ATR multipliers as
+        risk/exit_strategy.py's ExitStrategyEngine (ATR_STOP=2.0,
+        PARTIAL_TARGET=2.0, FINAL_TARGET=3.5). `direction` is BUY or
+        SELL — callers pass today's fresh signal (scan_symbol, entry)
+        or the ALREADY-HELD position's direction (evaluate_position,
+        monitoring), whichever is the relevant "am I long or short"
+        context for that caller.
+        """
+        ATR_STOP = 2.0
+        PARTIAL_TARGET = 2.0
+        FINAL_TARGET = 3.5
+
+        if atr and close_price:
+            if direction == "SELL":
+                stop_loss = round(close_price + ATR_STOP * atr, 2)
+                target1 = round(close_price - PARTIAL_TARGET * atr, 2)
+                target2 = round(close_price - FINAL_TARGET * atr, 2)
+            else:
+                stop_loss = round(close_price - ATR_STOP * atr, 2)
+                target1 = round(close_price + PARTIAL_TARGET * atr, 2)
+                target2 = round(close_price + FINAL_TARGET * atr, 2)
+            risk = abs(close_price - stop_loss)
+            reward = abs(target1 - close_price)
+            risk_reward = round(reward / risk, 2) if risk else 0.0
+        else:
+            stop_loss = target1 = target2 = risk_reward = 0.0
+        return stop_loss, target1, target2, risk_reward
+
     def scan_symbol(
         self,
         symbol: str,
@@ -138,211 +411,13 @@ class MarketScanner:
         diagnostics = {}
 
         try:
-            # 1. DOWNLOAD DATA (market OHLCV + fundamentals + news, in one bundle)
-            # A caller (e.g. the backtester, replaying history day-by-day)
-            # can pass a pre-fetched, correctly time-sliced `bundle` here to
-            # skip the live fetch entirely — this is what makes real
-            # historical backtesting possible instead of every simulated
-            # day silently re-fetching today's live data.
-            if bundle is None:
-                if self.data_engine is None:
-                    raise ValueError("DataEngine unavailable; cannot fetch market data.")
-                bundle = self.data_engine.fetch(symbol=symbol)
-
-            dataframe = bundle.market
-            if dataframe is None or dataframe.empty:
-                raise ValueError("No market data received.")
-
-            diagnostics["candles"] = len(dataframe)
-            diagnostics["symbol"] = symbol
-            diagnostics["sector"] = bundle.fundamentals.get("sector") if bundle.fundamentals else None
-            diagnostics["industry"] = bundle.fundamentals.get("industry") if bundle.fundamentals else None
-            diagnostics["highest"] = round(float(dataframe["high"].max()), 2)
-            diagnostics["lowest"] = round(float(dataframe["low"].min()), 2)
-
-            # 2. FEATURE ENGINEERING
-            dataframe = self.features.generate(dataframe)
+            context = self._evaluate_market_context(symbol, bundle=bundle)
+            dataframe = context["dataframe"]
+            fundamentals = context["fundamentals"]
+            news_score = context["news_score"]
+            final_decision = context["final_decision"]
+            diagnostics.update(context["diagnostics"])
             latest = dataframe.iloc[-1]
-            diagnostics["latest_close"] = round(float(latest["close"]), 2)
-
-            # 2b. FUNDAMENTALS / NEWS SENTIMENT / MARKET REGIME
-            # These feed the strategy + scoring engines (news_score / market_score /
-            # sector_score are 0-100 normalized inputs).
-            fundamentals = bundle.fundamentals or {}
-
-            news_items = self.sentiment.evaluate(bundle.news or [])
-            if news_items:
-                avg_impact = sum(i.get("impact_score", 0.0) for i in news_items) / len(
-                    news_items
-                )
-                news_score = max(0.0, min(100.0, 50.0 + avg_impact * 50.0))
-            else:
-                news_score = None  # genuinely no news -> must NOT interfere with score/confidence/probability
-
-            # Macro/geopolitical sector bias (e.g. "Strait of Hormuz closed"
-            # -> Energy/Defence positive, Airlines/Paints negative). This is
-            # a nudge on top of company-specific news, not a replacement.
-            macro_bias = macro_intelligence.sector_bias(
-                self._get_market_headlines(), diagnostics.get("sector")
-            )
-            if macro_bias != 0.0:
-                # A macro event counts as "news" even if this specific
-                # company had none — it's a real, directional signal.
-                base = news_score if news_score is not None else 50.0
-                news_score = max(0.0, min(100.0, base + macro_bias * 20.0))
-            diagnostics["macro_bias"] = macro_bias
-            diagnostics["news_score"] = news_score if news_score is not None else ""
-            diagnostics["has_news"] = news_score is not None
-
-            dataframe = self.regime.evaluate(dataframe)
-            latest = dataframe.iloc[-1]
-            latest_regime = latest["market_regime"]
-            market_score = {"BULL": 75.0, "SIDEWAYS": 50.0, "BEAR": 25.0}.get(
-                latest_regime, 50.0
-            )
-            diagnostics["market_regime"] = latest_regime
-
-            # Internal passthrough (not used by the report) so callers
-            # like the Paper Trading Engine can re-evaluate an existing
-            # position (via ExitEngine) using the SAME already-computed
-            # dataframe/fundamentals/news_score, instead of re-fetching
-            # or re-deriving them.
-            diagnostics["_dataframe"] = dataframe
-            diagnostics["_fundamentals"] = fundamentals
-            diagnostics["_news_score"] = news_score
-            diagnostics["market_score"] = market_score
-
-            # Raw indicator snapshot (latest row) for reporting.
-            diagnostics["ema_20"] = round(float(latest.get("ema_20", 0) or 0), 2)
-            diagnostics["ema_50"] = round(float(latest.get("ema_50", 0) or 0), 2)
-            diagnostics["ema_200"] = round(float(latest.get("ema_200", 0) or 0), 2)
-            diagnostics["rsi_14"] = round(float(latest.get("rsi_14", 0) or 0), 2)
-            diagnostics["macd"] = round(float(latest.get("macd", 0) or 0), 2)
-            diagnostics["adx_14"] = round(float(latest.get("adx_14", 0) or 0), 2)
-            diagnostics["atr_14"] = round(float(latest.get("atr_14", 0) or 0), 2)
-            vol = float(latest.get("volume", 0) or 0)
-            vol_sma = float(latest.get("volume_sma_20", 0) or 0)
-            diagnostics["volume_ratio"] = round(vol / vol_sma, 2) if vol_sma else 0.0
-            diagnostics["relative_strength"] = round(
-                float(latest.get("relative_strength", 0) or 0), 2
-            )
-            diagnostics["is_breakout"] = bool(latest.get("is_breakout", False))
-            diagnostics["is_pullback"] = bool(latest.get("is_pullback", False))
-            diagnostics["stoch_k"] = round(float(latest.get("stoch_k", 0) or 0), 2)
-            diagnostics["cmf_20"] = round(float(latest.get("cmf_20", 0) or 0), 2)
-            diagnostics["mfi_14"] = round(float(latest.get("mfi_14", 0) or 0), 2)
-            diagnostics["supertrend"] = bool(latest.get("supertrend", False))
-            diagnostics["cloud_trend"] = latest.get("cloud_trend", "")
-            diagnostics["bullish_engulfing"] = bool(latest.get("bullish_engulfing", False))
-            diagnostics["bearish_engulfing"] = bool(latest.get("bearish_engulfing", False))
-
-            # NOTE: Sector rotation needs a cross-symbol sector-index dataframe
-            # (see market/sector_rotation.py) which this per-symbol scan does not
-            # have available. Using a neutral placeholder until sector index data
-            # is wired into DataEngine.
-            sector_score = 50.0
-
-            # NOTE: "breadth" (market breadth) is also a market-wide metric
-            # (see market/market_breadth.py) that needs advance/decline data
-            # across the whole market, not a single symbol. Using a neutral
-            # placeholder for the same reason as sector_score above.
-            dataframe["breadth"] = 50.0
-
-            # 3. STRATEGIES EVALUATION
-            buy_decision = self.buy_strat.evaluate(
-                dataframe=dataframe,
-                fundamentals=fundamentals,
-                news_score=news_score,
-                market_score=market_score,
-                sector_score=sector_score,
-            )
-            sell_decision = self.sell_strat.evaluate(
-                dataframe=dataframe,
-                fundamentals=fundamentals,
-                news_score=news_score,
-                market_score=market_score,
-                sector_score=sector_score,
-            )
-            diagnostics["buy_signal"] = buy_decision.action
-            diagnostics["sell_signal"] = sell_decision.action
-
-            # EXPLAINABILITY: full tier breakdown for both engines, for
-            # every outcome (BUY/SELL/NO_TRADE) — not just the winner.
-            diagnostics["buy_tier1_checks"] = buy_decision.tier1_checks
-            diagnostics["buy_tier1_passed"] = buy_decision.tier1_passed
-            diagnostics["buy_tier2_score"] = buy_decision.tier2_score
-            diagnostics["buy_tier3_score"] = buy_decision.tier3_score
-            diagnostics["buy_overall_score"] = buy_decision.overall_score
-            diagnostics["buy_qualify_threshold"] = buy_decision.qualify_threshold
-            diagnostics["buy_fundamental_health"] = buy_decision.fundamental_health
-            diagnostics["buy_news_health"] = buy_decision.news_health
-
-            diagnostics["sell_tier1_checks"] = sell_decision.tier1_checks
-            diagnostics["sell_tier1_passed"] = sell_decision.tier1_passed
-            diagnostics["sell_tier2_score"] = sell_decision.tier2_score
-            diagnostics["sell_tier3_score"] = sell_decision.tier3_score
-            diagnostics["sell_overall_score"] = sell_decision.overall_score
-            diagnostics["sell_qualify_threshold"] = sell_decision.qualify_threshold
-            diagnostics["sell_fundamental_weakness"] = sell_decision.fundamental_weakness
-            diagnostics["sell_news_negativity"] = sell_decision.news_negativity
-            diagnostics["buy_checks_passed"] = sum(
-                bool(v) for v in buy_decision.technical_checks.values()
-            )
-            diagnostics["buy_checks_total"] = len(buy_decision.technical_checks)
-            diagnostics["sell_checks_passed"] = sum(
-                bool(v) for v in sell_decision.technical_checks.values()
-            )
-            diagnostics["sell_checks_total"] = len(sell_decision.technical_checks)
-            diagnostics["buy_decision_confidence"] = round(buy_decision.confidence, 2)
-            diagnostics["sell_decision_confidence"] = round(sell_decision.confidence, 2)
-
-            # 4. SCORING MATRIX
-            buy_score = self.buy_score.score(
-                dataframe=dataframe,
-                fundamentals=fundamentals,
-                news_score=news_score,
-                market_score=market_score,
-                sector_score=sector_score,
-            )
-            sell_score = self.sell_score.score(
-                dataframe=dataframe,
-                fundamentals=fundamentals,
-                news_score=news_score,
-                market_score=market_score,
-                sector_score=sector_score,
-            )
-            diagnostics["buy_score"] = round(buy_score.overall, 2)
-            diagnostics["sell_score"] = round(sell_score.overall, 2)
-            diagnostics["buy_technical_score"] = round(buy_score.technical, 2)
-            diagnostics["buy_fundamental_score"] = round(buy_score.fundamental, 2)
-            diagnostics["buy_news_score"] = round(buy_score.news, 2)
-            diagnostics["sell_technical_score"] = round(sell_score.technical, 2)
-
-            # 5. PROBABILITY ENGINES
-            buy_probability = self.buy_prob.evaluate(score=buy_score)
-            sell_probability = self.sell_prob.evaluate(score=sell_score)
-            diagnostics["buy_probability"] = round(buy_probability.win_probability, 2)
-            diagnostics["sell_probability"] = round(
-                sell_probability.success_probability, 2
-            )
-
-            # 6. DECISION ENGINE
-            final_decision = self.decision_engine.evaluate(
-                buy_decision=buy_decision,
-                sell_decision=sell_decision,
-                buy_score=buy_score,
-                sell_score=sell_score,
-                buy_probability=buy_probability,
-                sell_probability=sell_probability,
-            )
-            diagnostics["decision"] = final_decision.action
-            diagnostics["ranking"] = round(final_decision.ranking, 2)
-            diagnostics["confidence"] = round(final_decision.confidence, 2)
-            diagnostics["decision_reasons"] = " | ".join(final_decision.reasons)
-            diagnostics["expected_return"] = round(final_decision.expected_return, 2)
-            diagnostics["expected_drawdown"] = round(final_decision.expected_drawdown, 2)
-            diagnostics["expected_hold_days"] = final_decision.expected_hold_days
-            diagnostics["trade_grade"] = final_decision.diagnostics.get("trade_grade", "")
 
             # 7. VALIDATION ENGINE
             validation = self.validation.validate(
@@ -411,30 +486,13 @@ class MarketScanner:
             # risk/exit_strategy.py's ExitStrategyEngine (ATR_STOP=2.0,
             # PARTIAL_TARGET=2.0, FINAL_TARGET=3.5), so these scan-time
             # projections match what that engine will compute once a
-            # position is actually open. ExitStrategyEngine itself needs a
-            # live `position` dict (entry price, holding days, etc.) that
-            # doesn't exist yet at scan time, so we mirror its formula here
-            # rather than calling it directly.
-            ATR_STOP = 2.0
-            PARTIAL_TARGET = 2.0
-            FINAL_TARGET = 3.5
-
-            atr = diagnostics.get("atr_14", 0.0)
-            close_price = diagnostics.get("latest_close", 0.0)
-            if atr and close_price:
-                if final_decision.action == "SELL":
-                    stop_loss = round(close_price + ATR_STOP * atr, 2)
-                    target1 = round(close_price - PARTIAL_TARGET * atr, 2)
-                    target2 = round(close_price - FINAL_TARGET * atr, 2)
-                else:
-                    stop_loss = round(close_price - ATR_STOP * atr, 2)
-                    target1 = round(close_price + PARTIAL_TARGET * atr, 2)
-                    target2 = round(close_price + FINAL_TARGET * atr, 2)
-                risk = abs(close_price - stop_loss)
-                reward = abs(target1 - close_price)
-                risk_reward = round(reward / risk, 2) if risk else 0.0
-            else:
-                stop_loss = target1 = target2 = risk_reward = 0.0
+            # position is actually open. Shared with evaluate_position()
+            # via _compute_stop_loss_targets() — see that method.
+            stop_loss, target1, target2, risk_reward = self._compute_stop_loss_targets(
+                direction=final_decision.action,
+                close_price=diagnostics.get("latest_close", 0.0),
+                atr=diagnostics.get("atr_14", 0.0),
+            )
             diagnostics["stop_loss"] = stop_loss
             diagnostics["target1"] = target1
             diagnostics["target2"] = target2
@@ -473,6 +531,131 @@ class MarketScanner:
 
         except Exception as exc:
             logger.exception("Scanner compilation error for %s", symbol)
+            diagnostics["error"] = str(exc)
+            return ScanResult(
+                symbol=symbol,
+                action="ERROR",
+                score=0.0,
+                probability=0.0,
+                confidence=0.0,
+                ranking=0.0,
+                position_size=0,
+                portfolio_allowed=False,
+                diagnostics=diagnostics,
+            )
+
+    def evaluate_position(
+        self,
+        symbol: str,
+        position: dict[str, Any],
+        portfolio: dict[str, Any],
+        broker_status: dict[str, Any],
+        market_state: dict[str, Any],
+        bundle: Any = None,
+    ) -> ScanResult:
+        """
+        MONITORING-ONLY evaluation for an EXISTING open position.
+
+        Reuses _evaluate_market_context() — the exact same market
+        analysis (data, features, fundamentals/news/regime, BUY/SELL
+        strategy, scoring, probability, decision) as scan_symbol() — so
+        there is zero duplicated scoring/probability/confidence/decision
+        logic between the entry and monitoring paths.
+
+        Unlike scan_symbol(), this method NEVER runs entry-only
+        validations:
+          - duplicate_position   (this IS an existing position — not a
+                                   duplicate, by definition)
+          - max_positions        (we are not adding a new slot)
+          - capital allocation for opening a NEW trade
+          - new-entry portfolio limits (PositionSizingEngine /
+            PortfolioRulesEngine are entry-sizing concerns — not called
+            here at all)
+
+        It still runs ValidationEngine (for genuine data-quality checks
+        — NaN, market hours, minimum history, average volume, etc. —
+        which ARE relevant while monitoring) and RiskManager (for real
+        market/volatility/portfolio risk metrics), but with `symbol`
+        excluded from the `open_positions` dict passed to them, so the
+        entry-only checks above correctly evaluate as if this position
+        didn't need "room" to be opened — because it already IS open.
+        """
+        logger.info("Evaluating existing position: %s", symbol)
+        diagnostics: dict[str, Any] = {}
+
+        try:
+            context = self._evaluate_market_context(symbol, bundle=bundle)
+            dataframe = context["dataframe"]
+            final_decision = context["final_decision"]
+            diagnostics.update(context["diagnostics"])
+
+            # Exclude THIS symbol from open_positions so duplicate_position
+            # / max_positions evaluate correctly for a MONITORING check
+            # (see docstring above) — everything else about the portfolio
+            # (cash, other positions, exposure) stays real/unchanged.
+            monitoring_portfolio = dict(portfolio)
+            monitoring_portfolio["open_positions"] = {
+                sym: pos
+                for sym, pos in portfolio.get("open_positions", {}).items()
+                if sym != symbol
+            }
+
+            validation = self.validation.validate(
+                decision=final_decision,
+                dataframe=dataframe,
+                portfolio=monitoring_portfolio,
+                broker_status=broker_status,
+                market_state=market_state,
+            )
+            diagnostics["validation_passed"] = validation.passed
+            diagnostics["validation_action"] = validation.action
+            diagnostics["validation_warnings"] = len(validation.warnings)
+            diagnostics["validation_rejection_reason"] = validation.rejection_reason
+
+            risk_result = self.risk.evaluate(
+                validation=validation,
+                decision=final_decision,
+                dataframe=dataframe,
+                portfolio=monitoring_portfolio,
+                market=market_state,
+            )
+            diagnostics["risk_safe"] = risk_result.safe
+            diagnostics["risk_grade"] = risk_result.risk_grade
+            diagnostics["total_risk"] = round(risk_result.total_risk, 2)
+
+            # Stop-loss uses the POSITION'S HELD direction (not today's
+            # fresh signal) — monitoring cares about "given I am long
+            # this stock, where is my stop", regardless of what a brand
+            # new scan would decide today.
+            held_direction = position.get("direction", "BUY")
+            stop_loss, target1, target2, risk_reward = self._compute_stop_loss_targets(
+                direction=held_direction,
+                close_price=diagnostics.get("latest_close", 0.0),
+                atr=diagnostics.get("atr_14", 0.0),
+            )
+            diagnostics["stop_loss"] = stop_loss
+            diagnostics["target1"] = target1
+            diagnostics["target2"] = target2
+            diagnostics["risk_reward"] = risk_reward
+
+            return ScanResult(
+                symbol=symbol,
+                action=final_decision.action,
+                score=round(final_decision.confidence, 2),
+                probability=round(
+                    final_decision.buy_probability
+                    if held_direction == "BUY" else final_decision.sell_probability,
+                    2,
+                ),
+                confidence=round(final_decision.confidence, 2),
+                ranking=round(final_decision.ranking, 2),
+                position_size=0,          # not applicable — not sizing a new entry
+                portfolio_allowed=False,  # not applicable — see docstring
+                diagnostics=diagnostics,
+            )
+
+        except Exception as exc:
+            logger.exception("Position evaluation error for %s", symbol)
             diagnostics["error"] = str(exc)
             return ScanResult(
                 symbol=symbol,
