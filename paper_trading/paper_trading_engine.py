@@ -83,12 +83,23 @@ class PaperTradingEngine:
 
         # --------------------------------------------------
         # 1. MONITOR EXISTING OPEN POSITIONS FIRST
-        #    (uses the SAME production scanner intelligence)
+        #    (uses the SAME production scanner intelligence via
+        #    evaluate_position() — a MONITORING-ONLY method that never
+        #    runs entry-only checks like duplicate_position/max_positions,
+        #    since this position already legitimately exists.)
         # --------------------------------------------------
         for symbol in list(open_symbols):
             portfolio_dict = self.portfolio.engine.snapshot()
-            result = self.scanner.scan_symbol(
-                symbol=symbol, portfolio=portfolio_dict,
+            pos = self.portfolio.engine.state.open_positions[symbol]
+            result = self.scanner.evaluate_position(
+                symbol=symbol,
+                position={
+                    "symbol": symbol,
+                    "direction": pos.direction,
+                    "current_price": pos.current_price,
+                    "max_drawdown_percent": pos.max_drawdown_percent,
+                },
+                portfolio=portfolio_dict,
                 broker_status=broker_status, market_state=market_state,
             )
             if result.action == "ERROR":
@@ -97,7 +108,6 @@ class PaperTradingEngine:
 
             self.portfolio.register_sector(symbol, result.diagnostics.get("sector"))
 
-            pos = self.portfolio.engine.state.open_positions[symbol]
             current_price = result.diagnostics.get("latest_close", pos.current_price)
             self.portfolio.engine.update_position(symbol=symbol, current_price=current_price)
             pos = self.portfolio.engine.state.open_positions[symbol]  # refreshed
@@ -161,11 +171,9 @@ class PaperTradingEngine:
                 )
                 notify(
                     event_type="position_updated",
-                    message=(
-                        f"Existing Position Updated: {symbol} ({pos.direction})\n"
-                        f"BUY Confidence: {new_buy_conf:.1f} | SELL Confidence: {new_sell_conf:.1f}\n"
-                        f"Exit Score: {exit_eval.exit_score:.1f}/100 | Status: {position_status}\n"
-                        f"Current P&L: {pos.unrealized_pnl:.2f}"
+                    message=self._format_position_update(
+                        symbol, pos, holding_days, new_buy_conf, new_sell_conf,
+                        exit_eval, position_status,
                     ),
                     severity=severity_from_magnitude(exit_eval.exit_score / 100.0),
                     dedup_key=f"position_updated::{symbol}::{today}",
@@ -201,11 +209,8 @@ class PaperTradingEngine:
                     pnl_pct = (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
                     notify(
                         event_type="trade_closed",
-                        message=(
-                            f"Virtual Trade Closed: {symbol} ({closed.direction})\n"
-                            f"Entry: {closed.entry_price} -> Exit: {current_price}\n"
-                            f"Realized P&L: {closed.realized_pnl:.2f} ({pnl_pct:.2f}%)\n"
-                            f"Reason: {exit_eval.hard_risk_reason or exit_eval.reasons[-1] if exit_eval.reasons else 'N/A'}"
+                        message=self._format_trade_closed(
+                            symbol, closed, current_price, pnl_pct, holding_days, exit_eval,
                         ),
                         severity=severity_from_magnitude(min(abs(pnl_pct) / 10.0, 1.0)),
                         dedup_key=f"trade_closed::{symbol}::{today}",
@@ -238,11 +243,15 @@ class PaperTradingEngine:
                 self.portfolio.register_sector(candidate.symbol, candidate.diagnostics.get("sector"))
 
                 trade_id = self._new_trade_id(candidate.symbol)
+                reasons_list = [
+                    r for r in candidate.diagnostics.get("decision_reasons", "").split(" | ") if r
+                ]
+
                 self.diary.open_trade(
                     trade_id=trade_id, symbol=candidate.symbol, direction=candidate.action,
                     entry_price=price, entry_date=today,
                     buy_probability=candidate.probability, buy_confidence=candidate.confidence,
-                    entry_reasons=candidate.diagnostics.get("decision_reasons", "").split(" | "),
+                    entry_reasons=reasons_list,
                 )
                 self.trade_store.save_trade({
                     "symbol": candidate.symbol, "direction": candidate.action, "action": "OPEN",
@@ -252,13 +261,10 @@ class PaperTradingEngine:
                     "confidence": candidate.confidence, "reasons": "",
                 })
                 opened_today.append({"symbol": candidate.symbol, "action": candidate.action, "price": price})
+
                 notify(
                     event_type="trade_opened",
-                    message=(
-                        f"New {candidate.action} Signal — Virtual Trade Opened: {candidate.symbol}\n"
-                        f"Entry Price: {price} | Quantity: {candidate.position_size}\n"
-                        f"Confidence: {candidate.confidence:.1f} | Probability: {candidate.probability:.1f}"
-                    ),
+                    message=self._format_buy_report(candidate, price, reasons_list),
                     severity=severity_from_magnitude(candidate.confidence / 100.0),
                     dedup_key=f"trade_opened::{candidate.symbol}::{today}",
                 )
@@ -291,3 +297,57 @@ class PaperTradingEngine:
         # same symbol trades again later after a prior position closed,
         # this avoids overwriting the earlier CLOSED diary record.
         return f"paper_{symbol.replace('.', '_')}_{int(time.time() * 1000)}"
+
+    # ==========================================================
+    # TELEGRAM REPORT FORMATTING (presentation only — every value
+    # used below was already computed elsewhere; nothing new here.
+    # Market Intelligence stays fully decoupled — see
+    # market_intelligence/market_intelligence_engine.py, which runs on
+    # its own separate schedule and sends its own summary.)
+    # ==========================================================
+
+    @staticmethod
+    def _format_buy_report(candidate: Any, price: float, reasons_list: list[str]) -> str:
+        top_reasons = "\n".join(f"• {r}" for r in reasons_list[:5]) or "• N/A"
+        return (
+            f"🟢 New Virtual Trade Opened\n"
+            f"Symbol: {candidate.symbol}\n"
+            f"Signal: {candidate.action}\n"
+            f"Entry Price: {price}\n"
+            f"Quantity: {candidate.position_size}\n"
+            f"Probability: {candidate.probability:.1f}%\n"
+            f"Confidence: {candidate.confidence:.1f}%\n\n"
+            f"Top Reasons\n{top_reasons}"
+        )
+
+    @staticmethod
+    def _format_position_update(
+        symbol: str, pos: Any, holding_days: int, buy_conf: float, sell_conf: float,
+        exit_eval: Any, position_status: str,
+    ) -> str:
+        return (
+            f"🔄 Position Update: {symbol} ({pos.direction})\n"
+            f"Holding Days: {holding_days}\n"
+            f"Current Return: {pos.unrealized_pnl_percent:.2f}%\n"
+            f"BUY Confidence: {buy_conf:.1f}%\n"
+            f"SELL Confidence: {sell_conf:.1f}%\n"
+            f"Exit Score: {exit_eval.exit_score:.1f}/100\n"
+            f"Recommendation: {position_status}"
+        )
+
+    @staticmethod
+    def _format_trade_closed(
+        symbol: str, closed: Any, exit_price: float, pnl_pct: float,
+        holding_days: int, exit_eval: Any,
+    ) -> str:
+        reason = exit_eval.hard_risk_reason or (exit_eval.reasons[-1] if exit_eval.reasons else "N/A")
+        top_reasons = "\n".join(f"• {r}" for r in exit_eval.reasons[:5]) or "• N/A"
+        return (
+            f"🔴 Virtual Trade Closed: {symbol} ({closed.direction})\n"
+            f"Entry: {closed.entry_price}\n"
+            f"Exit: {exit_price}\n"
+            f"Return: {pnl_pct:.2f}%\n"
+            f"Holding Days: {holding_days}\n"
+            f"Exit Reason: {reason}\n\n"
+            f"Top Reasons\n{top_reasons}"
+        )
