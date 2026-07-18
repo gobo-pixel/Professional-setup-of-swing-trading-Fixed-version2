@@ -17,6 +17,7 @@ Workflow per cycle (see module docstring in the spec):
 
 from __future__ import annotations
 
+import math
 import time
 from datetime import date
 from typing import Any
@@ -109,6 +110,26 @@ class PaperTradingEngine:
             self.portfolio.register_sector(symbol, result.diagnostics.get("sector"))
 
             current_price = result.diagnostics.get("latest_close", pos.current_price)
+
+            # ROOT-CAUSE GUARD (see CHANGELOG.md): an occasional bad/
+            # incomplete market-data fetch can produce a NaN close price
+            # even when the scan otherwise "succeeds" (action != ERROR).
+            # Using a NaN price here would silently corrupt this
+            # position's P&L today AND, if it reaches close_position(),
+            # PERMANENTLY corrupt the whole portfolio's cumulative
+            # total_pnl (NaN is contagious through +=) for every future
+            # day. Skip this symbol for this cycle instead — same
+            # fail-safe pattern as the existing action=="ERROR" skip
+            # above — and retry next cycle when fresh data is available.
+            if current_price is None or (
+                isinstance(current_price, float) and math.isnan(current_price)
+            ):
+                logger.warning(
+                    "Latest close price is NaN/invalid for %s; skipping this "
+                    "monitoring cycle (will retry next run).", symbol,
+                )
+                continue
+
             self.portfolio.engine.update_position(symbol=symbol, current_price=current_price)
             pos = self.portfolio.engine.state.open_positions[symbol]  # refreshed
 
@@ -233,7 +254,12 @@ class PaperTradingEngine:
                     continue
 
                 price = candidate.diagnostics.get("latest_close")
-                if not price:
+                # NOTE: "if not price" alone would NOT catch NaN — NaN is
+                # truthy in Python (bool(float('nan')) is True) — so this
+                # explicit isnan check is required to actually guard
+                # against a bad/incomplete data fetch (see the matching
+                # guard + explanation in the monitoring loop above).
+                if not price or (isinstance(price, float) and math.isnan(price)):
                     continue
 
                 self.portfolio.engine.add_position(
