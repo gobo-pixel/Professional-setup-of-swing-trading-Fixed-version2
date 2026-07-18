@@ -1,0 +1,354 @@
+"""
+FULL REPORT SCAN SCRIPT
+
+Same idea as daily_scan.py, but writes the full 72-column report format
+(TradeID, Sector, EMA20/50/200, RSI, MACD, ADX, ATR, StopLoss/Targets,
+BUY/SELL score-probability-confidence breakdowns, etc.) instead of the
+lightweight summary CSV.
+
+Usage:
+    python scripts/generate_full_report.py
+"""
+
+from __future__ import annotations
+
+import csv
+import sys
+import time
+from datetime import date
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from core.logger import get_logger  # noqa: E402
+from core.notifications import notify  # noqa: E402
+from core.trading_calendar import is_trading_day, now_ist, skip_reason  # noqa: E402
+from data.watchlist import WatchlistManager  # noqa: E402
+from execution.scanner import MarketScanner  # noqa: E402
+from storage.trades.trade_store import TradeStore  # noqa: E402
+
+logger = get_logger(__name__)
+
+WATCHLIST = WatchlistManager("storage/watchlist/nifty500.json").load()
+
+# Exact column order the person asked for.
+FIELDNAMES = [
+    "TradeID", "Date", "Stock", "Sector", "Industry", "Signal", "Reason",
+    "Confidence", "EntryPrice", "CurrentPrice", "Highest", "Lowest",
+    "EMA20", "EMA50", "EMA200", "RSI", "MACD", "ADX", "ATR", "VolumeRatio",
+    "RelativeStrength", "MomentumIndicators", "VolatilityIndicator",
+    "VolumeIndicators", "BreakoutIndicators", "IchimokuIndicators",
+    "PatternIndicators", "Breakout", "Pullback", "score", "probability",
+    "confidence", "ranking", "SELL score 00.00", "SELL Confidence 00.00",
+    "SELL Passed 0/0", "SELL  probability  %", "BUT score 00.00",
+    "BUT Confidence 00.00", "BUT Passed 0/0", "BUT  probability  %",
+    "portfolio_allowed", "latest_close", "market_regime",
+    "Decision=NO_TRADE/TRADE", "Grade=ACCEPT/REJECT", "Rank=0.00",
+    "Confidence=0.00", "PositionSize", "PositionRULE", "StopLoss",
+    "Target1", "Target2", "RiskReward", "ExpectedHoldDays", "HoldingDays",
+    "Return", "MaxProfit", "MaxDrawdown", "TechnicalScore",
+    "FundamentalScore", "NewsScore", "OverallScore", "Status",
+    "ExitReason", "ExitDate", "AIComment", "AIVersion", "ANALYSIS REPORT",
+    "LEARNIG", "OPTIMER", "BACKTESET",
+    # Explainability (audit requirement) — full tier breakdown for both
+    # engines, present for every outcome (BUY/SELL/NO_TRADE).
+    "BuyTier1Passed", "BuyTier1Detail", "BuyTier2Score", "BuyTier3Score",
+    "BuyOverallScore", "BuyThreshold",
+    "SellTier1Passed", "SellTier1Detail", "SellTier2Score", "SellTier3Score",
+    "SellOverallScore", "SellThreshold",
+    "Tier4Block",
+]
+
+AI_VERSION = "v1.0"
+
+
+def latest_trade_by_symbol(trade_store: TradeStore) -> dict:
+    """Most recent journal record per symbol, keyed by symbol.
+    Used to fill lifecycle fields (Status/Return/ExitDate/HoldingDays) for
+    symbols that actually have an open or closed trade on record.
+    """
+    latest: dict[str, dict] = {}
+    for t in trade_store.get_all_trades():
+        sym = t.get("symbol")
+        if not sym:
+            continue
+        prev = latest.get(sym)
+        if prev is None or float(t.get("timestamp", 0)) > float(prev.get("timestamp", 0)):
+            latest[sym] = t
+    return latest
+
+
+def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
+    """Map one ScanResult (with the enriched diagnostics from scanner.py)
+    into a row matching the full report schema. `trade` is this symbol's
+    latest journal record from trades_master.csv, if one exists — used to
+    fill lifecycle fields (Status/Return/ExitDate/HoldingDays)."""
+    d = r.diagnostics
+    trade = trade or {}
+
+    return {
+        "TradeID": trade_id,
+        "Date": date.today().isoformat(),
+        "Stock": r.symbol,
+        "Sector": d.get("sector") or "",
+        "Industry": d.get("industry") or "",
+        "Signal": r.action,
+        "Reason": d.get("decision_reasons", "")[:500],  # keep rows CSV-friendly
+        "Confidence": r.confidence,
+        "EntryPrice": d.get("latest_close"),
+        "CurrentPrice": d.get("latest_close"),
+        "Highest": d.get("highest"),
+        "Lowest": d.get("lowest"),
+        "EMA20": d.get("ema_20"),
+        "EMA50": d.get("ema_50"),
+        "EMA200": d.get("ema_200"),
+        "RSI": d.get("rsi_14"),
+        "MACD": d.get("macd"),
+        "ADX": d.get("adx_14"),
+        "ATR": d.get("atr_14"),
+        "VolumeRatio": d.get("volume_ratio"),
+        "RelativeStrength": d.get("relative_strength"),
+        "MomentumIndicators": f"RSI:{d.get('rsi_14')} STOCH:{d.get('stoch_k')} ADX:{d.get('adx_14')}",
+        "VolatilityIndicator": f"ATR:{d.get('atr_14')}",
+        "VolumeIndicators": f"CMF:{d.get('cmf_20')} MFI:{d.get('mfi_14')} VolRatio:{d.get('volume_ratio')}",
+        "BreakoutIndicators": "YES" if d.get("is_breakout") else "NO",
+        "IchimokuIndicators": d.get("cloud_trend", ""),
+        "PatternIndicators": (
+            "BULLISH_ENGULFING" if d.get("bullish_engulfing")
+            else "BEARISH_ENGULFING" if d.get("bearish_engulfing")
+            else "NONE"
+        ),
+        "Breakout": "YES" if d.get("is_breakout") else "NO",
+        "Pullback": "YES" if d.get("is_pullback") else "NO",
+        "score": r.score,
+        "probability": r.probability,
+        "confidence": r.confidence,
+        "ranking": r.ranking,
+        "SELL score 00.00": d.get("sell_score"),
+        "SELL Confidence 00.00": d.get("sell_decision_confidence"),
+        "SELL Passed 0/0": f"{d.get('sell_checks_passed', 0)} of {d.get('sell_checks_total', 0)}",
+        "SELL  probability  %": d.get("sell_probability"),
+        "BUT score 00.00": d.get("buy_score"),
+        "BUT Confidence 00.00": d.get("buy_decision_confidence"),
+        "BUT Passed 0/0": f"{d.get('buy_checks_passed', 0)} of {d.get('buy_checks_total', 0)}",
+        "BUT  probability  %": d.get("buy_probability"),
+        "portfolio_allowed": r.portfolio_allowed,
+        "latest_close": d.get("latest_close"),
+        "market_regime": d.get("market_regime"),
+        "Decision=NO_TRADE/TRADE": d.get("decision"),
+        "Grade=ACCEPT/REJECT": "ACCEPT" if r.portfolio_allowed else "REJECT",
+        "Rank=0.00": r.ranking,
+        "Confidence=0.00": r.confidence,
+        "PositionSize": d.get("quantity"),
+        "PositionRULE": d.get("portfolio_rule_reason"),
+        "StopLoss": d.get("stop_loss"),
+        "Target1": d.get("target1"),
+        "Target2": d.get("target2"),
+        "RiskReward": d.get("risk_reward"),
+        "ExpectedHoldDays": d.get("expected_hold_days"),
+        # Trade-lifecycle fields: filled in from trades_master.csv when this
+        # symbol actually has an open/closed trade on record. MaxProfit and
+        # MaxDrawdown come from portfolio.py's running highest/lowest price
+        # tracking over the life of the position (see _track_extremes()).
+        "HoldingDays": (
+            round((time.time() - float(trade["timestamp"])) / 86400.0, 1)
+            if trade.get("status") == "OPEN" and trade.get("timestamp")
+            else ""
+        ),
+        "Return": trade.get("realized_pnl_percent", ""),
+        "MaxProfit": trade.get("max_profit_percent", ""),
+        "MaxDrawdown": trade.get("max_drawdown_percent", ""),
+        "TechnicalScore": d.get("buy_technical_score") if r.action == "BUY" else d.get("sell_technical_score"),
+        "FundamentalScore": d.get("buy_fundamental_score"),
+        "NewsScore": d.get("buy_news_score"),
+        "OverallScore": r.score,
+        "Status": trade.get("status", "WATCH" if r.action in ("BUY", "SELL") else ""),
+        "ExitReason": trade.get("reasons", "") if trade.get("status") == "CLOSED" else "",
+        "ExitDate": (
+            date.fromtimestamp(float(trade["timestamp"])).isoformat()
+            if trade.get("status") == "CLOSED" and trade.get("timestamp")
+            else ""
+        ),
+        "AIComment": (d.get("decision_reasons", "").split(" | ")[-1] if d.get("decision_reasons") else ""),
+        "AIVersion": AI_VERSION,
+        "ANALYSIS REPORT": "",
+        "LEARNIG": "",
+        "OPTIMER": "",
+        "BACKTESET": "",
+        # Explainability
+        "BuyTier1Passed": d.get("buy_tier1_passed"),
+        "BuyTier1Detail": "; ".join(
+            f"{k}={v}" for k, v in (d.get("buy_tier1_checks") or {}).items()
+        ),
+        "BuyTier2Score": d.get("buy_tier2_score"),
+        "BuyTier3Score": d.get("buy_tier3_score"),
+        "BuyOverallScore": d.get("buy_overall_score"),
+        "BuyThreshold": d.get("buy_qualify_threshold"),
+        "SellTier1Passed": d.get("sell_tier1_passed"),
+        "SellTier1Detail": "; ".join(
+            f"{k}={v}" for k, v in (d.get("sell_tier1_checks") or {}).items()
+        ),
+        "SellTier2Score": d.get("sell_tier2_score"),
+        "SellTier3Score": d.get("sell_tier3_score"),
+        "SellOverallScore": d.get("sell_overall_score"),
+        "SellThreshold": d.get("sell_qualify_threshold"),
+        "Tier4Block": (
+            d.get("portfolio_rule_reason")
+            if d.get("portfolio_rule_reason") not in (None, "OK")
+            else ("Risk grade: " + str(d.get("risk_grade")) if not d.get("risk_safe", True) else "")
+        ),
+    }
+
+
+def main() -> None:
+    today_date = date.today()
+    ist_now = now_ist()
+
+    if not is_trading_day(today_date):
+        reason = skip_reason(today_date) or "Non-trading day"
+        logger.info("Not an NSE trading day — exiting before any scan begins.")
+        print("Not an NSE trading day (weekend or holiday). No scan performed.")
+        notify(
+            event_type="daily_scan_skipped",
+            message=(
+                f"⏸️ Daily Scan Skipped\n"
+                f"Reason: {reason}\n"
+                f"No market scan was executed."
+            ),
+            dedup_key=f"scan_skipped::{today_date.isoformat()}",
+        )
+        return
+
+    total_symbols = len(WATCHLIST)
+    notify(
+        event_type="daily_scan_started",
+        message=(
+            f"🚀 Daily Scan Started\n"
+            f"Date: {today_date.isoformat()}\n"
+            f"Time (IST): {ist_now.strftime('%H:%M:%S')}\n"
+            f"Status: Production Scanner Started\n"
+            f"The scan is now analyzing today's market ({total_symbols} symbols)."
+        ),
+        dedup_key=f"scan_started::{today_date.isoformat()}",
+    )
+
+    scanner = MarketScanner()
+    trade_lookup = latest_trade_by_symbol(TradeStore())
+    portfolio = {
+        "equity": 100000.0,
+        "total_capital": 100000.0,
+        "total_pnl": 0.0,
+        "exposure": 0.0,
+        "available_capital": 100000.0,
+        "open_positions": {},
+    }
+    broker_status = {"status": "ONLINE", "mode": "SCAN", "connected": True, "order_allowed": True, "available_margin": 100000.0}
+    market_state = {"max_trade_candidates": 20, "max_watchlist": 50, "market_open": True, "holiday": False}
+
+    out_path = "reports/full_report.csv"
+    Path("reports").mkdir(exist_ok=True)
+
+    # TradeID must stay unique across runs since we're appending, not
+    # overwriting — start counting from how many rows already exist.
+    next_id = 1
+    if Path(out_path).exists():
+        with open(out_path, newline="") as f:
+            next_id = sum(1 for _ in csv.DictReader(f)) + 1
+
+    total = len(WATCHLIST)
+    rows = []
+    for i, symbol in enumerate(WATCHLIST, start=0):
+        logger.info("[%d/%d] Full report scan: %s", i + 1, total, symbol)
+        r = scanner.scan_symbol(
+            symbol=symbol,
+            portfolio=portfolio,
+            broker_status=broker_status,
+            market_state=market_state,
+        )
+        if r.action == "ERROR":
+            logger.warning("Skipping %s from report: %s", symbol, r.diagnostics.get("error"))
+            continue
+        rows.append(build_row(next_id + i, r, trade_lookup.get(symbol)))
+
+    # APPEND mode: this is ONE running file that accumulates a full history
+    # (filter by the "Date" column to see any day/month) rather than being
+    # overwritten each run. Write the header only the first time the file
+    # is created.
+    file_exists = Path(out_path).exists()
+    with open(out_path, "a", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerows(rows)
+
+    logger.info("Wrote %d rows to %s", len(rows), out_path)
+    print(f"\nWrote {len(rows)} rows to {out_path}")
+
+    buy_count = sum(1 for r in rows if r["Signal"] == "BUY")
+    sell_count = sum(1 for r in rows if r["Signal"] == "SELL")
+    no_trade_count = sum(1 for r in rows if r["Signal"] == "NO_TRADE")
+
+    # SIDEWAYS is already computed by MarketRegimeEngine (market_regime
+    # column) — just counting an existing classification, not a new
+    # detector. NOTE: this is a market-regime sub-classification WITHIN
+    # NO_TRADE (and occasionally within BUY/SELL), NOT a 4th mutually
+    # exclusive bucket alongside BUY/SELL/NO_TRADE — worded below to make
+    # that overlap explicit rather than implying the counts are additive.
+    sideways_count = sum(1 for r in rows if r.get("market_regime") == "SIDEWAYS")
+
+    # Rejection Summary — built ENTIRELY from fields already computed
+    # and stored in the report (BuyTier1Passed, Tier4Block). No new
+    # thresholds, no new filters, no new scoring — just categorizing
+    # text/flags that already exist.
+    no_trade_rows = [r for r in rows if r["Signal"] == "NO_TRADE"]
+    trend_filter_count = sum(1 for r in no_trade_rows if r.get("BuyTier1Passed") == "False")
+    risk_count = 0
+    liquidity_count = 0
+    portfolio_rules_count = 0
+    score_threshold_count = 0
+    for r in no_trade_rows:
+        block = (r.get("Tier4Block") or "").lower()
+        if not block:
+            continue
+        if "risk" in block or "unsafe" in block or "nan" in block or "circuit" in block:
+            risk_count += 1
+        elif "volume" in block or "liquidity" in block:
+            liquidity_count += 1
+        elif "exposure" in block or "capital" in block or "position" in block or "reserve" in block:
+            portfolio_rules_count += 1
+        elif "decision engine rejected" in block:
+            # Trend/Tier-1 passed but the combined BUY/SELL score itself
+            # was below the qualifying threshold — this IS the most
+            # common NO_TRADE reason and was previously falling through
+            # every bucket uncounted (matched none of the keywords
+            # above). Same existing Tier4Block text, just now recognized.
+            score_threshold_count += 1
+
+    summary_lines = [
+        f"Daily Scan completed — {len(rows)} symbols scanned.",
+        f"BUY: {buy_count} | SELL: {sell_count} | NO_TRADE: {no_trade_count}"
+        + (f" (of which {sideways_count} in SIDEWAYS regime)" if sideways_count else ""),
+    ]
+    if trend_filter_count or risk_count or liquidity_count or portfolio_rules_count or score_threshold_count:
+        summary_lines.append("")
+        summary_lines.append("Rejection Summary (NO_TRADE breakdown)")
+        if trend_filter_count:
+            summary_lines.append(f"Trend Filter: {trend_filter_count}")
+        if score_threshold_count:
+            summary_lines.append(f"Score Threshold: {score_threshold_count}")
+        if risk_count:
+            summary_lines.append(f"Risk: {risk_count}")
+        if liquidity_count:
+            summary_lines.append(f"Liquidity: {liquidity_count}")
+        if portfolio_rules_count:
+            summary_lines.append(f"Portfolio Rules: {portfolio_rules_count}")
+
+    notify(
+        event_type="daily_scan_completed",
+        message="\n".join(summary_lines),
+        dedup_key=f"scan_completed::{time.strftime('%Y-%m-%d')}",
+    )
+
+
+if __name__ == "__main__":
+    main()
