@@ -1,6 +1,8 @@
 {
   "2026-07-20": [
     "scan_started::2026-07-20",
-    "scan_completed::2026-07-20"
+    "scan_completed::2026-07-20",
+    "portfolio_summary::2026-07-20",
+    "analysis_summary::2026-07-20"
   ]
 }
