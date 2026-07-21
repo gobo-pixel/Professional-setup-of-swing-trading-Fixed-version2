@@ -13,10 +13,10 @@ This replaces scattered portfolio dict usage.
 
 from __future__ import annotations
 
+import math
+import time
 from dataclasses import dataclass, field
 from typing import Any
-
-import time
 
 from core.logger import get_logger
 
@@ -330,9 +330,18 @@ class PortfolioEngine:
 
             total_unrealized_percent += pos.unrealized_pnl_percent
 
-        self.state.total_pnl = (
-            sum(p.realized_pnl for p in self.state.closed_positions) + total_unrealized
-        )
+        # NaN-safe: a historical closed position with an unrecoverable
+        # (NaN) realized_pnl must not poison this SUM forever — exclude
+        # it from the total rather than letting a single old corrupted
+        # record propagate NaN through every future day's total_pnl.
+        # The corrupted record itself is left untouched (not fabricated
+        # or zeroed) — it's simply excluded from this aggregate, the
+        # same way a NULL is excluded from a SQL SUM().
+        known_realized_pnl = [
+            p.realized_pnl for p in self.state.closed_positions
+            if not (isinstance(p.realized_pnl, float) and math.isnan(p.realized_pnl))
+        ]
+        self.state.total_pnl = sum(known_realized_pnl) + total_unrealized
 
         self.state.total_pnl_percent = (
             self.state.total_pnl / max(self.state.total_capital, 1e-9)
