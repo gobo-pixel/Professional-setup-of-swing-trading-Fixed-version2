@@ -29,8 +29,8 @@
       "entry_price": 401.3,
       "current_price": 401.3,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 401.3,
       "lowest_price": 401.3,
@@ -237,8 +237,8 @@
       "entry_price": 281.95,
       "current_price": 281.95,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 281.95,
       "lowest_price": 281.95,
@@ -471,5 +471,5 @@
     "ICICIBANK.NS": "Financial Services",
     "ZEEL.NS": "Communication Services"
   },
-  "saved_at": 1784616531.5761242
+  "saved_at": 1784661974.919913
 }
