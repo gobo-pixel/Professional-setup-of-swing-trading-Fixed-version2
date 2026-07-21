@@ -1,0 +1,16 @@
+{
+  "symbol": "ANTHEM.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 31,
+  "entry_price": 787.65,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 73.31,
+  "reasons": "",
+  "id": "trade_1784616527054",
+  "timestamp": 1784616527.0542004
+}

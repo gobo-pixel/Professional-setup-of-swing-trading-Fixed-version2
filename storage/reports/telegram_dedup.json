@@ -1,14 +1,26 @@
 {
-  "2026-07-20": [
-    "scan_started::2026-07-20",
-    "scan_completed::2026-07-20",
-    "portfolio_summary::2026-07-20",
-    "analysis_summary::2026-07-20",
-    "mi_summary_empty::2026-07-20 17:50:29.513592",
-    "mi_summary_empty::2026-07-20 18:52:15.863832",
-    "mi_summary_empty::2026-07-20 20:58:50.494224",
-    "mi_summary_empty::2026-07-20 22:22:39.452128",
-    "mi_summary_empty::2026-07-21 00:42:13.038717",
-    "mi_summary_empty::2026-07-21 02:19:56.044323"
+  "2026-07-21": [
+    "trade_opened::GABRIEL.NS::2026-07-21",
+    "trade_opened::EMAMILTD.NS::2026-07-21",
+    "trade_opened::TATATECH.NS::2026-07-21",
+    "trade_opened::ZYDUSWELL.NS::2026-07-21",
+    "trade_opened::FEDERALBNK.NS::2026-07-21",
+    "trade_opened::CHENNPETRO.NS::2026-07-21",
+    "trade_opened::HSCL.NS::2026-07-21",
+    "trade_opened::LAURUSLABS.NS::2026-07-21",
+    "trade_opened::EXIDEIND.NS::2026-07-21",
+    "trade_opened::BIOCON.NS::2026-07-21",
+    "trade_opened::WELCORP.NS::2026-07-21",
+    "trade_opened::SONACOMS.NS::2026-07-21",
+    "trade_opened::ANTHEM.NS::2026-07-21",
+    "trade_opened::UNIONBANK.NS::2026-07-21",
+    "trade_opened::ITI.NS::2026-07-21",
+    "trade_opened::SBIN.NS::2026-07-21",
+    "trade_opened::ZYDUSLIFE.NS::2026-07-21",
+    "trade_opened::ADANIENSOL.NS::2026-07-21",
+    "trade_opened::ICICIBANK.NS::2026-07-21",
+    "trade_opened::ZEEL.NS::2026-07-21",
+    "portfolio_summary::2026-07-21",
+    "analysis_summary::2026-07-21"
   ]
 }

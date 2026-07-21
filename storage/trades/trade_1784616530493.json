@@ -1,0 +1,16 @@
+{
+  "symbol": "ICICIBANK.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 32,
+  "entry_price": 1465.4,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.28,
+  "reasons": "",
+  "id": "trade_1784616530493",
+  "timestamp": 1784616530.4939106
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "EMAMILTD.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 65,
+  "entry_price": 401.3,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 72.56,
+  "reasons": "",
+  "id": "trade_1784616521012",
+  "timestamp": 1784616521.0120986
+}

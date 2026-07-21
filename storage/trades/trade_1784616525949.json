@@ -1,0 +1,16 @@
+{
+  "symbol": "WELCORP.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 14,
+  "entry_price": 1634.1,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.18,
+  "reasons": "",
+  "id": "trade_1784616525949",
+  "timestamp": 1784616525.9499187
+}
