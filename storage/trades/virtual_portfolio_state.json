@@ -1,6 +1,6 @@
 {
-  "total_capital": 200000.0,
-  "available_capital": NaN,
+  "total_capital": 500000.0,
+  "available_capital": 500000.0,
   "used_capital": 0.0,
   "total_pnl": NaN,
   "total_pnl_percent": NaN,
