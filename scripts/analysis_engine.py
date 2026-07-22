@@ -52,14 +52,27 @@ def main() -> None:
     logger.info("Analysis summary written to %s", OUTPUT_PATH)
 
     signal_counts = result.get("signal_counts", {})
+    sell_gap = result.get("sell_signal_vs_opened", {})
+    message_lines = [
+        f"Analysis Summary — {result.get('total_scans', 0)} scans analyzed.",
+        f"BUY: {signal_counts.get('BUY', 0)} | SELL: {signal_counts.get('SELL', 0)} | "
+        f"NO_TRADE: {signal_counts.get('NO_TRADE', 0)}",
+        f"Tier-1 pass rate: {result.get('tier1_pass_rate', {})}",
+    ]
+    if sell_gap.get("sell_signals", 0) > 0 and sell_gap.get("gap", 0) > 0:
+        message_lines.append("")
+        message_lines.append(f"SELL Signals: {sell_gap['sell_signals']}")
+        message_lines.append(f"SELL Trades Opened: {sell_gap['sell_trades_opened']}")
+        message_lines.append("Reason:")
+        if sell_gap.get("gap_reasons"):
+            for reason, count in sell_gap["gap_reasons"].items():
+                message_lines.append(f"  {reason} ({count})")
+        else:
+            message_lines.append("  All SELL candidates failed final portfolio/risk validation.")
+
     notify(
         event_type="analysis_summary",
-        message=(
-            f"Analysis Summary — {result.get('total_scans', 0)} scans analyzed.\n"
-            f"BUY: {signal_counts.get('BUY', 0)} | SELL: {signal_counts.get('SELL', 0)} | "
-            f"NO_TRADE: {signal_counts.get('NO_TRADE', 0)}\n"
-            f"Tier-1 pass rate: {result.get('tier1_pass_rate', {})}"
-        ),
+        message="\n".join(message_lines),
         dedup_key=f"analysis_summary::{time.strftime('%Y-%m-%d')}",
     )
 
