@@ -20,6 +20,14 @@
   "no_trade_stats": {
     "count": 2340
   },
+  "sell_signal_vs_opened": {
+    "sell_signals": 12,
+    "sell_trades_opened": 0,
+    "gap": 12,
+    "gap_reasons": {
+      "Insufficient historical candles.": 11
+    }
+  },
   "tier1_pass_rate": {
     "buy": 10.71,
     "sell": 8.06
