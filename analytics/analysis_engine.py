@@ -17,9 +17,12 @@ Usage:
 from __future__ import annotations
 
 import csv
+import time
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
+
+from core.trading_calendar import now_ist
 
 
 class AnalysisEngine:
@@ -45,6 +48,26 @@ class AnalysisEngine:
         except ValueError:
             return default
 
+    @staticmethod
+    def _count_opened_today(direction: str, trade_journal_path: str = "storage/trades/trades_master.csv") -> int:
+        path = Path(trade_journal_path)
+        if not path.exists():
+            return 0
+        today_str = now_ist().strftime("%Y-%m-%d")
+        count = 0
+        with open(path, newline="") as f:
+            for row in csv.DictReader(f):
+                if row.get("action") != "OPEN" or row.get("direction") != direction:
+                    continue
+                try:
+                    ts = float(row.get("timestamp", 0))
+                except ValueError:
+                    continue
+                row_date = time.strftime("%Y-%m-%d", time.gmtime(ts + 5.5 * 3600))  # UTC -> IST
+                if row_date == today_str:
+                    count += 1
+        return count
+
     def analyze(self) -> dict[str, Any]:
         rows = self.rows
         if not rows:
@@ -69,6 +92,24 @@ class AnalysisEngine:
 
         no_trade_rows = [r for r in rows if r.get("Signal") == "NO_TRADE"]
         report["no_trade_stats"] = {"count": len(no_trade_rows)}
+
+        # ---------------- SELL Signals vs SELL Trades Opened ----------------
+        # Uses the ALREADY-EXISTING trade journal (trades_master.csv) and
+        # the ALREADY-EXISTING Tier4Block rejection text — no new storage,
+        # no new calculation, just cross-referencing two existing sources.
+        sell_signal_rows = [r for r in rows if r.get("Signal") == "SELL"]
+        opened_sell_today = self._count_opened_today("SELL")
+        gap = len(sell_signal_rows) - opened_sell_today
+        sell_rejection_reasons = Counter(
+            r.get("Tier4Block", "").strip() for r in sell_signal_rows
+            if r.get("Tier4Block", "").strip()
+        )
+        report["sell_signal_vs_opened"] = {
+            "sell_signals": len(sell_signal_rows),
+            "sell_trades_opened": opened_sell_today,
+            "gap": max(gap, 0),
+            "gap_reasons": dict(sell_rejection_reasons.most_common(5)),
+        }
 
         # ---------------- Tier-1 pass rate ----------------
         buy_tier1 = [r.get("BuyTier1Passed") for r in rows if "BuyTier1Passed" in r]
