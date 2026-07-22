@@ -414,7 +414,7 @@ class PaperTradingEngine:
         opened_ts = self._fmt_ts(time.time())
 
         lines = [
-            f"🟢 New Virtual Trade Opened",
+            "🟢 New Virtual Trade Opened",
             f"Trade ID: {trade_id}",
             f"Symbol: {candidate.symbol}",
             f"Signal: {action}",
@@ -424,8 +424,8 @@ class PaperTradingEngine:
             f"Confidence: {candidate.confidence:.1f}%",
             "",
             f"📅 Expected Holding: ~{expected_hold_days} days",
-            f"🎯 " + target_block("Target 1 (Partial)", target1)[0],
-            f"🎯 " + target_block("Target 2 (Final)", target2)[0],
+            "🎯 " + target_block("Target 1 (Partial)", target1)[0],
+            "🎯 " + target_block("Target 2 (Final)", target2)[0],
             f"🛑 Expected Stop Loss: -{stop_pct:.1f}%",
         ]
         lines += margin_lines
@@ -448,8 +448,8 @@ class PaperTradingEngine:
             "",
             "Lifecycle",
             f"Opened: {opened_ts}",
-            f"Holding: 0 Days",
-            f"Status: ACTIVE",
+            "Holding: 0 Days",
+            "Status: ACTIVE",
         ]
 
         return "\n".join(lines)
@@ -502,7 +502,7 @@ class PaperTradingEngine:
             "Lifecycle",
             f"Opened: {self._fmt_ts(created_at)}",
             f"Holding: {holding_days} Days",
-            f"Status: ACTIVE",
+            "Status: ACTIVE",
         ]
         return "\n".join(lines)
 
