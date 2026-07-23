@@ -81,6 +81,36 @@ class PaperTradingEngine:
         opened_today: list[dict[str, Any]] = []
         closed_today: list[dict[str, Any]] = []
         monitored: list[dict[str, Any]] = []
+        monitoring_errors: list[str] = []
+        # Severity-based exception handling (not blanket continue):
+        # Data Fetch / Evaluation -> recoverable, skip this symbol only.
+        # Exit Logic -> recoverable but flagged for manual review (a
+        #   broken exit-evaluation on a held position is not fatal today,
+        #   but must not be silently treated as routine).
+        # Portfolio Update / State Persistence -> NON-recoverable: a
+        #   partial state mutation (position removed from open_positions
+        #   but diary/trade_store write failed, or the final save()
+        #   itself failing) risks silent data corruption if we just keep
+        #   going. These abort the remaining cycle instead of continuing.
+        cycle_aborted = False
+        cycle_abort_reason: str | None = None
+        holding_status_rows: list[dict[str, Any]] = []
+
+        snap_at_start = self.portfolio.snapshot()
+        notify(
+            event_type="paper_trading_started",
+            message=(
+                f"🚀 Paper Trading Started\n"
+                f"Date: {today}\n"
+                f"Time: {now_ist().strftime('%H:%M:%S')} IST\n"
+                f"Portfolio Value: {snap_at_start.get('portfolio_value', 0):.2f}\n"
+                f"Cash Balance: {snap_at_start.get('available_capital', 0):.2f}\n"
+                f"Open Positions: {len(open_symbols)}\n"
+                f"Maximum Positions: {market_state['max_trade_candidates']}\n"
+                f"Status: Evaluating executable trades..."
+            ),
+            dedup_key=f"paper_trading_started::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+        )
 
         # --------------------------------------------------
         # 1. MONITOR EXISTING OPEN POSITIONS FIRST
@@ -104,7 +134,11 @@ class PaperTradingEngine:
                 broker_status=broker_status, market_state=market_state,
             )
             if result.action == "ERROR":
-                logger.warning("Monitoring scan failed for %s: %s", symbol, result.diagnostics.get("error"))
+                stage = result.diagnostics.get("error_stage", "Data Fetch / Evaluation")
+                err_type = result.diagnostics.get("error_type", "UnknownError")
+                err_msg = result.diagnostics.get("error", "unknown error")
+                logger.warning("Monitoring scan failed for %s [%s]: %s: %s", symbol, stage, err_type, err_msg)
+                monitoring_errors.append(f"{symbol} [{stage}] {err_type}: {err_msg}")
                 continue
 
             self.portfolio.register_sector(symbol, result.diagnostics.get("sector"))
@@ -128,9 +162,30 @@ class PaperTradingEngine:
                     "Latest close price is NaN/invalid for %s; skipping this "
                     "monitoring cycle (will retry next run).", symbol,
                 )
+                monitoring_errors.append(f"{symbol} [Data Fetch] InvalidPriceError: NaN/invalid close price")
                 continue
 
-            self.portfolio.engine.update_position(symbol=symbol, current_price=current_price)
+            try:
+                self.portfolio.engine.update_position(symbol=symbol, current_price=current_price)
+            except Exception as exc:
+                logger.exception("Portfolio Update stage failed for %s — NON-RECOVERABLE, aborting cycle", symbol)
+                err_line = f"{symbol} [Portfolio Update] {type(exc).__name__}: {exc}"
+                monitoring_errors.append(err_line)
+                notify(
+                    event_type="cycle_aborted",
+                    message=(
+                        f"🔴 Paper Trading Cycle ABORTED — Non-Recoverable Failure\n"
+                        f"{err_line}\n\n"
+                        f"Portfolio state mutation failed mid-cycle. Remaining symbols "
+                        f"this cycle were NOT monitored, to avoid risking a partially "
+                        f"corrupted state. Already-completed changes will still be saved."
+                    ),
+                    severity="🔴 CRITICAL",
+                    dedup_key=f"cycle_aborted::{symbol}::{today}",
+                )
+                cycle_aborted = True
+                cycle_abort_reason = err_line
+                break
             pos = self.portfolio.engine.state.open_positions[symbol]  # refreshed
 
             trade_id = self._find_open_trade_id(symbol)
@@ -143,6 +198,7 @@ class PaperTradingEngine:
 
             if dataframe is None:
                 logger.warning("No dataframe available to evaluate exit for %s; holding by default.", symbol)
+                monitoring_errors.append(f"{symbol} [Data Fetch] MissingDataError: no market data available")
                 continue
 
             position_input = {
@@ -153,24 +209,94 @@ class PaperTradingEngine:
                 "stop_loss": result.diagnostics.get("stop_loss"),
                 "max_drawdown_percent": pos.max_drawdown_percent,
             }
-            exit_eval = self.exit_engine.evaluate(
-                dataframe=dataframe, fundamentals=fundamentals, news_score=news_score,
-                position=position_input, risk_safe=result.diagnostics.get("risk_safe", True),
-                holding_days=holding_days,
-            )
+            try:
+                exit_eval = self.exit_engine.evaluate(
+                    dataframe=dataframe, fundamentals=fundamentals, news_score=news_score,
+                    position=position_input, risk_safe=result.diagnostics.get("risk_safe", True),
+                    holding_days=holding_days,
+                )
+            except Exception as exc:
+                logger.exception("Exit Logic stage failed for %s — REVIEW REQUIRED", symbol)
+                err_line = f"{symbol} [Exit Logic] {type(exc).__name__}: {exc}"
+                monitoring_errors.append(err_line)
+                notify(
+                    event_type="exit_logic_review_required",
+                    message=(
+                        f"🟠 REVIEW REQUIRED — Exit Evaluation Failed\n"
+                        f"{err_line}\n\n"
+                        f"This position's exit decision could NOT be computed today. "
+                        f"It remains open and unmonitored for exit conditions until "
+                        f"the next successful cycle — please review manually if this "
+                        f"repeats."
+                    ),
+                    severity="🟠 HIGH",
+                    dedup_key=f"exit_logic_review::{symbol}::{today}",
+                )
+                continue
 
             if trade_id is None:
                 logger.warning("No open diary entry found for %s; skipping diary update.", symbol)
+                monitoring_errors.append(f"{symbol} [Portfolio Update] MissingDiaryEntryError: no matching diary entry found")
                 continue
-            self.diary.add_daily_log(
-                trade_id=trade_id, date=today, current_price=current_price,
-                current_pnl=pos.unrealized_pnl,
-                current_buy_confidence=result.diagnostics.get("buy_decision_confidence", 0.0),
-                current_sell_confidence=result.diagnostics.get("sell_decision_confidence", 0.0),
-                exit_score=exit_eval.exit_score, recommendation=exit_eval.action,
-                notes=exit_eval.reasons,
-            )
+            try:
+                self.diary.add_daily_log(
+                    trade_id=trade_id, date=today, current_price=current_price,
+                    current_pnl=pos.unrealized_pnl,
+                    current_buy_confidence=result.diagnostics.get("buy_decision_confidence", 0.0),
+                    current_sell_confidence=result.diagnostics.get("sell_decision_confidence", 0.0),
+                    exit_score=exit_eval.exit_score, recommendation=exit_eval.action,
+                    notes=exit_eval.reasons,
+                )
+            except Exception as exc:
+                logger.exception("Portfolio Update stage (diary) failed for %s — NON-RECOVERABLE, aborting cycle", symbol)
+                err_line = f"{symbol} [Portfolio Update] {type(exc).__name__}: {exc}"
+                monitoring_errors.append(err_line)
+                notify(
+                    event_type="cycle_aborted",
+                    message=(
+                        f"🔴 Paper Trading Cycle ABORTED — Non-Recoverable Failure\n"
+                        f"{err_line}\n\n"
+                        f"Portfolio and diary are now out of sync for this symbol. "
+                        f"Remaining symbols this cycle were NOT monitored, to avoid "
+                        f"risking further state corruption. Already-completed changes "
+                        f"will still be saved."
+                    ),
+                    severity="🔴 CRITICAL",
+                    dedup_key=f"cycle_aborted::{symbol}::{today}",
+                )
+                cycle_aborted = True
+                cycle_abort_reason = err_line
+                break
             monitored.append({"symbol": symbol, "action": exit_eval.action, "exit_score": exit_eval.exit_score})
+
+            # Holding Status row (item 3) — built entirely from values
+            # already computed above (pos, exit_eval, result.diagnostics).
+            stop_loss_v = result.diagnostics.get("stop_loss", 0.0) or 0.0
+            target1_v = result.diagnostics.get("target1", 0.0) or 0.0
+            target2_v = result.diagnostics.get("target2", 0.0) or 0.0
+            dist_target1 = round((target1_v - current_price) / current_price * 100, 2) if target1_v and current_price else None
+            dist_target2 = round((target2_v - current_price) / current_price * 100, 2) if target2_v and current_price else None
+            dist_stop = round((current_price - stop_loss_v) / current_price * 100, 2) if stop_loss_v and current_price else None
+
+            if exit_eval.action == "EXIT":
+                status_label = "EXIT CANDIDATE"
+            elif dist_target2 is not None and dist_target2 <= 0:
+                status_label = "TARGET 2 REACHED"
+            elif dist_target1 is not None and dist_target1 <= 0:
+                status_label = "TARGET 1 REACHED"
+            elif dist_stop is not None and dist_stop <= 2.0:
+                status_label = "STOP LOSS WARNING"
+            else:
+                status_label = "HOLD"
+
+            holding_status_rows.append({
+                "symbol": symbol, "direction": pos.direction, "holding_days": holding_days,
+                "entry_price": pos.entry_price, "current_price": current_price,
+                "pnl_pct": pos.unrealized_pnl_percent, "pnl_rupees": pos.unrealized_pnl,
+                "highest_pnl": pos.max_profit_percent, "lowest_pnl": -pos.max_drawdown_percent,
+                "dist_target1": dist_target1, "dist_target2": dist_target2, "dist_stop": dist_stop,
+                "status": status_label,
+            })
 
             # "Existing Position Updated" — only notify on a MEANINGFUL
             # change vs the last logged values (prevents spamming every
@@ -202,32 +328,56 @@ class PaperTradingEngine:
                 )
 
             if exit_eval.action == "EXIT":
-                closed = self.portfolio.engine.close_position(symbol=symbol, exit_price=current_price)
-                if closed is not None:
-                    self.trade_store.save_trade({
-                        "symbol": closed.symbol, "direction": closed.direction, "action": "CLOSE",
-                        "quantity": closed.quantity, "entry_price": closed.entry_price,
-                        "exit_price": current_price, "status": "CLOSED",
-                        "realized_pnl": closed.realized_pnl,
-                        "realized_pnl_percent": (
-                            (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
+                closed = None
+                try:
+                    closed = self.portfolio.engine.close_position(symbol=symbol, exit_price=current_price)
+                    if closed is not None:
+                        self.trade_store.save_trade({
+                            "symbol": closed.symbol, "direction": closed.direction, "action": "CLOSE",
+                            "quantity": closed.quantity, "entry_price": closed.entry_price,
+                            "exit_price": current_price, "status": "CLOSED",
+                            "realized_pnl": closed.realized_pnl,
+                            "realized_pnl_percent": (
+                                (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
+                            ),
+                            "max_profit_percent": closed.max_profit_percent,
+                            "max_drawdown_percent": closed.max_drawdown_percent,
+                            "regime": result.diagnostics.get("market_regime", ""),
+                            "confidence": result.confidence,
+                            "reasons": "; ".join(exit_eval.reasons),
+                        })
+                        self.diary.close_trade(
+                            trade_id=trade_id, exit_date=today, exit_price=current_price,
+                            exit_reason=exit_eval.hard_risk_reason or "; ".join(exit_eval.reasons[-1:]),
+                            final_pnl=closed.realized_pnl,
+                            max_profit_percent=closed.max_profit_percent,
+                            max_drawdown_percent=closed.max_drawdown_percent,
+                        )
+                        closed_today.append({"symbol": symbol, "pnl": closed.realized_pnl})
+                        open_symbols.discard(symbol)
+                except Exception as exc:
+                    logger.exception("Portfolio Update stage (close) failed for %s — NON-RECOVERABLE, aborting cycle", symbol)
+                    err_line = f"{symbol} [Portfolio Update] {type(exc).__name__}: {exc}"
+                    monitoring_errors.append(err_line)
+                    notify(
+                        event_type="cycle_aborted",
+                        message=(
+                            f"🔴 Paper Trading Cycle ABORTED — Non-Recoverable Failure\n"
+                            f"{err_line}\n\n"
+                            f"A position close operation failed partway through — the "
+                            f"portfolio/diary/trade journal may now be inconsistent for "
+                            f"this symbol. Remaining symbols this cycle were NOT "
+                            f"monitored, to avoid risking further corruption. "
+                            f"Already-completed changes will still be saved."
                         ),
-                        "max_profit_percent": closed.max_profit_percent,
-                        "max_drawdown_percent": closed.max_drawdown_percent,
-                        "regime": result.diagnostics.get("market_regime", ""),
-                        "confidence": result.confidence,
-                        "reasons": "; ".join(exit_eval.reasons),
-                    })
-                    self.diary.close_trade(
-                        trade_id=trade_id, exit_date=today, exit_price=current_price,
-                        exit_reason=exit_eval.hard_risk_reason or "; ".join(exit_eval.reasons[-1:]),
-                        final_pnl=closed.realized_pnl,
-                        max_profit_percent=closed.max_profit_percent,
-                        max_drawdown_percent=closed.max_drawdown_percent,
+                        severity="🔴 CRITICAL",
+                        dedup_key=f"cycle_aborted::{symbol}::{today}",
                     )
-                    closed_today.append({"symbol": symbol, "pnl": closed.realized_pnl})
-                    open_symbols.discard(symbol)
+                    cycle_aborted = True
+                    cycle_abort_reason = err_line
+                    break
 
+                if closed is not None:
                     closed_at = time.time()
                     pnl_pct = (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
                     notify(
@@ -240,18 +390,90 @@ class PaperTradingEngine:
                         dedup_key=f"trade_closed::{symbol}::{today}",
                     )
 
+        if monitoring_errors:
+            failure_lines = ["⚠️ Monitoring Failures", ""]
+            for err in monitoring_errors:
+                # err format: "SYMBOL [Stage] ExceptionType: message"
+                if "[" in err and "]" in err:
+                    symbol_part, rest = err.split("[", 1)
+                    stage_part, detail_part = rest.split("]", 1)
+                    detail_part = detail_part.strip()
+                    if ":" in detail_part:
+                        exc_type, exc_msg = detail_part.split(":", 1)
+                    else:
+                        exc_type, exc_msg = "UnknownError", detail_part
+                    failure_lines.append(f"{symbol_part.strip()}")
+                    failure_lines.append(f"Stage: {stage_part.strip()}")
+                    failure_lines.append(f"Exception Type: {exc_type.strip()}")
+                    failure_lines.append(f"Exception Message: {exc_msg.strip()}")
+                else:
+                    failure_lines.append(err)
+                failure_lines.append("")
+            notify(
+                event_type="monitoring_failures",
+                message="\n".join(failure_lines).strip(),
+                dedup_key=f"monitoring_failures::{today}",
+            )
+
         self.portfolio.engine.mark_to_market()
+
+        if holding_status_rows:
+            status_lines = ["📋 Holding Status", ""]
+            for r in holding_status_rows:
+                status_lines.append(f"{r['symbol']} ({r['direction']}) — {r['status']}")
+                status_lines.append(f"Holding Days: {r['holding_days']}")
+                status_lines.append(f"Entry: {r['entry_price']} | Current: {r['current_price']}")
+                status_lines.append(f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})")
+                status_lines.append(f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%")
+                if r["dist_target1"] is not None:
+                    status_lines.append(f"Target 1 Progress: {-r['dist_target1']:.2f}% remaining" if r["dist_target1"] > 0 else "Target 1: REACHED")
+                if r["dist_target2"] is not None:
+                    status_lines.append(f"Target 2 Progress: {-r['dist_target2']:.2f}% remaining" if r["dist_target2"] > 0 else "Target 2: REACHED")
+                if r["dist_stop"] is not None:
+                    status_lines.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
+                status_lines.append("")
+            notify(
+                event_type="holding_status",
+                message="\n".join(status_lines).strip(),
+                dedup_key=f"holding_status::{today}",
+            )
 
         # --------------------------------------------------
         # 2. SCAN FOR NEW ENTRIES (skip symbols already open)
+        #    Skipped entirely if a non-recoverable failure aborted the
+        #    monitoring phase above — adding MORE state changes on top
+        #    of a potentially inconsistent portfolio would compound risk.
         # --------------------------------------------------
-        candidate_symbols = [s for s in symbols if s not in open_symbols]
+        candidate_symbols = [s for s in symbols if s not in open_symbols] if not cycle_aborted else []
         if candidate_symbols:
             portfolio_dict = self.portfolio.engine.snapshot()
             candidates = self.scanner.scan_symbols(
                 symbols=candidate_symbols, portfolio=portfolio_dict,
                 broker_status=broker_status, market_state=market_state,
             )
+
+            # Item 2: every BUY/SELL candidate gets a visible outcome —
+            # including ones that did NOT make it into `candidates`
+            # (already-computed, previously-discarded diagnostics).
+            executed_symbols = {c.symbol for c in candidates}
+            not_executed_lines = []
+            for r in self.scanner._last_full_scan_results:
+                if r.action not in ("BUY", "SELL") or r.symbol in executed_symbols:
+                    continue
+                reason = (
+                    r.diagnostics.get("validation_rejection_reason")
+                    or r.diagnostics.get("portfolio_rule_reason")
+                    or ("Risk grade: " + str(r.diagnostics.get("risk_grade")) if not r.diagnostics.get("risk_safe", True) else None)
+                    or "Did not clear final execution checks."
+                )
+                not_executed_lines.append(f"{r.symbol} ({r.action}) — NOT EXECUTED\nReason: {reason}")
+            if not_executed_lines:
+                notify(
+                    event_type="candidates_not_executed",
+                    message="📌 Candidates Not Executed\n\n" + "\n\n".join(not_executed_lines),
+                    dedup_key=f"candidates_not_executed::{today}",
+                )
+
             for candidate in candidates:
                 if not candidate.portfolio_allowed or candidate.position_size <= 0:
                     continue
@@ -298,13 +520,35 @@ class PaperTradingEngine:
                     dedup_key=f"trade_opened::{candidate.symbol}::{today}",
                 )
 
-        self.portfolio.save()
+        try:
+            self.portfolio.save()
+        except Exception as exc:
+            logger.exception("State Persistence stage failed — NON-RECOVERABLE, this cycle's changes may be lost")
+            notify(
+                event_type="cycle_aborted",
+                message=(
+                    f"🔴 STATE PERSISTENCE FAILED — Non-Recoverable\n"
+                    f"Stage: State Persistence\n"
+                    f"Exception Type: {type(exc).__name__}\n"
+                    f"Exception Message: {exc}\n\n"
+                    f"Today's Opened/Closed/Monitored changes may NOT have been "
+                    f"saved to disk. Do not trust this cycle's summary until "
+                    f"verified manually."
+                ),
+                severity="🔴 CRITICAL",
+                dedup_key=f"state_persistence_failed::{today}",
+            )
+            raise  # do not swallow — let the workflow run itself fail loudly
 
         summary = {
             "date": today,
             "opened_today": opened_today,
             "closed_today": closed_today,
             "monitored": monitored,
+            "monitoring_errors": monitoring_errors,
+            "cycle_aborted": cycle_aborted,
+            "cycle_abort_reason": cycle_abort_reason,
+            "open_positions_at_start": len(open_symbols) + len(closed_today),
             "portfolio_snapshot": self.portfolio.snapshot(),
         }
         logger.info(
