@@ -98,6 +98,7 @@ class PaperTradingEngine:
         closed_details: list[dict[str, Any]] = []
 
         snap_at_start = self.portfolio.snapshot()
+        return_pct = snap_at_start.get("portfolio_return_percent", 0.0)
         notify(
             event_type="paper_trading_started",
             message=(
@@ -106,6 +107,7 @@ class PaperTradingEngine:
                 f"Time: {now_ist().strftime('%H:%M:%S')} IST\n"
                 f"Portfolio Value: {snap_at_start.get('portfolio_value', 0):.2f}\n"
                 f"Cash Balance: {snap_at_start.get('available_capital', 0):.2f}\n"
+                f"Overall Return: {'+' if return_pct >= 0 else ''}{return_pct:.2f}%\n"
                 f"Open Positions: {len(open_symbols)}\n"
                 f"Maximum Positions: {market_state['max_trade_candidates']}\n"
                 f"Status: Evaluating executable trades..."
