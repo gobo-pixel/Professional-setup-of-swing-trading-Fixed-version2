@@ -619,6 +619,7 @@ class MarketScanner:
                 portfolio=monitoring_portfolio,
                 broker_status=broker_status,
                 market_state=market_state,
+                skip_position_count=True,
             )
             diagnostics["validation_passed"] = validation.passed
             diagnostics["validation_action"] = validation.action
