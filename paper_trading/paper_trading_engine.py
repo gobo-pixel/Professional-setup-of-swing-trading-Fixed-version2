@@ -95,6 +95,7 @@ class PaperTradingEngine:
         cycle_aborted = False
         cycle_abort_reason: str | None = None
         holding_status_rows: list[dict[str, Any]] = []
+        closed_details: list[dict[str, Any]] = []
 
         snap_at_start = self.portfolio.snapshot()
         notify(
@@ -321,16 +322,10 @@ class PaperTradingEngine:
                 position_status = "EXIT" if exit_eval.action == "EXIT" else (
                     "REVIEW" if exit_eval.exit_score >= exit_eval.threshold * 0.7 else "HOLD"
                 )
-                notify(
-                    event_type="position_updated",
-                    message=self._format_position_update(
-                        symbol, pos, holding_days, new_buy_conf, new_sell_conf,
-                        exit_eval, position_status, result.diagnostics,
-                        trade_id, diary_record.get("created_at") if diary_record else None,
-                    ),
-                    severity=severity_from_magnitude(exit_eval.exit_score / 100.0),
-                    dedup_key=f"position_updated::{symbol}::{today}",
-                )
+                # NOTE: no longer sent as an individual Telegram message
+                # (was causing 1 message per position per day — see the
+                # consolidated "Paper Trading Summary" at the end of this
+                # cycle instead, which reflects every meaningful change).
 
             if exit_eval.action == "EXIT":
                 closed = None
@@ -342,9 +337,7 @@ class PaperTradingEngine:
                             "quantity": closed.quantity, "entry_price": closed.entry_price,
                             "exit_price": current_price, "status": "CLOSED",
                             "realized_pnl": closed.realized_pnl,
-                            "realized_pnl_percent": (
-                                (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
-                            ),
+                            "realized_pnl_percent": closed.realized_pnl_percent,
                             "max_profit_percent": closed.max_profit_percent,
                             "max_drawdown_percent": closed.max_drawdown_percent,
                             "regime": result.diagnostics.get("market_regime", ""),
@@ -384,16 +377,14 @@ class PaperTradingEngine:
 
                 if closed is not None:
                     closed_at = time.time()
-                    pnl_pct = (current_price - closed.entry_price) / max(closed.entry_price, 1e-9) * 100
-                    notify(
-                        event_type="trade_closed",
-                        message=self._format_trade_closed(
-                            symbol, closed, current_price, pnl_pct, holding_days, exit_eval,
-                            trade_id, diary_record.get("created_at") if diary_record else None, closed_at,
-                        ),
-                        severity=severity_from_magnitude(min(abs(pnl_pct) / 10.0, 1.0)),
-                        dedup_key=f"trade_closed::{symbol}::{today}",
-                    )
+                    pnl_pct = closed.realized_pnl_percent
+                    trigger = self._classify_exit_trigger(exit_eval)
+                    closed_details.append({
+                        "symbol": symbol, "direction": closed.direction,
+                        "pnl_pct": pnl_pct, "pnl_rupees": closed.realized_pnl,
+                        "trigger": trigger, "holding_days": holding_days,
+                        "trade_id": trade_id,
+                    })
 
         total_positions = len(open_symbols) + len(closed_today)
         if total_positions > 0:
@@ -420,15 +411,36 @@ class PaperTradingEngine:
                 g = groups.setdefault(key, {"type": exc_type, "stage": stage_part.strip() if "[" in err else "N/A", "symbols": [], "reason": exc_msg})
                 g["symbols"].append(symbol_part.strip().split(".")[0])
 
+            holding_count = successful_count - len(closed_details)
             summary_lines = [
-                "📊 Monitoring Summary",
-                f"{total_positions} Positions",
-                "",
-                "Successful",
-                f"{successful_count}",
-                "Failed",
-                f"{failed_count}",
+                "📊 Paper Trading Summary",
+                f"{total_positions} Positions Evaluated",
+                f"{len(closed_details)} Closed",
+                f"{max(holding_count, 0)} Holding",
             ]
+            if failed_count:
+                summary_lines.append(f"{failed_count} Failed")
+
+            if closed_details:
+                short_trigger = {
+                    "Stop Loss Hit": "Stop Loss",
+                    "Risk Management Exit": "Risk Exit",
+                    "Time-Based Exit": "Time Exit",
+                    "Momentum Weakened": "Momentum Exit",
+                    "Fundamentals Weakened": "Fundamentals Exit",
+                    "Negative News": "News Exit",
+                    "Trend Reversal": "Trend Exit",
+                }
+                summary_lines.append("-" * 16)
+                summary_lines.append("Closed")
+                for c in closed_details:
+                    summary_lines.append("-" * 14)
+                    tag = f"{c['symbol'].split('.')[0]}" + (" SELL" if c["direction"] == "SELL" else "")
+                    summary_lines.append(tag)
+                    sign = "+" if c["pnl_pct"] >= 0 else ""
+                    summary_lines.append(f"{sign}{c['pnl_pct']:.2f}%")
+                    summary_lines.append(short_trigger.get(c["trigger"], c["trigger"]))
+
             if groups:
                 summary_lines.append("")
                 summary_lines.append("Failure Breakdown")
@@ -460,9 +472,15 @@ class PaperTradingEngine:
                 status_lines.append(f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})")
                 status_lines.append(f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%")
                 if r["dist_target1"] is not None:
-                    status_lines.append(f"Target 1 Progress: {-r['dist_target1']:.2f}% remaining" if r["dist_target1"] > 0 else "Target 1: REACHED")
+                    if r["dist_target1"] > 0:
+                        status_lines.append(f"Target 1 Progress: {-r['dist_target1']:.2f}% remaining")
+                    else:
+                        status_lines.append(f"Target 1: REACHED ({abs(r['dist_target1']):.2f}% Beyond)")
                 if r["dist_target2"] is not None:
-                    status_lines.append(f"Target 2 Progress: {-r['dist_target2']:.2f}% remaining" if r["dist_target2"] > 0 else "Target 2: REACHED")
+                    if r["dist_target2"] > 0:
+                        status_lines.append(f"Target 2 Progress: {-r['dist_target2']:.2f}% remaining")
+                    else:
+                        status_lines.append(f"Target 2: REACHED ({abs(r['dist_target2']):.2f}% Beyond)")
                 if r["dist_stop"] is not None:
                     status_lines.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
                 status_lines.append(f"Probability: {r['probability']:.1f}%")
