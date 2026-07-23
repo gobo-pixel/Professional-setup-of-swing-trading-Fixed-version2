@@ -1,0 +1,18 @@
+{
+  "symbol": "ZYDUSWELL.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 43,
+  "entry_price": 599.7,
+  "exit_price": 571.8,
+  "status": "CLOSED",
+  "realized_pnl": -1199.700000000004,
+  "realized_pnl_percent": -4.652326163081556,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 4.652326163081556,
+  "regime": "BULL",
+  "confidence": 57.52,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784841362706",
+  "timestamp": 1784841362.7062457
+}

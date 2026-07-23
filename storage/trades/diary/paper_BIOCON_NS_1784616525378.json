@@ -71,15 +71,28 @@
     "Expected Hold : 10 days",
     "Trade Grade : B"
   ],
-  "daily_log": [],
-  "status": "OPEN",
-  "exit_date": null,
-  "exit_price": null,
-  "exit_reason": null,
-  "holding_days": 0,
+  "daily_log": [
+    {
+      "date": "2026-07-23",
+      "current_price": 437.95,
+      "current_pnl": -197.64999999999924,
+      "current_buy_confidence": 64.33,
+      "current_sell_confidence": 26.12,
+      "current_exit_score": 12.51,
+      "recommendation": "EXIT",
+      "notes": [
+        "HARD RISK EXIT: Risk engine flagged this symbol as unsafe."
+      ]
+    }
+  ],
+  "status": "CLOSED",
+  "exit_date": "2026-07-23",
+  "exit_price": 437.95,
+  "exit_reason": "Risk engine flagged this symbol as unsafe.",
+  "holding_days": 1,
   "max_profit_percent": 0.0,
-  "max_drawdown_percent": 0.0,
-  "final_pnl": null,
+  "max_drawdown_percent": 0.6690859605352663,
+  "final_pnl": -197.64999999999924,
   "created_at": 1784616525.3780415,
-  "updated_at": 1784616525.3780422
+  "updated_at": 1784841386.1103654
 }

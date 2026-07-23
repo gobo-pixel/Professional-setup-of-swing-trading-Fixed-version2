@@ -1,0 +1,18 @@
+{
+  "symbol": "SBIN.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 43,
+  "entry_price": 1051.3,
+  "exit_price": 1025.0,
+  "status": "CLOSED",
+  "realized_pnl": -1130.899999999998,
+  "realized_pnl_percent": -2.5016646057262397,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 2.5016646057262397,
+  "regime": "SIDEWAYS",
+  "confidence": 49.13,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; Technical trend reversing against the BUY position (60/100).",
+  "id": "trade_1784841378142",
+  "timestamp": 1784841378.1426728
+}

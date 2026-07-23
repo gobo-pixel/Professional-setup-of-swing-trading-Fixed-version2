@@ -1,0 +1,18 @@
+{
+  "symbol": "UNIONBANK.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 155,
+  "entry_price": 176.62,
+  "exit_price": 170.64,
+  "status": "CLOSED",
+  "realized_pnl": -926.9000000000028,
+  "realized_pnl_percent": -3.385800022647502,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 3.385800022647502,
+  "regime": "BULL",
+  "confidence": 66.68,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; Fundamentals have deteriorated for this BUY position (64/100).",
+  "id": "trade_1784841370624",
+  "timestamp": 1784841370.6249042
+}

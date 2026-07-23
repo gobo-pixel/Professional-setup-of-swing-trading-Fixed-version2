@@ -1,0 +1,18 @@
+{
+  "symbol": "ADANIENSOL.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 15,
+  "entry_price": 1735.0,
+  "exit_price": 1724.4,
+  "status": "CLOSED",
+  "realized_pnl": -158.99999999999864,
+  "realized_pnl_percent": -0.6109510086455279,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 0.6109510086455279,
+  "regime": "BULL",
+  "confidence": 72.26,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784841375458",
+  "timestamp": 1784841375.4581177
+}

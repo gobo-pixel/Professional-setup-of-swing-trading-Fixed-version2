@@ -1,0 +1,18 @@
+{
+  "symbol": "HSCL.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 39,
+  "entry_price": 788.45,
+  "exit_price": 768.25,
+  "status": "CLOSED",
+  "realized_pnl": -787.8000000000018,
+  "realized_pnl_percent": -2.561988712029938,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 2.561988712029938,
+  "regime": "BULL",
+  "confidence": 77.22,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784841395839",
+  "timestamp": 1784841395.8392754
+}

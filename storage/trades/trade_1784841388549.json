@@ -1,0 +1,18 @@
+{
+  "symbol": "TATATECH.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 34,
+  "entry_price": 741.05,
+  "exit_price": 712.45,
+  "status": "CLOSED",
+  "realized_pnl": -972.3999999999969,
+  "realized_pnl_percent": -3.8593887052155607,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 3.8593887052155607,
+  "regime": "BULL",
+  "confidence": 53.16,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784841388549",
+  "timestamp": 1784841388.549816
+}

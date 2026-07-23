@@ -1,0 +1,18 @@
+{
+  "symbol": "BIOCON.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 67,
+  "entry_price": 440.9,
+  "exit_price": 437.95,
+  "status": "CLOSED",
+  "realized_pnl": -197.64999999999924,
+  "realized_pnl_percent": -0.6690859605352663,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 0.6690859605352663,
+  "regime": "BULL",
+  "confidence": 71.95,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784841386110",
+  "timestamp": 1784841386.1100738
+}
