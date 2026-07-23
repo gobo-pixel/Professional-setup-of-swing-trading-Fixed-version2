@@ -344,12 +344,29 @@ class PaperTradingEngine:
                             "confidence": result.confidence,
                             "reasons": "; ".join(exit_eval.reasons),
                         })
+                        target1_status = (
+                            "REACHED" if dist_target1 is not None and dist_target1 <= 0
+                            else "NOT REACHED" if dist_target1 is not None else "N/A"
+                        )
+                        target2_status = (
+                            "REACHED" if dist_target2 is not None and dist_target2 <= 0
+                            else "NOT REACHED" if dist_target2 is not None else "N/A"
+                        )
+                        stop_loss_status = (
+                            "HIT" if dist_stop is not None and dist_stop <= 0
+                            else "NOT HIT" if dist_stop is not None else "N/A"
+                        )
                         self.diary.close_trade(
                             trade_id=trade_id, exit_date=today, exit_price=current_price,
                             exit_reason=exit_eval.hard_risk_reason or "; ".join(exit_eval.reasons[-1:]),
                             final_pnl=closed.realized_pnl,
+                            final_pnl_percent=closed.realized_pnl_percent,
                             max_profit_percent=closed.max_profit_percent,
                             max_drawdown_percent=closed.max_drawdown_percent,
+                            exit_score=exit_eval.exit_score,
+                            target1_status=target1_status,
+                            target2_status=target2_status,
+                            stop_loss_status=stop_loss_status,
                         )
                         closed_today.append({"symbol": symbol, "pnl": closed.realized_pnl})
                         open_symbols.discard(symbol)
@@ -381,9 +398,12 @@ class PaperTradingEngine:
                     trigger = self._classify_exit_trigger(exit_eval)
                     closed_details.append({
                         "symbol": symbol, "direction": closed.direction,
+                        "entry_price": closed.entry_price, "exit_price": current_price,
                         "pnl_pct": pnl_pct, "pnl_rupees": closed.realized_pnl,
                         "trigger": trigger, "holding_days": holding_days,
-                        "trade_id": trade_id,
+                        "trade_id": trade_id, "exit_score": exit_eval.exit_score,
+                        "target1_status": target1_status, "target2_status": target2_status,
+                        "stop_loss_status": stop_loss_status,
                     })
 
         total_positions = len(open_symbols) + len(closed_today)
@@ -435,11 +455,7 @@ class PaperTradingEngine:
                 summary_lines.append("Closed")
                 for c in closed_details:
                     summary_lines.append("-" * 14)
-                    tag = f"{c['symbol'].split('.')[0]}" + (" SELL" if c["direction"] == "SELL" else "")
-                    summary_lines.append(tag)
-                    sign = "+" if c["pnl_pct"] >= 0 else ""
-                    summary_lines.append(f"{sign}{c['pnl_pct']:.2f}%")
-                    summary_lines.append(short_trigger.get(c["trigger"], c["trigger"]))
+                    summary_lines.extend(self._render_closed_trade_block(c, short_trigger))
 
             if groups:
                 summary_lines.append("")
@@ -458,6 +474,46 @@ class PaperTradingEngine:
                 message="\n".join(summary_lines).strip(),
                 severity="🔴 CRITICAL" if failed_count == total_positions and total_positions > 0 else "🟢 LOW",
                 dedup_key=f"monitoring_summary::{today}",
+            )
+        else:
+            recent_closed = self.diary.get_closed_trades()
+            # Most-recently-closed first, capped to a reasonable count
+            # so this doesn't grow unbounded over the life of the portfolio.
+            recent_closed = sorted(
+                recent_closed, key=lambda r: r.get("updated_at", 0), reverse=True
+            )[:20]
+
+            lines = [
+                "📊 Paper Trading Summary",
+                "0 Positions Evaluated",
+                "",
+                "No open positions to monitor.",
+            ]
+            if recent_closed:
+                short_trigger = {
+                    "Stop Loss Hit": "Stop Loss", "Risk Management Exit": "Risk Exit",
+                    "Time-Based Exit": "Time Exit", "Momentum Weakened": "Momentum Exit",
+                    "Fundamentals Weakened": "Fundamentals Exit", "Negative News": "News Exit",
+                    "Trend Reversal": "Trend Exit",
+                }
+                lines.append("")
+                lines.append(f"Last {len(recent_closed)} Exit(s)")
+                for rec in recent_closed:
+                    lines.append("-" * 14)
+                    c = {
+                        "symbol": rec.get("symbol", "N/A"), "direction": rec.get("direction", ""),
+                        "entry_price": rec.get("entry_price"), "exit_price": rec.get("exit_price"),
+                        "pnl_pct": rec.get("final_pnl_percent", 0.0), "pnl_rupees": rec.get("final_pnl", 0.0),
+                        "trigger": rec.get("exit_reason", "N/A"), "holding_days": rec.get("holding_days", "N/A"),
+                        "exit_score": rec.get("exit_score"), "target1_status": rec.get("target1_status"),
+                        "target2_status": rec.get("target2_status"), "stop_loss_status": rec.get("stop_loss_status"),
+                    }
+                    lines.extend(self._render_closed_trade_block(c, short_trigger))
+
+            notify(
+                event_type="monitoring_summary",
+                message="\n".join(lines).strip(),
+                dedup_key=f"monitoring_summary_empty::{today}",
             )
 
         self.portfolio.engine.mark_to_market()
@@ -809,6 +865,34 @@ class PaperTradingEngine:
             "Status: ACTIVE",
         ]
         return "\n".join(lines)
+
+    @staticmethod
+    def _render_closed_trade_block(c: dict, short_trigger: dict) -> list[str]:
+        """Full detail lines for one closed trade — Symbol/Direction/
+        Entry/Exit/Return%/PnL/Holding Days/Exit Score/Target1/Target2/
+        StopLoss/Reason. Shared by both the "closed this cycle" section
+        and the "last known exits" (0 open positions) recap."""
+        lines = []
+        tag = f"{c['symbol'].split('.')[0]}" + (" SELL" if c["direction"] == "SELL" else "")
+        lines.append(tag)
+        if c.get("entry_price") is not None:
+            lines.append(f"Entry: {c['entry_price']} -> Exit: {c.get('exit_price', 'N/A')}")
+        sign = "+" if c["pnl_pct"] >= 0 else ""
+        lines.append(f"Return: {sign}{c['pnl_pct']:.2f}%  |  P&L: ₹{c['pnl_rupees']:.2f}")
+        lines.append(f"Holding Days: {c.get('holding_days', 'N/A')}")
+        lines.append(f"Exit Reason: {short_trigger.get(c['trigger'], c['trigger'])}")
+        if c.get("exit_score") is not None:
+            lines.append(f"Exit Score: {c['exit_score']:.1f}/100")
+        t1 = c.get("target1_status")
+        t2 = c.get("target2_status")
+        sl = c.get("stop_loss_status")
+        if t1 and t1 != "N/A":
+            lines.append(f"Target 1: {t1}")
+        if t2 and t2 != "N/A":
+            lines.append(f"Target 2: {t2}")
+        if sl and sl != "N/A":
+            lines.append(f"Stop Loss: {sl}")
+        return lines
 
     @staticmethod
     def _classify_exit_trigger(exit_eval: Any) -> str:
