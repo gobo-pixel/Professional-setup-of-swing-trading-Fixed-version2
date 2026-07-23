@@ -85,7 +85,7 @@ class MarketDataProvider:
         df["symbol"] = symbol
         df["timeframe"] = interval
 
-        return df[
+        df = df[
             [
                 "timestamp",
                 "symbol",
@@ -97,6 +97,35 @@ class MarketDataProvider:
                 "volume",
             ]
         ].copy()
+
+        # ROOT-CAUSE FIX: yfinance can occasionally append an incomplete
+        # placeholder row for the current calendar date before that
+        # day's actual trading data exists on Yahoo's backend (most
+        # common right after a calendar-day rollover, well before NSE
+        # opens for the new session) — its OHLC values come back NaN.
+        # This affects every symbol identically (a data-provider timing
+        # quirk, not a per-symbol data problem), which is exactly what
+        # was observed: all monitored positions failing at once with
+        # the same "NaN/invalid close price" error.
+        #
+        # Trim ONLY trailing rows with NaN OHLC (never historical rows —
+        # a genuine historical gap is a separate, legitimate data-quality
+        # concern already handled by validation elsewhere), falling back
+        # to the last genuinely complete trading session.
+        ohlc_cols = ["open", "high", "low", "close"]
+        trimmed = 0
+        while len(df) > 0 and df.iloc[-1][ohlc_cols].isna().any():
+            df = df.iloc[:-1]
+            trimmed += 1
+        if trimmed:
+            logger.warning(
+                "Trimmed %d trailing incomplete/placeholder row(s) with NaN "
+                "OHLC for %s (kept %d valid rows).", trimmed, symbol, len(df),
+            )
+        if df.empty:
+            raise DataError(f"No valid (non-NaN) OHLC data available for {symbol}")
+
+        return df
 
     def to_schema(self, dataframe: pd.DataFrame) -> list[MarketData]:
         """Convert dataframe into MarketData schema objects."""
