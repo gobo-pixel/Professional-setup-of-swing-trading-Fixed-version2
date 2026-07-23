@@ -128,6 +128,11 @@ class TradeDiary:
         final_pnl: float,
         max_profit_percent: float,
         max_drawdown_percent: float,
+        final_pnl_percent: float = 0.0,
+        exit_score: float = 0.0,
+        target1_status: str = "N/A",
+        target2_status: str = "N/A",
+        stop_loss_status: str = "N/A",
     ) -> None:
         record = self._read(trade_id)
         if record is None:
@@ -138,8 +143,13 @@ class TradeDiary:
         record["exit_price"] = exit_price
         record["exit_reason"] = exit_reason
         record["final_pnl"] = final_pnl
+        record["final_pnl_percent"] = final_pnl_percent
         record["max_profit_percent"] = max_profit_percent
         record["max_drawdown_percent"] = max_drawdown_percent
+        record["exit_score"] = exit_score
+        record["target1_status"] = target1_status
+        record["target2_status"] = target2_status
+        record["stop_loss_status"] = stop_loss_status
         record["updated_at"] = time.time()
 
         self._write(trade_id, record)
