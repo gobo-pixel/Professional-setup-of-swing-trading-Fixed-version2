@@ -92,6 +92,30 @@ def main() -> None:
 
     if ran_cycle:
         snap = summary["portfolio_snapshot"]
+        monitored_count = len(summary["monitored"])
+        opened_at_start = summary.get("open_positions_at_start", 0)
+        errors = summary.get("monitoring_errors", [])
+
+        if summary.get("cycle_aborted"):
+            reason = (
+                f"⚠️ Cycle ABORTED early due to a non-recoverable failure: "
+                f"{summary.get('cycle_abort_reason', 'see Monitoring Failures alert')}. "
+                f"{monitored_count} position(s) were monitored before the abort; "
+                f"remaining positions were skipped this cycle."
+            )
+        elif monitored_count > 0:
+            reason = f"{monitored_count} position(s) successfully evaluated."
+        elif opened_at_start == 0:
+            reason = "No active positions in portfolio."
+        elif errors:
+            reason = (
+                f"Monitoring skipped for all {opened_at_start} open position(s) — "
+                f"evaluation errors: " + "; ".join(errors[:5])
+                + (f" (+{len(errors)-5} more)" if len(errors) > 5 else "")
+            )
+        else:
+            reason = f"{opened_at_start} open position(s) existed, but none produced a valid evaluation this cycle."
+
         notify(
             event_type="daily_portfolio_summary",
             message=(
@@ -101,7 +125,8 @@ def main() -> None:
                 f"({snap.get('portfolio_return_percent', 0):.2f}%)\n"
                 f"Opened: {len(summary['opened_today'])} | "
                 f"Closed: {len(summary['closed_today'])} | "
-                f"Monitored: {len(summary['monitored'])}"
+                f"Monitored: {monitored_count}\n"
+                f"Reason:\n{reason}"
             ),
             dedup_key=f"portfolio_summary::{summary['date']}",
         )
