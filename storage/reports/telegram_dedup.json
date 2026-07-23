@@ -49,6 +49,7 @@
     "position_updated::EMAMILTD.NS::2026-07-23",
     "trade_closed::EMAMILTD.NS::2026-07-23",
     "monitoring_summary::2026-07-23",
-    "holding_status::2026-07-23"
+    "holding_status::2026-07-23",
+    "paper_trading_started::2026-07-23::03:18:28.211012"
   ]
 }
