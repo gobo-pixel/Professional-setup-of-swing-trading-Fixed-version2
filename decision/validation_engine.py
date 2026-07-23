@@ -104,6 +104,7 @@ class ValidationEngine:
         portfolio: dict[str, Any],
         broker_status: dict[str, Any],
         market_state: dict[str, Any],
+        skip_position_count: bool = False,
     ) -> ValidationResult:
 
         checks = {}
@@ -419,11 +420,20 @@ class ValidationEngine:
 
         # --------------------------------------------------
         # MAX POSITIONS
+        # ENTRY-ONLY concept ("is there room to add ONE MORE
+        # position") — meaningless when monitoring an ALREADY-open
+        # position, so evaluate_position() (monitoring) passes
+        # skip_position_count=True. Entry-path callers (scan_symbol /
+        # scan_symbols) never pass this, so their behavior is
+        # completely unchanged.
         # --------------------------------------------------
 
         position_count = len(open_positions)
 
-        checks["max_positions"] = position_count < self.MAX_OPEN_POSITIONS
+        if skip_position_count:
+            checks["max_positions"] = True
+        else:
+            checks["max_positions"] = position_count < self.MAX_OPEN_POSITIONS
 
         if rejection_reason is None and not checks["max_positions"]:
 
