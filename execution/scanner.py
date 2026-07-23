@@ -54,6 +54,7 @@ class MarketScanner:
     """
 
     def __init__(self):
+        self._last_full_scan_results: list = []
         # Professional Standard: Use the actual Data Engine for pipeline management, not a single raw dataclass model
         try:
             from data.data_engine import DataEngine
@@ -585,6 +586,18 @@ class MarketScanner:
 
         try:
             context = self._evaluate_market_context(symbol, bundle=bundle)
+        except Exception as exc:
+            logger.exception("Data Fetch stage failed for %s", symbol)
+            diagnostics["error"] = str(exc)
+            diagnostics["error_type"] = type(exc).__name__
+            diagnostics["error_stage"] = "Data Fetch"
+            return ScanResult(
+                symbol=symbol, action="ERROR", score=0.0, probability=0.0,
+                confidence=0.0, ranking=0.0, position_size=0,
+                portfolio_allowed=False, diagnostics=diagnostics,
+            )
+
+        try:
             dataframe = context["dataframe"]
             final_decision = context["final_decision"]
             diagnostics.update(context["diagnostics"])
@@ -655,8 +668,10 @@ class MarketScanner:
             )
 
         except Exception as exc:
-            logger.exception("Position evaluation error for %s", symbol)
+            logger.exception("Evaluation stage failed for %s", symbol)
             diagnostics["error"] = str(exc)
+            diagnostics["error_type"] = type(exc).__name__
+            diagnostics["error_stage"] = "Evaluation"
             return ScanResult(
                 symbol=symbol,
                 action="ERROR",
@@ -719,6 +734,14 @@ class MarketScanner:
             )
 
         max_trade_candidates = int(market_state.get("max_trade_candidates", 20))
+
+        # Additive only — does NOT change execution behavior. Stashes the
+        # FULL per-symbol result list (including non-executable BUY/SELL
+        # signals and their rejection diagnostics) so callers can report
+        # "why wasn't this candidate executed" without re-scanning or
+        # duplicating any scoring/validation/risk logic.
+        self._last_full_scan_results = results
+
         return executable_results[:max_trade_candidates]
 
     @staticmethod
