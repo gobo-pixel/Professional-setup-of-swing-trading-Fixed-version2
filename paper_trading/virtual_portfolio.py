@@ -131,9 +131,14 @@ class VirtualPortfolio:
         s["portfolio_value"] = s["available_capital"] + sum(
             p.quantity * p.current_price for p in self.engine.state.open_positions.values()
         )
+        # Use the PERSISTED total_capital as the return% baseline — NOT
+        # self.initial_capital (a constructor-only default that is never
+        # synced with the actual state file, so it silently goes stale
+        # whenever total_capital is changed directly in the JSON).
+        baseline_capital = self.engine.state.total_capital
         s["portfolio_return_percent"] = (
-            (s["portfolio_value"] - self.initial_capital) / self.initial_capital * 100
-            if self.initial_capital else 0.0
+            (s["portfolio_value"] - baseline_capital) / baseline_capital * 100
+            if baseline_capital else 0.0
         )
         s["win_rate"] = round(wins / total_closed * 100, 2) if total_closed else None
         s["loss_rate"] = round(losses / total_closed * 100, 2) if total_closed else None
