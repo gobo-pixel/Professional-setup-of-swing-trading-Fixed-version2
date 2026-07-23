@@ -290,11 +290,16 @@ class PaperTradingEngine:
                 status_label = "HOLD"
 
             holding_status_rows.append({
-                "symbol": symbol, "direction": pos.direction, "holding_days": holding_days,
+                "trade_id": trade_id, "symbol": symbol, "direction": pos.direction,
+                "holding_days": holding_days,
+                "entry_date": diary_record.get("entry_date") if diary_record else "N/A",
                 "entry_price": pos.entry_price, "current_price": current_price,
                 "pnl_pct": pos.unrealized_pnl_percent, "pnl_rupees": pos.unrealized_pnl,
                 "highest_pnl": pos.max_profit_percent, "lowest_pnl": -pos.max_drawdown_percent,
                 "dist_target1": dist_target1, "dist_target2": dist_target2, "dist_stop": dist_stop,
+                "probability": result.probability,
+                "buy_confidence": result.diagnostics.get("buy_decision_confidence", 0.0),
+                "sell_confidence": result.diagnostics.get("sell_decision_confidence", 0.0),
                 "status": status_label,
             })
 
@@ -390,10 +395,14 @@ class PaperTradingEngine:
                         dedup_key=f"trade_closed::{symbol}::{today}",
                     )
 
-        if monitoring_errors:
-            failure_lines = ["⚠️ Monitoring Failures", ""]
+        total_positions = len(open_symbols) + len(closed_today)
+        if total_positions > 0:
+            successful_count = len(monitored)
+            failed_count = len(monitoring_errors)
+
+            # Group failures by exception type for the breakdown.
+            groups: dict[str, dict[str, Any]] = {}
             for err in monitoring_errors:
-                # err format: "SYMBOL [Stage] ExceptionType: message"
                 if "[" in err and "]" in err:
                     symbol_part, rest = err.split("[", 1)
                     stage_part, detail_part = rest.split("]", 1)
@@ -402,17 +411,41 @@ class PaperTradingEngine:
                         exc_type, exc_msg = detail_part.split(":", 1)
                     else:
                         exc_type, exc_msg = "UnknownError", detail_part
-                    failure_lines.append(f"{symbol_part.strip()}")
-                    failure_lines.append(f"Stage: {stage_part.strip()}")
-                    failure_lines.append(f"Exception Type: {exc_type.strip()}")
-                    failure_lines.append(f"Exception Message: {exc_msg.strip()}")
+                    exc_type = exc_type.strip()
+                    exc_msg = exc_msg.strip()
                 else:
-                    failure_lines.append(err)
-                failure_lines.append("")
+                    symbol_part, exc_type, exc_msg = err, "UnknownError", err
+
+                key = f"{exc_type}::{stage_part.strip() if '[' in err else ''}"
+                g = groups.setdefault(key, {"type": exc_type, "stage": stage_part.strip() if "[" in err else "N/A", "symbols": [], "reason": exc_msg})
+                g["symbols"].append(symbol_part.strip().split(".")[0])
+
+            summary_lines = [
+                "📊 Monitoring Summary",
+                f"{total_positions} Positions",
+                "",
+                "Successful",
+                f"{successful_count}",
+                "Failed",
+                f"{failed_count}",
+            ]
+            if groups:
+                summary_lines.append("")
+                summary_lines.append("Failure Breakdown")
+                for g in groups.values():
+                    summary_lines.append(f"{g['type']} ({g['stage']})")
+                    summary_lines.append(f"{len(g['symbols'])}")
+                    summary_lines.append("Affected Symbols")
+                    summary_lines.extend(g["symbols"])
+                    summary_lines.append("Reason")
+                    summary_lines.append(g["reason"])
+                    summary_lines.append("")
+
             notify(
-                event_type="monitoring_failures",
-                message="\n".join(failure_lines).strip(),
-                dedup_key=f"monitoring_failures::{today}",
+                event_type="monitoring_summary",
+                message="\n".join(summary_lines).strip(),
+                severity="🔴 CRITICAL" if failed_count == total_positions and total_positions > 0 else "🟢 LOW",
+                dedup_key=f"monitoring_summary::{today}",
             )
 
         self.portfolio.engine.mark_to_market()
@@ -421,7 +454,8 @@ class PaperTradingEngine:
             status_lines = ["📋 Holding Status", ""]
             for r in holding_status_rows:
                 status_lines.append(f"{r['symbol']} ({r['direction']}) — {r['status']}")
-                status_lines.append(f"Holding Days: {r['holding_days']}")
+                status_lines.append(f"Trade ID: {r['trade_id']}")
+                status_lines.append(f"Holding Days: {r['holding_days']} | Entry Date: {r['entry_date']}")
                 status_lines.append(f"Entry: {r['entry_price']} | Current: {r['current_price']}")
                 status_lines.append(f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})")
                 status_lines.append(f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%")
@@ -431,6 +465,8 @@ class PaperTradingEngine:
                     status_lines.append(f"Target 2 Progress: {-r['dist_target2']:.2f}% remaining" if r["dist_target2"] > 0 else "Target 2: REACHED")
                 if r["dist_stop"] is not None:
                     status_lines.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
+                status_lines.append(f"Probability: {r['probability']:.1f}%")
+                status_lines.append(f"BUY Confidence: {r['buy_confidence']:.1f}% | SELL Confidence: {r['sell_confidence']:.1f}%")
                 status_lines.append("")
             notify(
                 event_type="holding_status",
@@ -456,6 +492,7 @@ class PaperTradingEngine:
             # including ones that did NOT make it into `candidates`
             # (already-computed, previously-discarded diagnostics).
             executed_symbols = {c.symbol for c in candidates}
+            available_cash = portfolio_dict.get("available_capital", 0.0)
             not_executed_lines = []
             for r in self.scanner._last_full_scan_results:
                 if r.action not in ("BUY", "SELL") or r.symbol in executed_symbols:
@@ -466,7 +503,12 @@ class PaperTradingEngine:
                     or ("Risk grade: " + str(r.diagnostics.get("risk_grade")) if not r.diagnostics.get("risk_safe", True) else None)
                     or "Did not clear final execution checks."
                 )
-                not_executed_lines.append(f"{r.symbol} ({r.action}) — NOT EXECUTED\nReason: {reason}")
+                price = r.diagnostics.get("latest_close", 0.0) or 0.0
+                required_capital = (r.position_size or 0) * price
+                line = f"{r.symbol} ({r.action}) — NOT EXECUTED\nReason: {reason}"
+                if required_capital > 0:
+                    line += f"\nRequired: ₹{required_capital:,.2f}\nAvailable: ₹{available_cash:,.2f}"
+                not_executed_lines.append(line)
             if not_executed_lines:
                 notify(
                     event_type="candidates_not_executed",
