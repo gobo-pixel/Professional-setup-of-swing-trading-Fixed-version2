@@ -47,6 +47,8 @@ class PortfolioPosition:
 
     realized_pnl: float = 0.0
 
+    realized_pnl_percent: float = 0.0
+
     highest_price: float = 0.0
 
     lowest_price: float = 0.0
@@ -224,6 +226,8 @@ class PortfolioEngine:
         pos.current_price = exit_price
 
         pos.realized_pnl = realized_pnl
+
+        pos.realized_pnl_percent = realized_pnl_percent
 
         pos.unrealized_pnl = 0.0
 
