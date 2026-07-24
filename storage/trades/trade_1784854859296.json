@@ -1,0 +1,16 @@
+{
+  "symbol": "GABRIEL.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 8,
+  "entry_price": 1377.7,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 73.84,
+  "reasons": "",
+  "id": "trade_1784854859296",
+  "timestamp": 1784854859.2968822
+}

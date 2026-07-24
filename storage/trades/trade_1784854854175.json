@@ -1,0 +1,16 @@
+{
+  "symbol": "JUBLFOOD.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 65,
+  "entry_price": 412.3,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 71.66,
+  "reasons": "",
+  "id": "trade_1784854854175",
+  "timestamp": 1784854854.1752615
+}

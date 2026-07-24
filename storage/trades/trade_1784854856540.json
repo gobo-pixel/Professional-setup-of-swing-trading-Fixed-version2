@@ -1,0 +1,16 @@
+{
+  "symbol": "BALRAMCHIN.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 35,
+  "entry_price": 612.8,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.22,
+  "reasons": "",
+  "id": "trade_1784854856540",
+  "timestamp": 1784854856.5402613
+}

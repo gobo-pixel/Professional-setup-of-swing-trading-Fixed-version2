@@ -1,0 +1,16 @@
+{
+  "symbol": "DATAPATTNS.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 4,
+  "entry_price": 4597.5,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.2,
+  "reasons": "",
+  "id": "trade_1784854857016",
+  "timestamp": 1784854857.0160103
+}

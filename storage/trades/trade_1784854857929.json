@@ -1,0 +1,16 @@
+{
+  "symbol": "HSCL.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 40,
+  "entry_price": 777.65,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 75.94,
+  "reasons": "",
+  "id": "trade_1784854857929",
+  "timestamp": 1784854857.92941
+}

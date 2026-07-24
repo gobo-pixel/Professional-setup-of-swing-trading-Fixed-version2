@@ -1,0 +1,16 @@
+{
+  "symbol": "BDL.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 24,
+  "entry_price": 1239.8,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 76.99,
+  "reasons": "",
+  "id": "trade_1784854859772",
+  "timestamp": 1784854859.7724042
+}
