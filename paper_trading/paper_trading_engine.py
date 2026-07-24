@@ -281,9 +281,21 @@ class PaperTradingEngine:
             stop_loss_v = result.diagnostics.get("stop_loss", 0.0) or 0.0
             target1_v = result.diagnostics.get("target1", 0.0) or 0.0
             target2_v = result.diagnostics.get("target2", 0.0) or 0.0
-            dist_target1 = round((target1_v - current_price) / current_price * 100, 2) if target1_v and current_price else None
-            dist_target2 = round((target2_v - current_price) / current_price * 100, 2) if target2_v and current_price else None
-            dist_stop = round((current_price - stop_loss_v) / current_price * 100, 2) if stop_loss_v and current_price else None
+            # Direction-aware: for BUY, target is ABOVE entry (positive
+            # distance = still need to rise) and stop is BELOW (positive
+            # distance = still safely above stop). For SELL this is
+            # REVERSED — target is below entry, stop is above — so the
+            # sign of each comparison must flip, or SELL positions would
+            # always show a false REACHED/HIT regardless of actual price
+            # movement (this was the confirmed bug).
+            if pos.direction == "SELL":
+                dist_target1 = round((current_price - target1_v) / current_price * 100, 2) if target1_v and current_price else None
+                dist_target2 = round((current_price - target2_v) / current_price * 100, 2) if target2_v and current_price else None
+                dist_stop = round((stop_loss_v - current_price) / current_price * 100, 2) if stop_loss_v and current_price else None
+            else:
+                dist_target1 = round((target1_v - current_price) / current_price * 100, 2) if target1_v and current_price else None
+                dist_target2 = round((target2_v - current_price) / current_price * 100, 2) if target2_v and current_price else None
+                dist_stop = round((current_price - stop_loss_v) / current_price * 100, 2) if stop_loss_v and current_price else None
 
             if exit_eval.action == "EXIT":
                 status_label = "EXIT CANDIDATE"
@@ -829,18 +841,32 @@ class PaperTradingEngine:
         stop_loss = result_diagnostics.get("stop_loss", 0.0) or 0.0
         target1 = result_diagnostics.get("target1", 0.0) or 0.0
         target2 = result_diagnostics.get("target2", 0.0) or 0.0
-        dist_to_target1 = (
-            round((target1 - current_price) / current_price * 100, 2)
-            if target1 and current_price else None
-        )
-        dist_to_target2 = (
-            round((target2 - current_price) / current_price * 100, 2)
-            if target2 and current_price else None
-        )
-        dist_to_stop = (
-            round((current_price - stop_loss) / current_price * 100, 2)
-            if stop_loss and current_price else None
-        )
+        if pos.direction == "SELL":
+            dist_to_target1 = (
+                round((current_price - target1) / current_price * 100, 2)
+                if target1 and current_price else None
+            )
+            dist_to_target2 = (
+                round((current_price - target2) / current_price * 100, 2)
+                if target2 and current_price else None
+            )
+            dist_to_stop = (
+                round((stop_loss - current_price) / current_price * 100, 2)
+                if stop_loss and current_price else None
+            )
+        else:
+            dist_to_target1 = (
+                round((target1 - current_price) / current_price * 100, 2)
+                if target1 and current_price else None
+            )
+            dist_to_target2 = (
+                round((target2 - current_price) / current_price * 100, 2)
+                if target2 and current_price else None
+            )
+            dist_to_stop = (
+                round((current_price - stop_loss) / current_price * 100, 2)
+                if stop_loss and current_price else None
+            )
         current_pnl_rupees = pos.unrealized_pnl
 
         lines = [
