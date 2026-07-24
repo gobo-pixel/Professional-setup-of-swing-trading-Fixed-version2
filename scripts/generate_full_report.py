@@ -215,7 +215,7 @@ def main() -> None:
                 f"Reason: {reason}\n"
                 f"No market scan was executed."
             ),
-            dedup_key=f"scan_skipped::{today_date.isoformat()}",
+            dedup_key=f"scan_skipped::{today_date.isoformat()}::{ist_now.strftime('%H:%M:%S.%f')}",
         )
         return
 
@@ -229,7 +229,7 @@ def main() -> None:
             f"Status: Production Scanner Started\n"
             f"The scan is now analyzing today's market ({total_symbols} symbols)."
         ),
-        dedup_key=f"scan_started::{today_date.isoformat()}",
+        dedup_key=f"scan_started::{today_date.isoformat()}::{ist_now.strftime('%H:%M:%S.%f')}",
     )
 
     scanner = MarketScanner()
@@ -346,7 +346,7 @@ def main() -> None:
     notify(
         event_type="daily_scan_completed",
         message="\n".join(summary_lines),
-        dedup_key=f"scan_completed::{time.strftime('%Y-%m-%d')}",
+        dedup_key=f"scan_completed::{time.strftime('%Y-%m-%d')}::{now_ist().strftime('%H:%M:%S.%f')}",
     )
 
 
