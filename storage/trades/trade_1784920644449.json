@@ -1,0 +1,18 @@
+{
+  "symbol": "TATAELXSI.NS",
+  "direction": "SELL",
+  "action": "CLOSE",
+  "quantity": 7,
+  "entry_price": 3387.6,
+  "exit_price": 3387.6,
+  "status": "CLOSED",
+  "realized_pnl": -0.0,
+  "realized_pnl_percent": -0.0,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 0.0,
+  "regime": "BEAR",
+  "confidence": 72.02,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; News sentiment now works against this SELL position (100/100).",
+  "id": "trade_1784920644449",
+  "timestamp": 1784920644.4492147
+}

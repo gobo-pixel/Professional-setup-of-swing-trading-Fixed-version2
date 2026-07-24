@@ -1,0 +1,18 @@
+{
+  "symbol": "HAL.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 8,
+  "entry_price": 4592.5,
+  "exit_price": 4592.5,
+  "status": "CLOSED",
+  "realized_pnl": 0.0,
+  "realized_pnl_percent": 0.0,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 82.5,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1784920640809",
+  "timestamp": 1784920640.8095386
+}
