@@ -27,7 +27,23 @@ logger = get_logger(__name__)
 # than one avoids a single-point-of-failure: if one index's news feed
 # is sparse/empty on a given fetch, the others can still surface real
 # macro headlines instead of the whole macro-risk check going blind.
-MACRO_NEWS_SOURCES = ["^NSEI", "^BSESN"]
+# One large, liquid representative stock per sector used in this
+# system's own taxonomy — chosen so a sector-specific macro theme
+# (e.g. pharma tariffs, real-estate rate sensitivity) has a genuine
+# chance of surfacing, not just broad economy-wide news.
+MACRO_NEWS_SOURCES = [
+    "RELIANCE.NS",     # Energy
+    "TCS.NS",          # IT / Technology
+    "HDFCBANK.NS",     # Financial Services
+    "MARUTI.NS",       # Consumer Cyclical
+    "ITC.NS",          # Consumer Defensive
+    "SUNPHARMA.NS",    # Healthcare
+    "LT.NS",           # Industrials
+    "NTPC.NS",         # Utilities
+    "TATASTEEL.NS",    # Basic Materials
+    "DLF.NS",          # Real Estate
+    "BHARTIARTL.NS",   # Communication Services
+]
 
 # How many attempts (including the first) before giving up on a fetch.
 _RETRY_ATTEMPTS = 2
@@ -108,8 +124,12 @@ class NewsDataProvider:
 
         Resilience (this fetch affects EVERY open position's macro-risk
         check in one shot, so a gap here is high-impact):
-        - Queries multiple broad-market index tickers (MACRO_NEWS_SOURCES),
-          not just one, and combines whatever each source returns.
+        - Queries multiple large-cap bellwether stocks spanning
+          different sectors (MACRO_NEWS_SOURCES) as a broad-market news
+          proxy — NOT index tickers, since ^NSEI/^BSESN's own .news
+          field was confirmed (in production) to consistently return
+          empty even when individual stock tickers reliably return
+          real headlines.
         - Retries each source on transient failure.
         - If every source comes back genuinely empty, falls back to the
           last successfully-fetched non-empty headline set (cached on
