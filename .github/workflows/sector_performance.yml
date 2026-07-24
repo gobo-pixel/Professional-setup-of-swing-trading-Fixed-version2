@@ -30,4 +30,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run sector_performance_report.py
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: PYTHONPATH=. python scripts/sector_performance_report.py --period "${{ inputs.period }}"
