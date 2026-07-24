@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.logger import get_logger  # noqa: E402
 from core.notifications import notify  # noqa: E402
+from core.trading_calendar import now_ist  # noqa: E402
 from data.watchlist import WatchlistManager  # noqa: E402
 from paper_trading.paper_trading_engine import PaperTradingEngine  # noqa: E402
 from storage.trades.trade_diary import TradeDiary  # noqa: E402
@@ -147,7 +148,7 @@ def main() -> None:
                 f"Reason:\n{reason}"
                 f"{opened_lines}"
             ),
-            dedup_key=f"portfolio_summary::{summary['date']}",
+            dedup_key=f"portfolio_summary::{summary['date']}::{now_ist().strftime('%H:%M:%S.%f')}",
         )
 
     if summary.get("status") == "SKIPPED_NON_TRADING_DAY":
