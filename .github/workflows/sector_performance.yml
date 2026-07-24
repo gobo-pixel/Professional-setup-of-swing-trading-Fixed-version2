@@ -1,0 +1,33 @@
+name: Sector Performance Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      period:
+        description: "Market performance lookback period"
+        required: true
+        default: "1y"
+        type: choice
+        options:
+          - "1mo"
+          - "3mo"
+          - "6mo"
+          - "1y"
+          - "2y"
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run sector_performance_report.py
+        run: PYTHONPATH=. python scripts/sector_performance_report.py --period "${{ inputs.period }}"
