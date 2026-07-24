@@ -142,6 +142,12 @@ class NewsDataProvider:
 
         for source in MACRO_NEWS_SOURCES:
             news = _fetch_ticker_news_with_retry(source)
+            # Small delay between consecutive calls — evidence from
+            # production showed the SAME symbol (SUNPHARMA.NS) return 0
+            # headlines here but 10 headlines later in the naturally
+            # slower, spaced-out per-position loop, strongly indicating
+            # rate-limiting from too many rapid successive calls.
+            time.sleep(1.0)
             if news is None:
                 continue  # this source failed entirely, try the next
             if not news:
