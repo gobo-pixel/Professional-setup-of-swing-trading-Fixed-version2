@@ -22,6 +22,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
+from core.rejection_classifier import classify_tier4_block
 from core.trading_calendar import now_ist
 
 
@@ -143,6 +144,81 @@ class AnalysisEngine:
             sector = r.get("Sector") or "UNKNOWN"
             sector_stats[sector][r.get("Signal", "")] += 1
         report["sector_stats"] = {k: dict(v) for k, v in sector_stats.items()}
+
+        # ---------------- Market Regime percentages ----------------
+        total_regime_rows = sum(sum(v.values()) for v in sector_stats.values()) or 1
+        regime_totals = Counter()
+        for r in rows:
+            regime_totals[r.get("market_regime") or "UNKNOWN"] += 1
+        report["regime_percentages"] = {
+            k: round(v / len(rows) * 100, 1) for k, v in regime_totals.items()
+        } if rows else {}
+
+        # ---------------- Top / Weakest BUY sectors ----------------
+        sector_buy_counts = {k: v.get("BUY", 0) for k, v in sector_stats.items()}
+        ranked_sectors = sorted(sector_buy_counts.items(), key=lambda kv: kv[1], reverse=True)
+        report["top_buy_sectors"] = ranked_sectors[:3]
+        # "Weakest" = lowest BUY activity among sectors that were
+        # actually scanned (excludes sectors with 0 total rows, which
+        # would trivially "win" this ranking without meaning anything).
+        scanned_sectors = [(k, v) for k, v in sector_buy_counts.items() if sector_stats[k]]
+        report["weakest_buy_sectors"] = sorted(scanned_sectors, key=lambda kv: kv[1])[:3]
+
+        # ---------------- Rejection Funnel ----------------
+        # Scanned -> BUY Candidates -> Rejected by Trend/Risk/Portfolio
+        # -> Executed. Uses the SAME shared classifier as Daily Scan's
+        # own Rejection Summary — no duplicate categorization logic.
+        # NOTE: "Rejected by Fundamentals" is intentionally NOT included
+        # — Tier1 is purely technical (trend/EMA/SMA), and fundamentals
+        # are blended into Tier3 together with news/market context, so
+        # they cannot be cleanly isolated without inventing a new
+        # detector/threshold that doesn't exist in the strategy today.
+        buy_candidate_rows = [r for r in rows if r.get("Signal") in ("BUY", "NO_TRADE")]
+        rejected_trend = sum(1 for r in buy_candidate_rows if r.get("BuyTier1Passed") == "False")
+        rejected_risk = rejected_portfolio = 0
+        for r in buy_candidate_rows:
+            # Non-overlapping with "rejected_by_trend": only count
+            # risk/portfolio rejections for rows that already PASSED
+            # Tier1, so each row is attributed to exactly one funnel
+            # stage instead of being double-counted.
+            if r.get("Signal") != "NO_TRADE" or r.get("BuyTier1Passed") != "True":
+                continue
+            category = classify_tier4_block(r.get("Tier4Block"))
+            if category == "risk":
+                rejected_risk += 1
+            elif category == "portfolio":
+                rejected_portfolio += 1
+        executed_buy_today = self._count_opened_today("BUY")
+        report["rejection_funnel"] = {
+            "scanned": len(rows),
+            "buy_candidates": signal_counts.get("BUY", 0),
+            "rejected_by_trend": rejected_trend,
+            "rejected_by_risk": rejected_risk,
+            "rejected_by_portfolio": rejected_portfolio,
+            "executed": executed_buy_today,
+        }
+
+        # ---------------- Execution Summary ----------------
+        buy_generated = signal_counts.get("BUY", 0)
+        buy_executed = executed_buy_today
+        buy_rejected = max(buy_generated - buy_executed, 0)
+        reason_buckets = Counter()
+        for r in rows:
+            if r.get("Signal") != "BUY":
+                continue
+            category = classify_tier4_block(r.get("Tier4Block"))
+            if category == "portfolio":
+                reason_buckets["Capital / Portfolio Rules"] += 1
+            elif category == "risk":
+                reason_buckets["Risk Engine"] += 1
+            elif category == "liquidity":
+                reason_buckets["Liquidity"] += 1
+        report["execution_summary"] = {
+            "buy_generated": buy_generated,
+            "buy_executed": buy_executed,
+            "buy_rejected": buy_rejected,
+            "reasons": dict(reason_buckets.most_common(5)),
+        }
 
         # ---------------- Market-regime stats ----------------
         regime_stats = defaultdict(lambda: Counter())
