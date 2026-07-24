@@ -53,7 +53,7 @@ def _part_a_paper_trading_sectors() -> dict:
         state = json.load(f)
     symbol_sector = state.get("symbol_sector", {})
 
-    sector_stats = defaultdict(lambda: {"pnl": 0.0, "trades": 0, "wins": 0})
+    sector_stats = defaultdict(lambda: {"pnl": 0.0, "trades": 0, "wins": 0, "invested": 0.0})
     for pos in state.get("closed_positions", []):
         pnl = pos.get("realized_pnl")
         if pnl is None or (isinstance(pnl, float) and pnl != pnl):  # skip NaN
@@ -61,6 +61,7 @@ def _part_a_paper_trading_sectors() -> dict:
         sector = symbol_sector.get(pos["symbol"], "UNKNOWN")
         sector_stats[sector]["pnl"] += pnl
         sector_stats[sector]["trades"] += 1
+        sector_stats[sector]["invested"] += pos.get("entry_price", 0) * pos.get("quantity", 0)
         if pnl > 0:
             sector_stats[sector]["wins"] += 1
 
@@ -97,11 +98,12 @@ def _part_b_market_sector_performance(period: str) -> dict:
                 if df.empty or len(df) < 2:
                     continue
                 close_col = df["Close"] if "Close" in df.columns else df.iloc[:, 3]
+                close_col = close_col.squeeze()  # handles MultiIndex-column case where this is a 1-col DataFrame, not a Series
                 close_col = close_col.dropna()
                 if len(close_col) < 2:
                     continue
-                start_price = float(close_col.iloc[0])
-                end_price = float(close_col.iloc[-1])
+                start_price = float(close_col.iloc[0].item() if hasattr(close_col.iloc[0], "item") else close_col.iloc[0])
+                end_price = float(close_col.iloc[-1].item() if hasattr(close_col.iloc[-1], "item") else close_col.iloc[-1])
                 if start_price <= 0:
                     continue
                 pct_return = (end_price - start_price) / start_price * 100
@@ -119,6 +121,7 @@ def _part_b_market_sector_performance(period: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--period", default="1y", choices=["1mo", "3mo", "6mo", "1y", "2y"])
+    parser.add_argument("--top-n", type=int, default=3, help="How many best/worst sectors to show per section")
     args = parser.parse_args()
 
     part_a = _part_a_paper_trading_sectors()
@@ -126,15 +129,40 @@ def main() -> None:
 
     lines = ["📊 Sector Performance Report", ""]
 
+    # ---------------- Overall Best/Worst highlight ----------------
+    if part_b:
+        ranked_b_all = sorted(part_b.items(), key=lambda kv: kv[1], reverse=True)
+        best_sector, best_ret = ranked_b_all[0]
+        worst_sector, worst_ret = ranked_b_all[-1]
+        lines.append(f"🏆 Best Sector ({args.period}): {best_sector} (+{best_ret}%)" if best_ret >= 0
+                      else f"🏆 Best Sector ({args.period}): {best_sector} ({best_ret}%)")
+        lines.append(f"⚠️ Worst Sector ({args.period}): {worst_sector} ({worst_ret}%)")
+        lines.append("")
+
+    def emoji(value: float) -> str:
+        return "🟢" if value >= 0 else "🔴"
+
     lines.append("Part A — Paper Trading's Own Sector Performance")
     if part_a:
-        ranked = sorted(part_a.items(), key=lambda kv: kv[1]["pnl"], reverse=True)
-        for sector, stats in ranked:
+        ranked = sorted(
+            part_a.items(),
+            key=lambda kv: (kv[1]["pnl"] / kv[1]["invested"] * 100) if kv[1]["invested"] else 0.0,
+            reverse=True,
+        )
+        top_n = args.top_n
+        shown = ranked[:top_n] + (ranked[-top_n:] if len(ranked) > top_n else [])
+        # de-duplicate in case top_n overlaps the whole list
+        seen_sectors = set()
+        for sector, stats in shown:
+            if sector in seen_sectors:
+                continue
+            seen_sectors.add(sector)
             win_rate = round(stats["wins"] / stats["trades"] * 100, 1) if stats["trades"] else 0.0
+            pnl_pct = round(stats["pnl"] / stats["invested"] * 100, 2) if stats["invested"] else 0.0
             sign = "+" if stats["pnl"] >= 0 else ""
             lines.append(
-                f"{sector}: {sign}₹{stats['pnl']:.2f} "
-                f"({stats['trades']} trades, {win_rate}% win rate)"
+                f"{emoji(stats['pnl'])} {sector}: {sign}₹{stats['pnl']:.2f} ({sign}{pnl_pct}%) "
+                f"— {stats['trades']} trades, {win_rate}% win rate"
             )
     else:
         lines.append("No closed trades yet.")
@@ -143,9 +171,15 @@ def main() -> None:
     lines.append(f"Part B — Market Sector Performance ({args.period})")
     if part_b:
         ranked_b = sorted(part_b.items(), key=lambda kv: kv[1], reverse=True)
-        for sector, ret in ranked_b:
+        top_n = args.top_n
+        shown_b = ranked_b[:top_n] + (ranked_b[-top_n:] if len(ranked_b) > top_n else [])
+        seen_sectors_b = set()
+        for sector, ret in shown_b:
+            if sector in seen_sectors_b:
+                continue
+            seen_sectors_b.add(sector)
             sign = "+" if ret >= 0 else ""
-            lines.append(f"{sector}: {sign}{ret}%")
+            lines.append(f"{emoji(ret)} {sector}: {sign}{ret}%")
     else:
         lines.append("Could not fetch market data (no internet, or no symbol_sector map available).")
 
