@@ -21,7 +21,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933754.699701
+      "updated_at": 1784935490.9391823
     },
     "HAL.NS": {
       "symbol": "HAL.NS",
@@ -37,7 +37,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933758.4290104
+      "updated_at": 1784935501.2665079
     },
     "SUNPHARMA.NS": {
       "symbol": "SUNPHARMA.NS",
@@ -53,7 +53,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933763.1307206
+      "updated_at": 1784935495.542936
     },
     "IIFL.NS": {
       "symbol": "IIFL.NS",
@@ -69,7 +69,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933752.4052575
+      "updated_at": 1784935491.7933002
     },
     "MANAPPURAM.NS": {
       "symbol": "MANAPPURAM.NS",
@@ -85,7 +85,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933762.3836944
+      "updated_at": 1784935496.3621023
     },
     "INDUSINDBK.NS": {
       "symbol": "INDUSINDBK.NS",
@@ -101,7 +101,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933756.297531
+      "updated_at": 1784935500.4213252
     },
     "ADANIENSOL.NS": {
       "symbol": "ADANIENSOL.NS",
@@ -117,7 +117,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933753.90023
+      "updated_at": 1784935492.7190018
     },
     "RKFORGE.NS": {
       "symbol": "RKFORGE.NS",
@@ -133,7 +133,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933751.5963826
+      "updated_at": 1784935497.9632692
     },
     "JUBLFOOD.NS": {
       "symbol": "JUBLFOOD.NS",
@@ -149,7 +149,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933755.473019
+      "updated_at": 1784935489.9290547
     },
     "TATAELXSI.NS": {
       "symbol": "TATAELXSI.NS",
@@ -165,7 +165,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933760.6450355
+      "updated_at": 1784935502.169508
     },
     "JUBLINGREA.NS": {
       "symbol": "JUBLINGREA.NS",
@@ -181,7 +181,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933757.0433247
+      "updated_at": 1784935498.7813632
     },
     "MFSL.NS": {
       "symbol": "MFSL.NS",
@@ -197,7 +197,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933757.7219613
+      "updated_at": 1784935499.5571961
     },
     "HEG.NS": {
       "symbol": "HEG.NS",
@@ -213,7 +213,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933761.6189137
+      "updated_at": 1784935493.9177964
     },
     "TMPV.NS": {
       "symbol": "TMPV.NS",
@@ -229,7 +229,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933753.2085197
+      "updated_at": 1784935494.7462022
     },
     "KEC.NS": {
       "symbol": "KEC.NS",
@@ -245,7 +245,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933759.1338
+      "updated_at": 1784935502.9878488
     },
     "SONACOMS.NS": {
       "symbol": "SONACOMS.NS",
@@ -261,7 +261,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784933759.87495
+      "updated_at": 1784935497.154739
     }
   },
   "closed_positions": [
@@ -1017,5 +1017,5 @@
     "KEC.NS": "Industrials",
     "INOXWIND.NS": "Industrials"
   },
-  "saved_at": 1784934152.0144913
+  "saved_at": 1784935916.5920045
 }
