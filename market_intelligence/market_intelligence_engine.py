@@ -100,14 +100,20 @@ class MarketIntelligenceEngine:
         """
         open_positions: [{"symbol": "INFY.NS", "direction": "BUY", "sector": "IT"}, ...]
         Read-only input — this engine never mutates portfolio state.
-        """
-        macro_headlines = self._safe_fetch_market_news()
-        macro_observation = self._analyze_macro(macro_headlines)
 
+        Sequencing (see data/news_data.py history for why): company-news
+        analysis for ALL positions runs FIRST — this is the proven
+        reliable path. Macro-news fetch happens AFTER, once real yfinance
+        traffic has already flowed for this run, instead of before it —
+        an artificial single warm-up call didn't resolve the issue in
+        production, so this leverages the ACTUAL working call sequence.
+        """
         position_observations = []
         alerts_sent = []
+
+        # Pass 1 — company-news analysis for every position.
         for pos in open_positions:
-            obs = self._analyze_position(pos, macro_headlines)
+            obs = self._analyze_company_news(pos)
             position_observations.append(obs)
             if obs["alert_triggered"]:
                 sent = notify(
@@ -118,6 +124,24 @@ class MarketIntelligenceEngine:
                 )
                 if sent:
                     alerts_sent.append(obs["alert_body"])
+
+        # Macro-news fetch — now happens AFTER real per-symbol traffic.
+        macro_headlines = self._safe_fetch_market_news()
+        macro_observation = self._analyze_macro(macro_headlines)
+
+        # Pass 2 — macro-bias check, only for positions that didn't
+        # already trigger a company-news alert (same precedence as before).
+        for obs in position_observations:
+            updated = self._apply_macro_check(obs, macro_headlines)
+            if updated["alert_triggered"] and updated["alert_body"] not in alerts_sent:
+                sent = notify(
+                    event_type="market_intelligence",
+                    message=updated["alert_body"],
+                    severity=updated["severity"],
+                    dedup_key=updated["signature"],
+                )
+                if sent:
+                    alerts_sent.append(updated["alert_body"])
 
         record = {
             "timestamp": time.time(),
@@ -224,7 +248,10 @@ class MarketIntelligenceEngine:
     # PER-POSITION RESEARCH (advisory only)
     # ==========================================================
 
-    def _analyze_position(self, position: dict[str, Any], macro_headlines: list[str]) -> dict[str, Any]:
+    def _analyze_company_news(self, position: dict[str, Any]) -> dict[str, Any]:
+        """Company-specific news analysis only — macro check is applied
+        separately afterward, once macro_headlines has been fetched
+        (see run())."""
         symbol = position["symbol"]
         direction = position.get("direction", "BUY")
         sector = position.get("sector")
@@ -244,15 +271,12 @@ class MarketIntelligenceEngine:
         if scored_news:
             top_headline = max(scored_news, key=lambda n: abs(_signed_bias(n))).get("title", "")
 
-        macro_bias = macro_intelligence.sector_bias(macro_headlines, sector) if sector else 0.0
-
         alert_triggered = False
         alert_body = None
         signature = None
         severity = None
 
         adverse_signal = -avg_impact if direction == "BUY" else avg_impact
-        adverse_macro = -macro_bias if direction == "BUY" else macro_bias
 
         if avg_impact != 0.0 and abs(avg_impact) >= NEWS_ALERT_THRESHOLD and adverse_signal > 0:
             polarity = "Negative" if direction == "BUY" else "Positive"
@@ -266,27 +290,44 @@ class MarketIntelligenceEngine:
                 f"Please review this position.\n"
                 f"No automatic action has been taken."
             )
-        elif macro_bias != 0.0 and abs(macro_bias) >= 0.3 and adverse_macro > 0 and sector:
-            signature = f"macro::{sector}::{symbol}"
-            alert_triggered = True
-            severity = severity_from_magnitude(macro_bias)
-            alert_body = (
-                f"Macro development detected affecting the {sector} sector.\n"
-                f"This may affect your {direction} position in {symbol}.\n"
-                f"No automatic action has been taken."
-            )
 
         return {
             "symbol": symbol,
             "direction": direction,
             "sector": sector,
             "news_impact_score": round(avg_impact, 3),
-            "macro_bias": macro_bias,
+            "macro_bias": 0.0,  # filled in by _apply_macro_check, if it runs
             "alert_triggered": alert_triggered,
             "alert_body": alert_body,
-            "severity": severity,
             "signature": signature,
+            "severity": severity,
         }
+
+    @staticmethod
+    def _apply_macro_check(obs: dict[str, Any], macro_headlines: list[str]) -> dict[str, Any]:
+        """Applies the macro-bias check AFTER company-news analysis —
+        only if a company-news alert didn't already trigger (same
+        precedence as before, just evaluated in a second pass)."""
+        if obs["alert_triggered"]:
+            return obs  # company-news alert already took priority
+
+        symbol = obs["symbol"]
+        direction = obs["direction"]
+        sector = obs["sector"]
+        macro_bias = macro_intelligence.sector_bias(macro_headlines, sector) if sector else 0.0
+        obs["macro_bias"] = macro_bias
+
+        adverse_macro = -macro_bias if direction == "BUY" else macro_bias
+        if macro_bias != 0.0 and abs(macro_bias) >= 0.3 and adverse_macro > 0 and sector:
+            obs["signature"] = f"macro::{sector}::{symbol}"
+            obs["alert_triggered"] = True
+            obs["severity"] = severity_from_magnitude(macro_bias)
+            obs["alert_body"] = (
+                f"Macro development detected affecting the {sector} sector.\n"
+                f"This may affect your {direction} position in {symbol}.\n"
+                f"No automatic action has been taken."
+            )
+        return obs
 
     # ==========================================================
     # STORAGE (for future Analysis/Learning/Optimizer consumption)
