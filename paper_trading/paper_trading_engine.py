@@ -645,7 +645,10 @@ class PaperTradingEngine:
                     "regime": candidate.diagnostics.get("market_regime", ""),
                     "confidence": candidate.confidence, "reasons": "",
                 })
-                opened_today.append({"symbol": candidate.symbol, "action": candidate.action, "price": price})
+                opened_today.append({
+                    "symbol": candidate.symbol, "action": candidate.action, "price": price,
+                    "quantity": candidate.position_size,
+                })
 
                 notify(
                     event_type="trade_opened",
@@ -683,6 +686,7 @@ class PaperTradingEngine:
             "cycle_aborted": cycle_aborted,
             "cycle_abort_reason": cycle_abort_reason,
             "open_positions_at_start": len(open_symbols) + len(closed_today),
+            "opening_balance": snap_at_start.get("available_capital", 0.0),
             "portfolio_snapshot": self.portfolio.snapshot(),
         }
         logger.info(
