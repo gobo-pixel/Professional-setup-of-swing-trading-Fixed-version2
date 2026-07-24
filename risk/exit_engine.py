@@ -110,13 +110,45 @@ class ExitEngine:
 
         stop_loss = position.get("stop_loss")
         current_price = position.get("current_price", float(latest.get("close", 0.0)))
+        day_high = position.get("day_high")
+        day_low = position.get("day_low")
+
         if stop_loss:
-            stop_breached = (
-                current_price <= stop_loss if direction == "BUY" else current_price >= stop_loss
-            )
+            if direction == "BUY":
+                # Use the day's LOW if available — catches a genuine
+                # intraday stop-loss touch even if the close recovered
+                # above the stop level. Falls back to close-only if
+                # day_low wasn't supplied (backward compatible).
+                touch_price = day_low if day_low is not None else current_price
+                stop_breached = touch_price <= stop_loss
+            else:
+                touch_price = day_high if day_high is not None else current_price
+                stop_breached = touch_price >= stop_loss
             if stop_breached:
                 hard_risk_triggered = True
-                hard_risk_reason = f"Stop-loss breached (price={current_price}, stop={stop_loss})."
+                hard_risk_reason = (
+                    f"Stop-loss breached (intraday {'low' if direction == 'BUY' else 'high'}"
+                    f"={touch_price}, stop={stop_loss})."
+                )
+
+        # Target-hit hard-check (NEW — targets were previously display
+        # only, never triggered an actual exit). Uses Target 1 (the
+        # nearer, partial target) as the profit-booking trigger, same
+        # day-High/Low-aware logic as the stop-loss check above.
+        target1 = position.get("target1")
+        if not hard_risk_triggered and target1:
+            if direction == "BUY":
+                touch_price = day_high if day_high is not None else current_price
+                target_hit = touch_price >= target1
+            else:
+                touch_price = day_low if day_low is not None else current_price
+                target_hit = touch_price <= target1
+            if target_hit:
+                hard_risk_triggered = True
+                hard_risk_reason = (
+                    f"Target 1 reached (intraday {'high' if direction == 'BUY' else 'low'}"
+                    f"={touch_price}, target={target1})."
+                )
 
         if not hard_risk_triggered and not risk_safe:
             hard_risk_triggered = True
