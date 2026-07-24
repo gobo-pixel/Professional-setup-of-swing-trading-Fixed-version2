@@ -210,6 +210,10 @@ class PaperTradingEngine:
                 "entry_price": pos.entry_price,
                 "current_price": current_price,
                 "stop_loss": result.diagnostics.get("stop_loss"),
+                "target1": result.diagnostics.get("target1"),
+                "target2": result.diagnostics.get("target2"),
+                "day_high": result.diagnostics.get("latest_high"),
+                "day_low": result.diagnostics.get("latest_low"),
                 "max_drawdown_percent": pos.max_drawdown_percent,
             }
             try:
@@ -445,7 +449,7 @@ class PaperTradingEngine:
 
             if closed_details:
                 short_trigger = {
-                    "Stop Loss Hit": "Stop Loss",
+                    "Stop Loss Hit": "Stop Loss", "Target Achieved": "Target Hit",
                     "Risk Management Exit": "Risk Exit",
                     "Time-Based Exit": "Time Exit",
                     "Momentum Weakened": "Momentum Exit",
@@ -493,7 +497,7 @@ class PaperTradingEngine:
             ]
             if recent_closed:
                 short_trigger = {
-                    "Stop Loss Hit": "Stop Loss", "Risk Management Exit": "Risk Exit",
+                    "Stop Loss Hit": "Stop Loss", "Target Achieved": "Target Hit", "Risk Management Exit": "Risk Exit",
                     "Time-Based Exit": "Time Exit", "Momentum Weakened": "Momentum Exit",
                     "Fundamentals Weakened": "Fundamentals Exit", "Negative News": "News Exit",
                     "Trend Reversal": "Trend Exit",
@@ -905,6 +909,8 @@ class PaperTradingEngine:
         reason_text = (exit_eval.hard_risk_reason or "").lower()
         if "stop-loss" in reason_text:
             return "Stop Loss Hit"
+        if "target" in reason_text and "reached" in reason_text:
+            return "Target Achieved"
         if "risk engine" in reason_text or "unsafe" in reason_text:
             return "Risk Management Exit"
         if "maximum holding" in reason_text:
