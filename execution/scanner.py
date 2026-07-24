@@ -170,6 +170,8 @@ class MarketScanner:
         dataframe = self.features.generate(dataframe)
         latest = dataframe.iloc[-1]
         diagnostics["latest_close"] = round(float(latest["close"]), 2)
+        diagnostics["latest_high"] = round(float(latest["high"]), 2)
+        diagnostics["latest_low"] = round(float(latest["low"]), 2)
 
         # 2b. FUNDAMENTALS / NEWS SENTIMENT / MARKET REGIME
         # These feed the strategy + scoring engines (news_score / market_score /
