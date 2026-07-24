@@ -119,9 +119,9 @@ def main() -> None:
 
         opened_list = summary.get("opened_today", [])
         opened_lines = ""
-        used_balance = 0.0
+        new_trades_capital = 0.0
         if opened_list:
-            used_balance = sum(o.get("price", 0) * o.get("quantity", 0) for o in opened_list)
+            new_trades_capital = sum(o.get("price", 0) * o.get("quantity", 0) for o in opened_list)
             opened_lines = "\n\nNew Trades Opened\n" + "\n".join(
                 f"  {o['symbol']} ({o['action']}) @ {o['price']} x {o.get('quantity', '?')}" for o in opened_list
             )
@@ -129,15 +129,27 @@ def main() -> None:
         final_open_positions = len(snap.get("open_positions", {}))
         opening_balance = summary.get("opening_balance", 0.0)
         remaining_balance = snap.get("available_capital", 0.0)
+        portfolio_value = snap.get("portfolio_value", 0)
+        # Total capital CURRENTLY tied up across ALL open positions
+        # (regardless of when they were opened) — Portfolio Value minus
+        # Cash Balance. This is what "Used Balance" should show; the
+        # old version only counted TODAY's new trades, which was 0 (and
+        # therefore meaningless) on any day with no new opens.
+        total_capital_in_positions = portfolio_value - remaining_balance
+
+        new_trades_line = (
+            f"New Trades Capital Used: {new_trades_capital:.2f}\n" if opened_list else ""
+        )
 
         notify(
             event_type="daily_portfolio_summary",
             message=(
                 f"🏁 Paper Trading Completed — {summary['date']}\n"
                 f"Opening Balance: {opening_balance:.2f}\n"
-                f"Used Balance (new trades): {used_balance:.2f}\n"
+                f"Total Capital in Open Positions: {total_capital_in_positions:.2f}\n"
+                f"{new_trades_line}"
                 f"Remaining Balance: {remaining_balance:.2f}\n\n"
-                f"Portfolio Value: {snap.get('portfolio_value', 0):.2f}\n"
+                f"Portfolio Value: {portfolio_value:.2f}\n"
                 f"Cash Balance: {remaining_balance:.2f}\n"
                 f"Realized PnL: {snap.get('total_pnl', 0):.2f} "
                 f"({snap.get('portfolio_return_percent', 0):.2f}%)\n"
