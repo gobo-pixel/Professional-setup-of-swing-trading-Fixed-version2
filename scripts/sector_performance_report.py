@@ -135,7 +135,7 @@ def main() -> None:
         best_sector, best_ret = ranked_b_all[0]
         worst_sector, worst_ret = ranked_b_all[-1]
         lines.append(f"🏆 Best Sector ({args.period}): {best_sector} (+{best_ret}%)" if best_ret >= 0
-                      else f"🏆 Best Sector ({args.period}): {best_sector} ({best_ret}%)")
+        else f"🏆 Best Sector ({args.period}): {best_sector} ({best_ret}%)")
         lines.append(f"⚠️ Worst Sector ({args.period}): {worst_sector} ({worst_ret}%)")
         lines.append("")
 
