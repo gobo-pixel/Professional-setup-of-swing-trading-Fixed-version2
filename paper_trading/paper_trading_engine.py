@@ -184,7 +184,7 @@ class PaperTradingEngine:
                         f"corrupted state. Already-completed changes will still be saved."
                     ),
                     severity="🔴 CRITICAL",
-                    dedup_key=f"cycle_aborted::{symbol}::{today}",
+                    dedup_key=f"cycle_aborted::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
                 )
                 cycle_aborted = True
                 cycle_abort_reason = err_line
@@ -237,7 +237,7 @@ class PaperTradingEngine:
                         f"repeats."
                     ),
                     severity="🟠 HIGH",
-                    dedup_key=f"exit_logic_review::{symbol}::{today}",
+                    dedup_key=f"exit_logic_review::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
                 )
                 continue
 
@@ -269,7 +269,7 @@ class PaperTradingEngine:
                         f"will still be saved."
                     ),
                     severity="🔴 CRITICAL",
-                    dedup_key=f"cycle_aborted::{symbol}::{today}",
+                    dedup_key=f"cycle_aborted::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
                 )
                 cycle_aborted = True
                 cycle_abort_reason = err_line
@@ -404,7 +404,7 @@ class PaperTradingEngine:
                             f"Already-completed changes will still be saved."
                         ),
                         severity="🔴 CRITICAL",
-                        dedup_key=f"cycle_aborted::{symbol}::{today}",
+                        dedup_key=f"cycle_aborted::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
                     )
                     cycle_aborted = True
                     cycle_abort_reason = err_line
@@ -491,7 +491,7 @@ class PaperTradingEngine:
                 event_type="monitoring_summary",
                 message="\n".join(summary_lines).strip(),
                 severity="🔴 CRITICAL" if failed_count == total_positions and total_positions > 0 else "🟢 LOW",
-                dedup_key=f"monitoring_summary::{today}",
+                dedup_key=f"monitoring_summary::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
         else:
             recent_closed = self.diary.get_closed_trades()
@@ -531,7 +531,7 @@ class PaperTradingEngine:
             notify(
                 event_type="monitoring_summary",
                 message="\n".join(lines).strip(),
-                dedup_key=f"monitoring_summary_empty::{today}",
+                dedup_key=f"monitoring_summary_empty::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
 
         self.portfolio.engine.mark_to_market()
@@ -563,7 +563,7 @@ class PaperTradingEngine:
             notify(
                 event_type="holding_status",
                 message="\n".join(status_lines).strip(),
-                dedup_key=f"holding_status::{today}",
+                dedup_key=f"holding_status::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
 
         # --------------------------------------------------
@@ -605,7 +605,7 @@ class PaperTradingEngine:
                 notify(
                     event_type="candidates_not_executed",
                     message="📌 Candidates Not Executed\n\n" + "\n\n".join(not_executed_lines),
-                    dedup_key=f"candidates_not_executed::{today}",
+                    dedup_key=f"candidates_not_executed::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
                 )
 
             for candidate in candidates:
@@ -654,7 +654,7 @@ class PaperTradingEngine:
                     event_type="trade_opened",
                     message=self._format_buy_report(candidate, price, reasons_list, trade_id),
                     severity=severity_from_magnitude(candidate.confidence / 100.0),
-                    dedup_key=f"trade_opened::{candidate.symbol}::{today}",
+                    dedup_key=f"trade_opened::{candidate.symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
                 )
 
         try:
@@ -673,7 +673,7 @@ class PaperTradingEngine:
                     f"verified manually."
                 ),
                 severity="🔴 CRITICAL",
-                dedup_key=f"state_persistence_failed::{today}",
+                dedup_key=f"state_persistence_failed::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
             raise  # do not swallow — let the workflow run itself fail loudly
 
