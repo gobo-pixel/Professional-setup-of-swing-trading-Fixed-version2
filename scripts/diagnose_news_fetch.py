@@ -89,3 +89,47 @@ if hasattr(ticker, "get_news"):
 print("\n" + "=" * 70)
 print(f"Script end time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
 print("=== END DIAGNOSTIC — please share this ENTIRE output ===")
+
+# ---- Test 8: replicate the REAL pipeline's exact call pattern ----
+# Real pipeline: 16 "held position" news calls FIRST, then 11
+# MACRO_NEWS_SOURCES calls. This isolated test only made 6 calls total
+# (all succeeded) — this test replicates the REAL volume/pattern to
+# see if cumulative call count within ONE script run is what matters.
+print("\n\n" + "#" * 70)
+print("### TEST 8: Replicating REAL pipeline's exact 16+11 call pattern ###")
+print("#" * 70)
+
+held_position_style = [
+    "CHENNPETRO.NS", "HAL.NS", "SUNPHARMA.NS", "IIFL.NS", "MANAPPURAM.NS",
+    "INDUSINDBK.NS", "ADANIENSOL.NS", "RKFORGE.NS", "JUBLFOOD.NS", "TATAELXSI.NS",
+    "JUBLINGREA.NS", "MFSL.NS", "HEG.NS", "TMPV.NS", "KEC.NS", "SONACOMS.NS",
+]
+macro_sources = [
+    "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "MARUTI.NS", "ITC.NS",
+    "SUNPHARMA.NS", "LT.NS", "NTPC.NS", "TATASTEEL.NS", "DLF.NS", "BHARTIARTL.NS",
+]
+
+print(f"\n[{time.strftime('%H:%M:%S')}] --- Phase A: {len(held_position_style)} 'held position' calls ---")
+phase_a_results = []
+for sym in held_position_style:
+    try:
+        n = yf.Ticker(sym).news
+        phase_a_results.append((sym, len(n) if n else 0))
+    except Exception as exc:
+        phase_a_results.append((sym, f"EXCEPTION: {exc}"))
+for sym, res in phase_a_results:
+    print(f"  {sym}: {res}")
+
+print(f"\n[{time.strftime('%H:%M:%S')}] --- Phase B: {len(macro_sources)} macro-source calls (calls #{len(held_position_style)+1}-{len(held_position_style)+len(macro_sources)} of this run) ---")
+phase_b_results = []
+for sym in macro_sources:
+    try:
+        n = yf.Ticker(sym).news
+        phase_b_results.append((sym, len(n) if n else 0))
+    except Exception as exc:
+        phase_b_results.append((sym, f"EXCEPTION: {exc}"))
+for sym, res in phase_b_results:
+    print(f"  {sym}: {res}")
+
+print(f"\n[{time.strftime('%H:%M:%S')}] === TEST 8 COMPLETE ===")
+print("=== please share this section too ===")
