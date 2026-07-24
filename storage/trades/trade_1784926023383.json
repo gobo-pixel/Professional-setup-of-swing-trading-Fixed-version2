@@ -1,0 +1,16 @@
+{
+  "symbol": "TVSMOTOR.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 8,
+  "entry_price": 3919.8,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.32,
+  "reasons": "",
+  "id": "trade_1784926023383",
+  "timestamp": 1784926023.383443
+}

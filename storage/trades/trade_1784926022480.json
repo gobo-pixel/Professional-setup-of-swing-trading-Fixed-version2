@@ -1,0 +1,16 @@
+{
+  "symbol": "SONACOMS.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 53,
+  "entry_price": 719.75,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 78.04,
+  "reasons": "",
+  "id": "trade_1784926022480",
+  "timestamp": 1784926022.4800663
+}

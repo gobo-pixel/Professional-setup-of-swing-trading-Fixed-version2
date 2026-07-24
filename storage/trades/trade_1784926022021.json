@@ -1,0 +1,16 @@
+{
+  "symbol": "HEG.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 42,
+  "entry_price": 623.85,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 78.1,
+  "reasons": "",
+  "id": "trade_1784926022021",
+  "timestamp": 1784926022.0217502
+}

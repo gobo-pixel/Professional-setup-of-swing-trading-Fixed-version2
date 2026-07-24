@@ -1,0 +1,16 @@
+{
+  "symbol": "INDUSINDBK.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 27,
+  "entry_price": 1005.5,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 78.26,
+  "reasons": "",
+  "id": "trade_1784926020613",
+  "timestamp": 1784926020.6130104
+}

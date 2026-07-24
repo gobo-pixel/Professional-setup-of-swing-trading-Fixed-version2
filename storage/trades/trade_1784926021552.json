@@ -1,0 +1,16 @@
+{
+  "symbol": "MFSL.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 17,
+  "entry_price": 1503.9,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 73.54,
+  "reasons": "",
+  "id": "trade_1784926021552",
+  "timestamp": 1784926021.5524483
+}

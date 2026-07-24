@@ -22,8 +22,8 @@
   },
   "sell_signal_vs_opened": {
     "sell_signals": 35,
-    "sell_trades_opened": 0,
-    "gap": 35,
+    "sell_trades_opened": 6,
+    "gap": 29,
     "gap_reasons": {
       "Insufficient historical candles.": 29,
       "Average trading volume is too low.": 2
@@ -100,6 +100,57 @@
     },
     "UNKNOWN": {
       "SELL": 2
+    }
+  },
+  "regime_percentages": {
+    "SIDEWAYS": 35.5,
+    "BULL": 33.0,
+    "BEAR": 31.5
+  },
+  "top_buy_sectors": [
+    [
+      "Healthcare",
+      40
+    ],
+    [
+      "Financial Services",
+      34
+    ],
+    [
+      "Consumer Cyclical",
+      31
+    ]
+  ],
+  "weakest_buy_sectors": [
+    [
+      "UNKNOWN",
+      0
+    ],
+    [
+      "Communication Services",
+      2
+    ],
+    [
+      "Utilities",
+      4
+    ]
+  ],
+  "rejection_funnel": {
+    "scanned": 1000,
+    "buy_candidates": 202,
+    "rejected_by_trend": 584,
+    "rejected_by_risk": 0,
+    "rejected_by_portfolio": 0,
+    "executed": 14
+  },
+  "execution_summary": {
+    "buy_generated": 202,
+    "buy_executed": 14,
+    "buy_rejected": 188,
+    "reasons": {
+      "Liquidity": 7,
+      "Risk Engine": 3,
+      "Capital / Portfolio Rules": 1
     }
   },
   "regime_stats": {

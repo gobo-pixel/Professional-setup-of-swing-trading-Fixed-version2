@@ -1,0 +1,16 @@
+{
+  "symbol": "INOXWIND.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 499,
+  "entry_price": 76.21,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 72.72,
+  "reasons": "",
+  "id": "trade_1784926022933",
+  "timestamp": 1784926022.9332452
+}
