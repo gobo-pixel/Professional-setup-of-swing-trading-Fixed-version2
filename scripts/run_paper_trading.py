@@ -116,17 +116,36 @@ def main() -> None:
         else:
             reason = f"{opened_at_start} open position(s) existed, but none produced a valid evaluation this cycle."
 
+        opened_list = summary.get("opened_today", [])
+        opened_lines = ""
+        used_balance = 0.0
+        if opened_list:
+            used_balance = sum(o.get("price", 0) * o.get("quantity", 0) for o in opened_list)
+            opened_lines = "\n\nNew Trades Opened\n" + "\n".join(
+                f"  {o['symbol']} ({o['action']}) @ {o['price']} x {o.get('quantity', '?')}" for o in opened_list
+            )
+
+        final_open_positions = len(snap.get("open_positions", {}))
+        opening_balance = summary.get("opening_balance", 0.0)
+        remaining_balance = snap.get("available_capital", 0.0)
+
         notify(
             event_type="daily_portfolio_summary",
             message=(
-                f"Daily Portfolio Summary — {summary['date']}\n"
+                f"🏁 Paper Trading Completed — {summary['date']}\n"
+                f"Opening Balance: {opening_balance:.2f}\n"
+                f"Used Balance (new trades): {used_balance:.2f}\n"
+                f"Remaining Balance: {remaining_balance:.2f}\n\n"
                 f"Portfolio Value: {snap.get('portfolio_value', 0):.2f}\n"
+                f"Cash Balance: {remaining_balance:.2f}\n"
                 f"Realized PnL: {snap.get('total_pnl', 0):.2f} "
                 f"({snap.get('portfolio_return_percent', 0):.2f}%)\n"
                 f"Opened: {len(summary['opened_today'])} | "
                 f"Closed: {len(summary['closed_today'])} | "
                 f"Monitored: {monitored_count}\n"
+                f"Open Positions Now: {final_open_positions}\n"
                 f"Reason:\n{reason}"
+                f"{opened_lines}"
             ),
             dedup_key=f"portfolio_summary::{summary['date']}",
         )
