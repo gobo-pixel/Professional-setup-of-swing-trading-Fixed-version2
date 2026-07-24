@@ -93,22 +93,43 @@ class NewsDataProvider:
         results: list[dict[str, Any]] = []
 
         for item in news[:limit]:
+            # yfinance 0.2.x nests the real article fields under
+            # item["content"] (title, publisher, link, pubDate, type) —
+            # NOT at the top level. This was the actual root cause of
+            # the "macro news always returns 0 headlines" issue: reading
+            # item.get("title") directly always returned None/empty,
+            # even though the raw fetch genuinely had real articles.
+            # Try the new nested path first, fall back to the old flat
+            # path for compatibility with any other yfinance version.
+            content = item.get("content") or {}
+            title = content.get("title") or item.get("title")
+            publisher = (
+                (content.get("provider") or {}).get("displayName")
+                or item.get("publisher")
+            )
+            link = (
+                (content.get("canonicalUrl") or {}).get("url")
+                or item.get("link")
+            )
+            item_type = content.get("contentType") or item.get("type")
+            uuid = content.get("id") or item.get("uuid") or item.get("id")
+
             ts = item.get("providerPublishTime")
             published = (
                 datetime.fromtimestamp(ts).isoformat()
                 if isinstance(ts, (int, float))
-                else None
+                else content.get("pubDate")
             )
 
             results.append(
                 {
                     "symbol": symbol,
-                    "title": item.get("title"),
-                    "publisher": item.get("publisher"),
+                    "title": title,
+                    "publisher": publisher,
                     "published_at": published,
-                    "link": item.get("link"),
-                    "type": item.get("type"),
-                    "uuid": item.get("uuid"),
+                    "link": link,
+                    "type": item_type,
+                    "uuid": uuid,
                 }
             )
 
@@ -142,18 +163,21 @@ class NewsDataProvider:
 
         for source in MACRO_NEWS_SOURCES:
             news = _fetch_ticker_news_with_retry(source)
-            # Small delay between consecutive calls — evidence from
-            # production showed the SAME symbol (SUNPHARMA.NS) return 0
-            # headlines here but 10 headlines later in the naturally
-            # slower, spaced-out per-position loop, strongly indicating
-            # rate-limiting from too many rapid successive calls.
-            time.sleep(1.0)
             if news is None:
                 continue  # this source failed entirely, try the next
             if not news:
                 logger.warning("Market news fetch for %s returned 0 headlines.", source)
                 continue
-            titles = [item.get("title", "") for item in news[:limit] if item.get("title")]
+            # Title lives under item["content"]["title"] in yfinance
+            # 0.2.x, not at the top level — this was the actual root
+            # cause of "0 headlines" despite genuinely fetching real
+            # articles. Same fallback pattern as fetch() above.
+            titles = []
+            for item in news[:limit]:
+                content = item.get("content") or {}
+                title = content.get("title") or item.get("title")
+                if title:
+                    titles.append(title)
             if titles:
                 any_source_had_content = True
                 combined.extend(titles)
