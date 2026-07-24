@@ -140,6 +140,17 @@ class NewsDataProvider:
         combined: list[str] = []
         any_source_had_content = False
 
+        # Warm-up call — evidence from production showed the FIRST
+        # yfinance .news call in a fresh script run consistently
+        # returns empty (even with inter-call delays added), while
+        # every call AFTER it succeeds normally. This throwaway call
+        # (result discarded) primes whatever session/cookie state
+        # yfinance needs before the real fetch loop below.
+        try:
+            yf.Ticker(MACRO_NEWS_SOURCES[0]).news
+        except Exception:
+            pass  # warm-up failures are expected/harmless — ignore
+
         for source in MACRO_NEWS_SOURCES:
             news = _fetch_ticker_news_with_retry(source)
             # Small delay between consecutive calls — evidence from
