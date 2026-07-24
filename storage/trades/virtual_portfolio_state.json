@@ -21,7 +21,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.6070888
+      "updated_at": 1784928325.062021
     },
     "HAL.NS": {
       "symbol": "HAL.NS",
@@ -37,7 +37,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.6083603
+      "updated_at": 1784928329.0703082
     },
     "SUNPHARMA.NS": {
       "symbol": "SUNPHARMA.NS",
@@ -53,7 +53,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.609459
+      "updated_at": 1784928326.646795
     },
     "IIFL.NS": {
       "symbol": "IIFL.NS",
@@ -69,7 +69,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.6105685
+      "updated_at": 1784928333.2010634
     },
     "MANAPPURAM.NS": {
       "symbol": "MANAPPURAM.NS",
@@ -85,7 +85,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.6115792
+      "updated_at": 1784928327.4337006
     },
     "INDUSINDBK.NS": {
       "symbol": "INDUSINDBK.NS",
@@ -101,7 +101,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.6125424
+      "updated_at": 1784928331.5623279
     },
     "ADANIENSOL.NS": {
       "symbol": "ADANIENSOL.NS",
@@ -117,7 +117,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.613491
+      "updated_at": 1784928333.920139
     },
     "RKFORGE.NS": {
       "symbol": "RKFORGE.NS",
@@ -133,7 +133,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926020.6145267
+      "updated_at": 1784928330.771837
     },
     "JUBLFOOD.NS": {
       "symbol": "JUBLFOOD.NS",
@@ -141,15 +141,15 @@
       "entry_price": 412.3,
       "current_price": 412.3,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 412.3,
       "lowest_price": 412.3,
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926021.0684192
+      "updated_at": 1784928328.184168
     },
     "TATAELXSI.NS": {
       "symbol": "TATAELXSI.NS",
@@ -157,15 +157,15 @@
       "entry_price": 3387.6,
       "current_price": 3387.6,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 3387.6,
       "lowest_price": 3387.6,
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926021.0693324
+      "updated_at": 1784928332.4463217
     },
     "JUBLINGREA.NS": {
       "symbol": "JUBLINGREA.NS",
@@ -181,7 +181,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926021.0702515
+      "updated_at": 1784928322.2823348
     },
     "MFSL.NS": {
       "symbol": "MFSL.NS",
@@ -189,15 +189,15 @@
       "entry_price": 1503.9,
       "current_price": 1503.9,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 1503.9,
       "lowest_price": 1503.9,
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926021.5519378
+      "updated_at": 1784928325.8521287
     },
     "HEG.NS": {
       "symbol": "HEG.NS",
@@ -213,7 +213,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926022.021312
+      "updated_at": 1784928323.0984383
     },
     "TMPV.NS": {
       "symbol": "TMPV.NS",
@@ -221,15 +221,15 @@
       "entry_price": 324.3,
       "current_price": 324.3,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 324.3,
       "lowest_price": 324.3,
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926022.0222843
+      "updated_at": 1784928324.107318
     },
     "KEC.NS": {
       "symbol": "KEC.NS",
@@ -237,15 +237,15 @@
       "entry_price": 472.95,
       "current_price": 472.95,
       "direction": "SELL",
-      "unrealized_pnl": 0.0,
-      "unrealized_pnl_percent": 0.0,
+      "unrealized_pnl": -0.0,
+      "unrealized_pnl_percent": -0.0,
       "realized_pnl": 0.0,
       "highest_price": 472.95,
       "lowest_price": 472.95,
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926022.0233088
+      "updated_at": 1784928321.6039705
     },
     "SONACOMS.NS": {
       "symbol": "SONACOMS.NS",
@@ -261,7 +261,7 @@
       "max_profit_percent": 0.0,
       "max_drawdown_percent": 0.0,
       "status": "OPEN",
-      "updated_at": 1784926022.4795668
+      "updated_at": 1784928329.783134
     }
   },
   "closed_positions": [
@@ -1017,5 +1017,5 @@
     "KEC.NS": "Industrials",
     "INOXWIND.NS": "Industrials"
   },
-  "saved_at": 1784926023.8406768
+  "saved_at": 1784928725.1132123
 }
