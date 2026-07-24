@@ -121,7 +121,6 @@ def _part_b_market_sector_performance(period: str) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--period", default="1y", choices=["1mo", "3mo", "6mo", "1y", "2y"])
-    parser.add_argument("--top-n", type=int, default=3, help="How many best/worst sectors to show per section")
     args = parser.parse_args()
 
     part_a = _part_a_paper_trading_sectors()
@@ -151,8 +150,7 @@ def main() -> None:
             key=lambda kv: (kv[1]["pnl"] / kv[1]["invested"] * 100) if kv[1]["invested"] else 0.0,
             reverse=True,
         )
-        top_n = args.top_n
-        shown = ranked[:top_n] + (ranked[-top_n:] if len(ranked) > top_n else [])
+        shown = ranked
         # de-duplicate in case top_n overlaps the whole list
         seen_sectors = set()
         for sector, stats in shown:
@@ -173,8 +171,7 @@ def main() -> None:
     lines.append(f"Part B — Market Sector Performance ({args.period})")
     if part_b:
         ranked_b = sorted(part_b.items(), key=lambda kv: kv[1], reverse=True)
-        top_n = args.top_n
-        shown_b = ranked_b[:top_n] + (ranked_b[-top_n:] if len(ranked_b) > top_n else [])
+        shown_b = ranked_b
         seen_sectors_b = set()
         for sector, ret in shown_b:
             if sector in seen_sectors_b:
