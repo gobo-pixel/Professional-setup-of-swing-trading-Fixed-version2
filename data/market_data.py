@@ -37,14 +37,36 @@ class MarketDataProvider:
     ) -> pd.DataFrame:
         """Return normalized OHLCV dataframe."""
         try:
-            df = yf.download(
-                tickers=symbol,
-                interval=interval,
-                period=period,
-                auto_adjust=False,
-                progress=False,
-                threads=False,
-            )
+            if period == "1y" and interval == "1d":
+                # period="1y" yields EXACTLY ~250 trading days, which
+                # sits right at validation_engine.py's minimum_history
+                # threshold (>= 250). After the trailing-NaN-row trim
+                # below removes even ONE row, every fetch would land at
+                # 249 and universally fail "Insufficient historical
+                # candles" — this is exactly what happened in
+                # production. Fetch a genuine buffer of extra calendar
+                # days instead, so trimming has margin without ever
+                # touching the validation threshold itself.
+                end = datetime.now()
+                start = end - pd.Timedelta(days=400)
+                df = yf.download(
+                    tickers=symbol,
+                    start=start.strftime("%Y-%m-%d"),
+                    end=end.strftime("%Y-%m-%d"),
+                    interval=interval,
+                    auto_adjust=False,
+                    progress=False,
+                    threads=False,
+                )
+            else:
+                df = yf.download(
+                    tickers=symbol,
+                    interval=interval,
+                    period=period,
+                    auto_adjust=False,
+                    progress=False,
+                    threads=False,
+                )
         except Exception as exc:
             raise DataError(f"Failed to download data for {symbol}") from exc
 
