@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.logger import get_logger  # noqa: E402
 from core.notifications import notify  # noqa: E402
+from core.rejection_classifier import classify_tier4_block  # noqa: E402
 from core.trading_calendar import is_trading_day, now_ist, skip_reason  # noqa: E402
 from data.watchlist import WatchlistManager  # noqa: E402
 from execution.scanner import MarketScanner  # noqa: E402
@@ -297,31 +298,21 @@ def main() -> None:
     sideways_count = sum(1 for r in rows if r.get("market_regime") == "SIDEWAYS")
 
     # Rejection Summary — built ENTIRELY from fields already computed
-    # and stored in the report (BuyTier1Passed, Tier4Block). No new
-    # thresholds, no new filters, no new scoring — just categorizing
-    # text/flags that already exist.
+    # and stored in the report (BuyTier1Passed, Tier4Block). Uses the
+    # SAME shared classifier as Analysis Engine's Rejection Funnel —
+    # no duplicate categorization logic.
     no_trade_rows = [r for r in rows if r["Signal"] == "NO_TRADE"]
     trend_filter_count = sum(1 for r in no_trade_rows if r.get("BuyTier1Passed") == "False")
-    risk_count = 0
-    liquidity_count = 0
-    portfolio_rules_count = 0
-    score_threshold_count = 0
+    risk_count = liquidity_count = portfolio_rules_count = score_threshold_count = 0
     for r in no_trade_rows:
-        block = (r.get("Tier4Block") or "").lower()
-        if not block:
-            continue
-        if "risk" in block or "unsafe" in block or "nan" in block or "circuit" in block:
+        category = classify_tier4_block(r.get("Tier4Block"))
+        if category == "risk":
             risk_count += 1
-        elif "volume" in block or "liquidity" in block:
+        elif category == "liquidity":
             liquidity_count += 1
-        elif "exposure" in block or "capital" in block or "position" in block or "reserve" in block:
+        elif category == "portfolio":
             portfolio_rules_count += 1
-        elif "decision engine rejected" in block:
-            # Trend/Tier-1 passed but the combined BUY/SELL score itself
-            # was below the qualifying threshold — this IS the most
-            # common NO_TRADE reason and was previously falling through
-            # every bucket uncounted (matched none of the keywords
-            # above). Same existing Tier4Block text, just now recognized.
+        elif category == "score_threshold":
             score_threshold_count += 1
 
     summary_lines = [
