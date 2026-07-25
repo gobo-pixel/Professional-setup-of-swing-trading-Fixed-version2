@@ -185,6 +185,13 @@ def main() -> None:
     message = "\n".join(lines)
     print(message)
 
+    Path("reports").mkdir(exist_ok=True)
+    with open("reports/sector_performance_latest.json", "w") as f:
+        json.dump(
+            {"part_a_paper_trading": part_a, "part_b_market": part_b, "period": args.period},
+            f, indent=2, default=str,
+        )
+
     notify(
         event_type="sector_performance_report",
         message=message,
