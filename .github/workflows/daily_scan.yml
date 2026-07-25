@@ -4,12 +4,6 @@ on:
   schedule:
     - cron: "0 18 * * *"
   workflow_dispatch:
-    inputs:
-      force:
-        description: "Bypass the NSE trading-day check (testing only, e.g. on a market holiday)"
-        required: true
-        default: false
-        type: boolean
 
 permissions:
   contents: write
@@ -33,7 +27,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: PYTHONPATH=. python scripts/generate_full_report.py ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
+        run: PYTHONPATH=. python scripts/generate_full_report.py
 
       - name: Commit updated report back to repo
         run: |
