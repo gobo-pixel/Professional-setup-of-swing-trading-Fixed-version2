@@ -186,7 +186,7 @@ def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
         # Full per-rule technical checklist (all ~39 rules, not just the
         # smaller Tier1 gate above) — JSON so it round-trips cleanly for
         # the Learning Engine's rule-level correlation analysis.
-        "BuyTechnicalChecks": json.dumps(d.get("buy_technical_checks") or {}),
+        "BuyTechnicalChecks": json.dumps(d.get("buy_technical_checks") or {}, default=str),
         "BuyTier2Score": d.get("buy_tier2_score"),
         "BuyTier3Score": d.get("buy_tier3_score"),
         "BuyOverallScore": d.get("buy_overall_score"),
@@ -195,7 +195,7 @@ def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
         "SellTier1Detail": "; ".join(
             f"{k}={v}" for k, v in (d.get("sell_tier1_checks") or {}).items()
         ),
-        "SellTechnicalChecks": json.dumps(d.get("sell_technical_checks") or {}),
+        "SellTechnicalChecks": json.dumps(d.get("sell_technical_checks") or {}, default=str),
         "SellTier2Score": d.get("sell_tier2_score"),
         "SellTier3Score": d.get("sell_tier3_score"),
         "SellOverallScore": d.get("sell_overall_score"),
