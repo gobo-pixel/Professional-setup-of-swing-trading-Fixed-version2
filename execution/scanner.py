@@ -315,8 +315,14 @@ class MarketScanner:
         # addition alongside the aggregate counts above, needed so the
         # Learning Engine can eventually correlate INDIVIDUAL rules
         # (not just aggregate technical score) against real outcomes.
-        diagnostics["buy_technical_checks"] = dict(buy_decision.technical_checks)
-        diagnostics["sell_technical_checks"] = dict(sell_decision.technical_checks)
+        # bool(v) here matters: technical_checks values often come from
+        # pandas/numpy comparisons (e.g. df['rsi'] < 30), which return
+        # numpy.bool_ — NOT JSON-serializable by json.dumps() downstream
+        # in generate_full_report.py. Cast to native Python bool at the
+        # source so nothing further down the pipeline needs to know
+        # about this numpy quirk.
+        diagnostics["buy_technical_checks"] = {k: bool(v) for k, v in buy_decision.technical_checks.items()}
+        diagnostics["sell_technical_checks"] = {k: bool(v) for k, v in sell_decision.technical_checks.items()}
         diagnostics["buy_decision_confidence"] = round(buy_decision.confidence, 2)
         diagnostics["sell_decision_confidence"] = round(sell_decision.confidence, 2)
 
