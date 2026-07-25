@@ -1,0 +1,44 @@
+[
+  {
+    "category": "NEWS",
+    "finding": "News-present trades win 6.98% vs 100.0% without news (-93.0pp).",
+    "suggestion": "Consider decreasing the news weight in Tier 3 \u2014 it appears to carry real signal.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "category": "TECHNICAL",
+    "finding": "High-Tier2-score trades win 12.12% vs 0.0% for low-Tier2-score trades (+12.1pp).",
+    "suggestion": "Technical (Tier 2) weight looks well-calibrated.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "category": "SECTOR",
+    "finding": "Financial Services: 0.0% win rate over 12 trades.",
+    "suggestion": "Consider a sector-specific confidence penalty for Financial Services (this is exactly what Phase 3's Sector Templates would formalize).",
+    "confidence": "MEDIUM"
+  },
+  {
+    "category": "REGIME",
+    "finding": "SIDEWAYS regime: 0.0% win rate over 12 trades.",
+    "suggestion": "Feed this into Phase 3's Dynamic Regime Weights once sample size is HIGH confidence.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "category": "REGIME",
+    "finding": "BULL regime: 10.71% win rate over 28 trades.",
+    "suggestion": "Feed this into Phase 3's Dynamic Regime Weights once sample size is HIGH confidence.",
+    "confidence": "MEDIUM"
+  },
+  {
+    "category": "BUY ACCURACY",
+    "finding": "39 trades, 7.69% win rate.",
+    "suggestion": "Below 45% with a decent sample would suggest the qualify threshold is too loose for this side; above 65% may mean it's too strict and missing volume.",
+    "confidence": "HIGH"
+  },
+  {
+    "category": "SELL ACCURACY",
+    "finding": "5 trades, 20.0% win rate.",
+    "suggestion": "Sample too small to recommend a threshold change yet.",
+    "confidence": "LOW"
+  }
+]

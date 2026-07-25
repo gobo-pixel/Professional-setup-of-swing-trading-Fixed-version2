@@ -22,8 +22,8 @@
   },
   "sell_signal_vs_opened": {
     "sell_signals": 35,
-    "sell_trades_opened": 6,
-    "gap": 29,
+    "sell_trades_opened": 0,
+    "gap": 35,
     "gap_reasons": {
       "Insufficient historical candles.": 29,
       "Average trading volume is too low.": 2
@@ -141,12 +141,12 @@
     "rejected_by_trend": 584,
     "rejected_by_risk": 0,
     "rejected_by_portfolio": 0,
-    "executed": 14
+    "executed": 0
   },
   "execution_summary": {
     "buy_generated": 202,
-    "buy_executed": 14,
-    "buy_rejected": 188,
+    "buy_executed": 0,
+    "buy_rejected": 202,
     "reasons": {
       "Liquidity": 7,
       "Risk Engine": 3,

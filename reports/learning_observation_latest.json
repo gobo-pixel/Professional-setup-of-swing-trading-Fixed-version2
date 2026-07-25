@@ -1,0 +1,96 @@
+{
+  "timestamp": 1785014046.2087655,
+  "closed_trades_observed": 44,
+  "sector_performance": {
+    "Financial Services": {
+      "trades": 12,
+      "win_rate": 0.0
+    },
+    "Consumer Cyclical": {
+      "trades": 6,
+      "win_rate": 33.33
+    },
+    "Healthcare": {
+      "trades": 7,
+      "win_rate": 0.0
+    },
+    "Energy": {
+      "trades": 3,
+      "win_rate": 33.33
+    },
+    "Consumer Defensive": {
+      "trades": 4,
+      "win_rate": 0.0
+    },
+    "Technology": {
+      "trades": 3,
+      "win_rate": 33.33
+    },
+    "Utilities": {
+      "trades": 2,
+      "win_rate": 0.0
+    },
+    "Basic Materials": {
+      "trades": 4,
+      "win_rate": 0.0
+    },
+    "Industrials": {
+      "trades": 3,
+      "win_rate": 0.0
+    }
+  },
+  "regime_performance": {
+    "SIDEWAYS": {
+      "trades": 12,
+      "win_rate": 0.0
+    },
+    "BULL": {
+      "trades": 28,
+      "win_rate": 10.71
+    },
+    "BEAR": {
+      "trades": 4,
+      "win_rate": 25.0
+    }
+  },
+  "news_effectiveness": {
+    "with_news_win_rate": 6.98,
+    "without_news_win_rate": 100.0
+  },
+  "fundamental_effectiveness": {
+    "strong_fundamentals_win_rate": null,
+    "weak_fundamentals_win_rate": 9.09
+  },
+  "technical_effectiveness": {
+    "high_technical_win_rate": 12.12,
+    "low_technical_win_rate": 0.0
+  },
+  "rule_effectiveness": {},
+  "redundant_rule_pairs": [],
+  "threshold_sensitivity": {
+    "0-5": {
+      "trades": 5,
+      "win_rate": 0.0
+    },
+    "5-10": {
+      "trades": 8,
+      "win_rate": 0.0
+    },
+    "10-20": {
+      "trades": 22,
+      "win_rate": 18.18
+    },
+    "20+": {
+      "trades": 0,
+      "win_rate": null
+    }
+  },
+  "buy_accuracy": {
+    "trades": 39,
+    "win_rate": 7.69
+  },
+  "sell_accuracy": {
+    "trades": 5,
+    "win_rate": 20.0
+  }
+}
