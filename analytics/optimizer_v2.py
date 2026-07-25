@@ -61,11 +61,93 @@ class Optimizer:
         recs.extend(self._news_recommendation(latest))
         recs.extend(self._fundamental_recommendation(latest))
         recs.extend(self._technical_recommendation(latest))
+        recs.extend(self._rule_effectiveness_recommendation(latest))
+        recs.extend(self._redundant_rule_recommendation(latest))
+        recs.extend(self._threshold_recommendation(latest))
         recs.extend(self._sector_recommendation(latest))
         recs.extend(self._regime_recommendation(latest))
         recs.extend(self._accuracy_recommendation(latest))
 
         return recs
+
+    def _rule_effectiveness_recommendation(self, obs: dict) -> list[Recommendation]:
+        """Flags individual rules whose pass/fail differential is weak
+        or backwards (rule passing correlates with LOSING, not
+        winning) — genuine per-rule granularity, not just the aggregate
+        technical score used by _technical_recommendation above."""
+        rules = obs.get("rule_effectiveness", {})
+        recs = []
+        for rule_name, stats in rules.items():
+            diff = stats.get("differential")
+            n_total = stats.get("sample_passed", 0) + stats.get("sample_failed", 0)
+            if diff is None or n_total < self.MIN_SAMPLE_FOR_MEDIUM_CONFIDENCE:
+                continue
+            if diff < 0:
+                recs.append(Recommendation(
+                    "RULE (weak/backwards)",
+                    f"'{rule_name}': passing this rule wins {stats['win_rate_when_passed']}% vs "
+                    f"{stats['win_rate_when_failed']}% when it fails ({diff:+.1f}pp) — backwards.",
+                    "Re-examine this rule's logic/direction — it currently correlates with losses, "
+                    "not wins.",
+                    self._confidence_for_n(n_total),
+                ))
+            elif diff < 5:
+                recs.append(Recommendation(
+                    "RULE (weak)",
+                    f"'{rule_name}': only {diff:+.1f}pp win-rate difference between passing and failing.",
+                    "Weak predictive value — candidate for removal or re-weighting.",
+                    self._confidence_for_n(n_total),
+                ))
+        return recs
+
+    def _redundant_rule_recommendation(self, obs: dict) -> list[Recommendation]:
+        """Uses LearningEngine's pairwise agreement-rate analysis to
+        flag rules that nearly always agree with another rule — little
+        marginal signal beyond one another."""
+        pairs = obs.get("redundant_rule_pairs", [])
+        recs = []
+        for pair in pairs[:5]:  # cap noise — only the strongest redundancies
+            recs.append(Recommendation(
+                "RULE (redundant)",
+                f"'{pair['rule_a']}' and '{pair['rule_b']}' agree {pair['agreement_rate']}% of the "
+                f"time (n={pair['sample_size']}).",
+                "These two rules likely measure the same thing — consider dropping one to "
+                "simplify the checklist without losing signal.",
+                self._confidence_for_n(pair["sample_size"]),
+            ))
+        return recs
+
+    def _threshold_recommendation(self, obs: dict) -> list[Recommendation]:
+        """Uses the margin-band win-rate data from LearningEngine to
+        give a SPECIFIC, evidence-based threshold suggestion, instead
+        of the generic accuracy-based note in _accuracy_recommendation."""
+        bands = obs.get("threshold_sensitivity", {})
+        near = bands.get("0-5", {})
+        far = bands.get("20+", {})
+        near_wr, far_wr = near.get("win_rate"), far.get("win_rate")
+        near_n, far_n = near.get("trades", 0), far.get("trades", 0)
+
+        if near_wr is None or far_wr is None or near_n < 5 or far_n < 5:
+            return []
+
+        diff = far_wr - near_wr
+        n_total = near_n + far_n
+        if diff >= 15:
+            return [Recommendation(
+                "THRESHOLD",
+                f"Trades that barely passed (margin 0-5pts, n={near_n}) win {near_wr}% vs "
+                f"{far_wr}% for comfortable passes (margin 20+pts, n={far_n}).",
+                "Raise the qualify threshold — near-threshold passes are meaningfully weaker "
+                "than confident ones, suggesting the current cutoff lets in too many marginal trades.",
+                self._confidence_for_n(n_total),
+            )]
+        return [Recommendation(
+            "THRESHOLD",
+            f"Near-threshold win rate ({near_wr}%, n={near_n}) is close to comfortable-pass "
+            f"win rate ({far_wr}%, n={far_n}).",
+            "Current threshold looks reasonably well-calibrated — no adjustment indicated yet.",
+            self._confidence_for_n(n_total),
+        )]
 
     def _news_recommendation(self, obs: dict) -> list[Recommendation]:
         eff = obs.get("news_effectiveness", {})
