@@ -12,6 +12,7 @@ Usage:
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import sys
@@ -208,10 +209,18 @@ def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Bypass the NSE-trading-day check (testing only — e.g. to verify a "
+        "fix on a market holiday). Normal scheduled runs never pass this.",
+    )
+    args = parser.parse_args()
+
     today_date = date.today()
     ist_now = now_ist()
 
-    if not is_trading_day(today_date):
+    if not args.force and not is_trading_day(today_date):
         reason = skip_reason(today_date) or "Non-trading day"
         logger.info("Not an NSE trading day — exiting before any scan begins.")
         print("Not an NSE trading day (weekend or holiday). No scan performed.")
