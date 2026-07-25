@@ -13,6 +13,7 @@ Usage:
 from __future__ import annotations
 
 import csv
+import json
 import sys
 import time
 from datetime import date
@@ -53,9 +54,9 @@ FIELDNAMES = [
     "LEARNIG", "OPTIMER", "BACKTESET",
     # Explainability (audit requirement) — full tier breakdown for both
     # engines, present for every outcome (BUY/SELL/NO_TRADE).
-    "BuyTier1Passed", "BuyTier1Detail", "BuyTier2Score", "BuyTier3Score",
+    "BuyTier1Passed", "BuyTier1Detail", "BuyTechnicalChecks", "BuyTier2Score", "BuyTier3Score",
     "BuyOverallScore", "BuyThreshold",
-    "SellTier1Passed", "SellTier1Detail", "SellTier2Score", "SellTier3Score",
+    "SellTier1Passed", "SellTier1Detail", "SellTechnicalChecks", "SellTier2Score", "SellTier3Score",
     "SellOverallScore", "SellThreshold",
     "Tier4Block",
 ]
@@ -181,6 +182,10 @@ def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
         "BuyTier1Detail": "; ".join(
             f"{k}={v}" for k, v in (d.get("buy_tier1_checks") or {}).items()
         ),
+        # Full per-rule technical checklist (all ~39 rules, not just the
+        # smaller Tier1 gate above) — JSON so it round-trips cleanly for
+        # the Learning Engine's rule-level correlation analysis.
+        "BuyTechnicalChecks": json.dumps(d.get("buy_technical_checks") or {}),
         "BuyTier2Score": d.get("buy_tier2_score"),
         "BuyTier3Score": d.get("buy_tier3_score"),
         "BuyOverallScore": d.get("buy_overall_score"),
@@ -189,6 +194,7 @@ def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
         "SellTier1Detail": "; ".join(
             f"{k}={v}" for k, v in (d.get("sell_tier1_checks") or {}).items()
         ),
+        "SellTechnicalChecks": json.dumps(d.get("sell_technical_checks") or {}),
         "SellTier2Score": d.get("sell_tier2_score"),
         "SellTier3Score": d.get("sell_tier3_score"),
         "SellOverallScore": d.get("sell_overall_score"),
