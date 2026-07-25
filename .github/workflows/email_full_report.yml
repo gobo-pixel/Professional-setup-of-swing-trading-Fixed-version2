@@ -1,0 +1,35 @@
+name: Email Full Report
+
+on:
+  workflow_dispatch:
+
+jobs:
+  email_report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build and email full report
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          REPORT_RECIPIENT: ${{ secrets.REPORT_RECIPIENT }}
+        run: PYTHONPATH=. python scripts/email_full_report.py
+
+      - name: Commit generated workbook back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- reports/full_report_latest.xlsx
+          git diff --staged --quiet || git commit -m "Full report workbook: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
