@@ -42,6 +42,7 @@ logger = get_logger(__name__)
 class BacktestResult:
     equity_curve: list[float] = field(default_factory=list)
     dates: list[Any] = field(default_factory=list)
+    regimes: list[str] = field(default_factory=list)
     closed_trades: list[dict[str, Any]] = field(default_factory=list)
     metrics: dict[str, Any] = field(default_factory=dict)
     status: str = "OK"
@@ -267,6 +268,12 @@ class BacktestEngine:
             result.equity_curve.append(equity)
             ts_col = historical_data[symbols[0]].iloc[step].get("timestamp", step)
             result.dates.append(ts_col)
+            # Reuses the market_regime the scanner already computed for
+            # this day (same regime-detection used live) — no separate
+            # computation needed. Falls back to "UNKNOWN" if no scan
+            # result was available (e.g. all symbols rejected pre-regime).
+            day_regime = scan_results[0].diagnostics.get("market_regime", "UNKNOWN") if scan_results else "UNKNOWN"
+            result.regimes.append(day_regime)
 
         # Close anything still open at the end, so realized P&L covers the
         # whole run (otherwise long-held winners/losers would be invisible
@@ -298,6 +305,86 @@ class BacktestEngine:
             "max_profit_percent": closed.max_profit_percent,
             "max_drawdown_percent": closed.max_drawdown_percent,
         })
+
+    @staticmethod
+    def _compute_walk_forward_windows(
+        result: "BacktestResult", initial_capital: float, n_windows: int = 4,
+    ) -> list[dict[str, Any]]:
+        """Splits the backtest into N sequential, non-overlapping
+        windows and computes metrics for EACH window independently —
+        the core spirit of walk-forward (rolling, out-of-sample-style
+        evaluation) adapted for a rule-based strategy with no fittable
+        parameters to literally retrain window-over-window. A strategy
+        whose win-rate/CAGR swings wildly between windows is more
+        likely overfit to one historical stretch than one with
+        consistent numbers across all windows."""
+        curve = result.equity_curve
+        if len(curve) < n_windows * 10:  # need a reasonable minimum per window
+            return []
+
+        window_size = len(curve) // n_windows
+        windows = []
+        for w in range(n_windows):
+            start = w * window_size
+            end = start + window_size if w < n_windows - 1 else len(curve)
+            window_curve = curve[start:end]
+            if len(window_curve) < 2:
+                continue
+
+            window_returns = [
+                (window_curve[i] / window_curve[i - 1] - 1)
+                for i in range(1, len(window_curve)) if window_curve[i - 1] > 0
+            ]
+            win_days = sum(1 for r in window_returns if r > 0)
+            window_start_equity = window_curve[0]
+            window_end_equity = window_curve[-1]
+            window_return_pct = (
+                (window_end_equity / window_start_equity - 1) * 100
+                if window_start_equity > 0 else 0.0
+            )
+            mean_r = sum(window_returns) / len(window_returns) if window_returns else 0.0
+            std_r = (
+                (sum((r - mean_r) ** 2 for r in window_returns) / len(window_returns)) ** 0.5
+                if window_returns else 0.0
+            )
+            sharpe = (mean_r / std_r * (252 ** 0.5)) if std_r > 0 else 0.0
+
+            windows.append({
+                "window": w + 1,
+                "days": len(window_curve),
+                "return_pct": round(window_return_pct, 2),
+                "win_rate": round(win_days / len(window_returns) * 100, 2) if window_returns else None,
+                "sharpe": round(sharpe, 2),
+                "start_date": str(result.dates[start]) if start < len(result.dates) else None,
+                "end_date": str(result.dates[end - 1]) if end - 1 < len(result.dates) else None,
+            })
+        return windows
+
+    @staticmethod
+    def _compute_regime_breakdown(result: "BacktestResult", returns: list[float]) -> dict[str, Any]:
+        """Segments the day-over-day equity return series by the
+        market regime active on each day (reusing the SAME
+        MarketRegimeEngine used live — see the regimes list populated
+        during run()), so performance can be judged per-regime instead
+        of only as one blended number across the whole period. `returns`
+        has one fewer entry than `regimes` (return[i] is between day
+        i-1 and day i), so it's paired with regimes[1:]."""
+        if not returns or len(result.regimes) < 2:
+            return {}
+
+        by_regime: dict[str, list[float]] = {}
+        for regime, ret in zip(result.regimes[1:], returns):
+            by_regime.setdefault(regime, []).append(ret)
+
+        breakdown = {}
+        for regime, rets in by_regime.items():
+            wins = sum(1 for r in rets if r > 0)
+            breakdown[regime] = {
+                "days": len(rets),
+                "win_rate": round(wins / len(rets) * 100, 2) if rets else None,
+                "avg_daily_return_pct": round(sum(rets) / len(rets) * 100, 4) if rets else None,
+            }
+        return breakdown
 
     def _compute_metrics(
         self, result, initial_capital, wins, losses, gross_profit, gross_loss,
@@ -368,6 +455,8 @@ class BacktestEngine:
             "sell_trades": len(sell_trades),
             "buy_accuracy": buy_accuracy,
             "sell_accuracy": sell_accuracy,
+            "regime_breakdown": self._compute_regime_breakdown(result, returns),
+            "walk_forward_windows": self._compute_walk_forward_windows(result, initial_capital),
             # "False positives" here = losing trades (the engine said
             # trade, it lost). True false-positive/negative classification
             # against a ground truth needs labeled data this pipeline
