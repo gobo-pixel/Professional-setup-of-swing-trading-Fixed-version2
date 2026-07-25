@@ -141,6 +141,21 @@ def main() -> None:
             f"New Trades Capital Used: {new_trades_capital:.2f}\n" if opened_list else ""
         )
 
+        Path("reports").mkdir(exist_ok=True)
+        with open("reports/paper_trading_summary_latest.json", "w") as f:
+            json.dump({
+                "date": summary["date"],
+                "opening_balance": opening_balance,
+                "total_capital_in_positions": total_capital_in_positions,
+                "remaining_balance": remaining_balance,
+                "portfolio_value": portfolio_value,
+                "realized_pnl": snap.get("total_pnl", 0),
+                "portfolio_return_percent": snap.get("portfolio_return_percent", 0),
+                "opened_today": summary["opened_today"],
+                "closed_today": summary["closed_today"],
+                "open_positions_now": final_open_positions,
+            }, f, indent=2, default=str)
+
         notify(
             event_type="daily_portfolio_summary",
             message=(
