@@ -203,9 +203,34 @@ def build_row(trade_id: int, r, trade: dict | None = None) -> dict:
         "Tier4Block": (
             d.get("portfolio_rule_reason")
             if d.get("portfolio_rule_reason") not in (None, "OK")
-            else ("Risk grade: " + str(d.get("risk_grade")) if not d.get("risk_safe", True) else "")
+            else (
+                "Risk grade: " + str(d.get("risk_grade")) if not d.get("risk_safe", True)
+                else _score_threshold_reason(d, r.action)
+            )
         ),
     }
+
+
+def _score_threshold_reason(d: dict, action: str) -> str:
+    """Tier4Block previously had NO way to record the single most common
+    NO_TRADE cause: the candidate passed Tier1/portfolio/risk cleanly,
+    but its overall score simply didn't clear the qualifying threshold.
+    Without this, those rows had an empty Tier4Block and fell into an
+    unhelpful "Other" bucket with no text to explain why. This directly
+    checks the SAME overall-score-vs-threshold values already computed
+    and stored in BuyOverallScore/BuyThreshold (or Sell-equivalent)."""
+    score_key = "buy_overall_score" if action != "SELL" else "sell_overall_score"
+    threshold_key = "buy_qualify_threshold" if action != "SELL" else "sell_qualify_threshold"
+    score = d.get(score_key)
+    threshold = d.get(threshold_key)
+    if score is None or threshold is None:
+        return ""
+    try:
+        if float(score) < float(threshold):
+            return f"Decision engine rejected trade: score {round(float(score), 1)} below threshold {round(float(threshold), 1)}."
+    except (TypeError, ValueError):
+        pass
+    return ""
 
 
 def main() -> None:
