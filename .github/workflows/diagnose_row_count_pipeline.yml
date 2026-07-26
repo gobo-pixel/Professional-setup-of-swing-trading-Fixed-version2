@@ -1,0 +1,26 @@
+name: Diagnose Row Count Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Symbol to trace (must be one that's still failing)"
+        required: true
+        default: "ICICIBANK.NS"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run diagnose_row_count_pipeline.py
+        run: PYTHONPATH=. python scripts/diagnose_row_count_pipeline.py --symbol "${{ inputs.symbol }}"
