@@ -100,6 +100,7 @@ def main() -> None:
     if tier_contrib:
         message_lines.append("")
         message_lines.append("Rule Contribution (avg score)")
+        message_lines.append("(Tier2 = technical indicators score, Tier3 = fundamentals+news+market score)")
         message_lines.append(
             f"BUY  — Tier2: {tier_contrib.get('buy_tier2_avg', 0)}, Tier3: {tier_contrib.get('buy_tier3_avg', 0)}"
         )
@@ -129,6 +130,13 @@ def main() -> None:
         message_lines.append("Weakest BUY Sectors")
         for i, (sector, count) in enumerate(weak_sectors, 1):
             message_lines.append(f"{i}. {_sector_label(sector)} ({count} BUY)")
+        unknown_symbols = result.get("unknown_sector_symbols", [])
+        if unknown_symbols:
+            message_lines.append(
+                "Note: \"Unknown sector\" means yfinance didn't return a sector "
+                "for that stock (data gap, not a strategy issue). Affected:"
+            )
+            message_lines.append("  " + ", ".join(unknown_symbols[:10]))
 
     # ---------------- 4. Rejection Funnel ----------------
     # Honest note: these are the categories the classifier can actually
@@ -138,15 +146,26 @@ def main() -> None:
     # here.
     if funnel:
         message_lines.append("")
-        message_lines.append("Rejection Funnel (BUY-side; SELL tracked separately below)")
-        message_lines.append(f"{funnel.get('buy_side_scanned', 0)} Scanned")
+        message_lines.append("Rejection Funnel (BUY-side only)")
+        message_lines.append(
+            f"{funnel.get('buy_side_scanned', 0)} Scanned "
+            f"({total_scans} total scanned − {sell_n} SELL, tracked separately below)"
+        )
         message_lines.append(f"├── BUY Candidates: {funnel.get('buy_candidates', 0)}")
         message_lines.append(f"├── Rejected — Trend: {funnel.get('rejected_by_trend', 0)}")
         message_lines.append(f"├── Rejected — Risk (signal stage): {funnel.get('rejected_by_risk', 0)}")
         message_lines.append(f"├── Rejected — Portfolio: {funnel.get('rejected_by_portfolio', 0)}")
         message_lines.append(f"├── Rejected — Liquidity: {funnel.get('rejected_by_liquidity', 0)}")
         message_lines.append(f"├── Rejected — Score Threshold: {funnel.get('rejected_by_score_threshold', 0)}")
-        message_lines.append(f"├── Rejected — Other: {funnel.get('rejected_by_other', 0)}")
+        message_lines.append(
+            f"├── Rejected — Insufficient Historical Candles: {funnel.get('rejected_by_insufficient_history', 0)}"
+        )
+        other_n = funnel.get("rejected_by_other", 0)
+        message_lines.append(f"├── Rejected — Other: {other_n}")
+        other_breakdown = funnel.get("other_reasons_breakdown", {})
+        if other_breakdown:
+            for reason, count in other_breakdown.items():
+                message_lines.append(f"│     • {reason}: {count}")
         message_lines.append(f"└── Executed: {funnel.get('executed', 0)}")
 
     # ---------------- 5. Execution Summary (with Eligible) ----------------
@@ -203,6 +222,7 @@ def main() -> None:
                 ("Portfolio", funnel.get("rejected_by_portfolio", 0)),
                 ("Liquidity", funnel.get("rejected_by_liquidity", 0)),
                 ("Score Threshold", funnel.get("rejected_by_score_threshold", 0)),
+                ("Insufficient Historical Candles", funnel.get("rejected_by_insufficient_history", 0)),
             ],
             key=lambda kv: kv[1],
         )
@@ -229,10 +249,50 @@ def main() -> None:
     message_lines.append("")
     message_lines.append("Strategy Health")
     message_lines.append(f"{_health_emoji(buy_opportunities_level)} BUY Opportunities : {buy_opportunities_level.title()} ({buy_n})")
+    message_lines.append("   Rule: Healthy ≥50, Watch 15-49, Investigate <15")
     message_lines.append(f"{_health_emoji(trend_level)} Market Trend      : {trend_level.title()}")
+    message_lines.append("   Rule: Healthy if regime spread ≥40pp (clear dominant regime)")
     message_lines.append(f"{_health_emoji(exec_level)} Execution Rate    : {exec_level.title()} ({exec_rate}%)")
+    message_lines.append("   Rule: Healthy ≥5%, Watch 0-5%, Investigate at 0%")
     if exec_level == "investigate":
         message_lines.append("Recommendation: review execution filters (capital/liquidity/risk) before touching strategy logic.")
+
+    # ---------------- 8b. Scan Efficiency ----------------
+    message_lines.append("")
+    message_lines.append("⭐ Scan Efficiency")
+    message_lines.append(f"{total_scans} Stocks")
+    if total_scans:
+        message_lines.append(f"↓ {buy_n} BUY  ({round(buy_n / total_scans * 100, 1)}%)")
+        message_lines.append(f"↓ {sell_n} SELL  ({round(sell_n / total_scans * 100, 1)}%)")
+        message_lines.append(f"↓ {no_trade_n} NO TRADE  ({round(no_trade_n / total_scans * 100, 1)}%)")
+
+    # ---------------- 8c. Pipeline Health ----------------
+    # Explicit rules, shown so the classification isn't a black box:
+    #  Trend Filter: healthy if it's genuinely discriminating (rejecting
+    #    somewhere between 10-90% of candidates) — 0% means it never
+    #    rejects anything (suspicious), ~100% means nothing ever passes.
+    #  Execution Filter: healthy if at least one BUY actually executed;
+    #    "needs investigation" if signals were generated but zero executed.
+    #  Portfolio Filter: "idle" if it never had a chance to reject anything
+    #    (0 portfolio-rejections) — not necessarily broken, just unused
+    #    this run; "working" if it's genuinely rejecting when triggered.
+    message_lines.append("")
+    message_lines.append("⭐ Pipeline Health")
+    buy_side_scanned = funnel.get("buy_side_scanned", 1) or 1
+    trend_rejection_rate = funnel.get("rejected_by_trend", 0) / buy_side_scanned * 100
+    trend_status = "Working" if 10 <= trend_rejection_rate <= 90 else "Needs Investigation"
+    trend_emoji = "🟢" if trend_status == "Working" else "🔴"
+    message_lines.append(f"Trend Filter       : {trend_status} {trend_emoji}")
+
+    exec_status = "Working" if execution.get("buy_executed", 0) > 0 else (
+        "Needs Investigation" if execution.get("buy_generated", 0) > 0 else "Idle"
+    )
+    exec_emoji = {"Working": "🟢", "Needs Investigation": "🔴", "Idle": "⚪"}[exec_status]
+    message_lines.append(f"Execution Filter   : {exec_status} {exec_emoji}")
+
+    portfolio_status = "Working" if funnel.get("rejected_by_portfolio", 0) > 0 else "Idle"
+    portfolio_emoji = "🟢" if portfolio_status == "Working" else "⚪"
+    message_lines.append(f"Portfolio Filter   : {portfolio_status} {portfolio_emoji}")
 
     # ---------------- 9. Numbers Consistency Check ----------------
     # Mandatory reconciliation — verifies the report's own numbers add
@@ -245,7 +305,7 @@ def main() -> None:
             funnel.get("buy_candidates", 0) + funnel.get("rejected_by_trend", 0)
             + funnel.get("rejected_by_risk", 0) + funnel.get("rejected_by_portfolio", 0)
             + funnel.get("rejected_by_liquidity", 0) + funnel.get("rejected_by_score_threshold", 0)
-            + funnel.get("rejected_by_other", 0)
+            + funnel.get("rejected_by_insufficient_history", 0) + funnel.get("rejected_by_other", 0)
         )
         if funnel_sum != funnel.get("buy_side_scanned", 0):
             errors.append(f"BUY funnel: parts sum to {funnel_sum}, expected {funnel.get('buy_side_scanned', 0)}")
