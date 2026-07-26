@@ -1,5 +1,5 @@
 {
-  "timestamp": 1785086184.626906,
+  "timestamp": 1785088843.5963774,
   "closed_trades_observed": 44,
   "sector_performance": {
     "Financial Services": {
@@ -103,9 +103,10 @@
   },
   "buy_accuracy": {
     "trades": 39,
-    "win_rate": 7.69,
+    "win_rate": 10.34,
     "wins": 3,
     "losses": 26,
+    "data_quality_issues": 10,
     "avg_winner_pct": 2.09,
     "avg_loser_pct": -0.91,
     "largest_winner_pct": 4.75,
@@ -122,15 +123,32 @@
     "win_rate": 20.0,
     "wins": 1,
     "losses": 4,
-    "avg_winner_pct": -0.46,
-    "avg_loser_pct": 0.78,
-    "largest_winner_pct": -0.46,
-    "largest_loser_pct": -0.0,
+    "data_quality_issues": 0,
+    "avg_winner_pct": 0.46,
+    "avg_loser_pct": -0.78,
+    "largest_winner_pct": 0.46,
+    "largest_loser_pct": -3.14,
     "avg_holding_days": 1.5,
     "avg_winner_holding_days": 2.6,
     "avg_loser_holding_days": 1.2,
     "gross_profit": 113.1,
     "gross_loss": 819.0,
     "profit_factor": 0.14
+  },
+  "best_worst_trade": {
+    "best": {
+      "symbol": "CHENNPETRO.NS",
+      "direction": "BUY",
+      "pct": 4.75
+    },
+    "worst": {
+      "symbol": "ZYDUSWELL.NS",
+      "direction": "BUY",
+      "pct": -4.65
+    }
+  },
+  "exit_reason_breakdown": {
+    "Risk Exit": 40,
+    "Time Exit": 4
   }
 }

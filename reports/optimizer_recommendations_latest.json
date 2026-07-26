@@ -25,7 +25,7 @@
   },
   {
     "category": "BUY ACCURACY",
-    "finding": "39 trades, 7.69% win rate.",
+    "finding": "39 trades, 10.34% win rate.",
     "suggestion": "Below 45% with a decent sample would suggest the qualify threshold is too loose for this side; above 65% may mean it's too strict and missing volume.",
     "confidence": "HIGH"
   },
