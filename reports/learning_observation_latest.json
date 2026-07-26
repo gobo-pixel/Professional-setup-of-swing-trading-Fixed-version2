@@ -1,96 +1,136 @@
 {
-  "timestamp": 1785014046.2087655,
+  "timestamp": 1785038389.9515517,
   "closed_trades_observed": 44,
   "sector_performance": {
     "Financial Services": {
       "trades": 12,
+      "wins": 0,
       "win_rate": 0.0
     },
     "Consumer Cyclical": {
       "trades": 6,
+      "wins": 2,
       "win_rate": 33.33
     },
     "Healthcare": {
       "trades": 7,
+      "wins": 0,
       "win_rate": 0.0
     },
     "Energy": {
       "trades": 3,
+      "wins": 1,
       "win_rate": 33.33
     },
     "Consumer Defensive": {
       "trades": 4,
+      "wins": 0,
       "win_rate": 0.0
     },
     "Technology": {
       "trades": 3,
+      "wins": 1,
       "win_rate": 33.33
     },
     "Utilities": {
       "trades": 2,
+      "wins": 0,
       "win_rate": 0.0
     },
     "Basic Materials": {
       "trades": 4,
+      "wins": 0,
       "win_rate": 0.0
     },
     "Industrials": {
       "trades": 3,
+      "wins": 0,
       "win_rate": 0.0
     }
   },
   "regime_performance": {
     "SIDEWAYS": {
       "trades": 12,
+      "wins": 0,
       "win_rate": 0.0
     },
     "BULL": {
       "trades": 28,
+      "wins": 3,
       "win_rate": 10.71
     },
     "BEAR": {
       "trades": 4,
+      "wins": 1,
       "win_rate": 25.0
     }
   },
   "news_effectiveness": {
     "with_news_win_rate": 6.98,
-    "without_news_win_rate": 100.0
+    "without_news_win_rate": 100.0,
+    "with_news_trades": 43,
+    "without_news_trades": 1
   },
   "fundamental_effectiveness": {
     "strong_fundamentals_win_rate": null,
     "weak_fundamentals_win_rate": 9.09
   },
   "technical_effectiveness": {
-    "high_technical_win_rate": 12.12,
-    "low_technical_win_rate": 0.0
+    "high_technical_win_rate": null,
+    "low_technical_win_rate": null,
+    "high_technical_trades": 0,
+    "low_technical_trades": 0
   },
   "rule_effectiveness": {},
   "redundant_rule_pairs": [],
   "threshold_sensitivity": {
     "0-5": {
-      "trades": 5,
-      "win_rate": 0.0
+      "trades": 14,
+      "win_rate": 7.14
     },
     "5-10": {
-      "trades": 8,
-      "win_rate": 0.0
+      "trades": 6,
+      "win_rate": 16.67
     },
     "10-20": {
-      "trades": 22,
-      "win_rate": 18.18
+      "trades": 9,
+      "win_rate": 0.0
     },
     "20+": {
-      "trades": 0,
-      "win_rate": null
+      "trades": 3,
+      "win_rate": 0.0
     }
   },
   "buy_accuracy": {
     "trades": 39,
-    "win_rate": 7.69
+    "win_rate": 7.69,
+    "wins": 3,
+    "losses": 26,
+    "avg_winner_pct": 2.09,
+    "avg_loser_pct": -0.91,
+    "largest_winner_pct": 4.75,
+    "largest_loser_pct": -4.65,
+    "avg_holding_days": 1.5,
+    "avg_winner_holding_days": 2.6,
+    "avg_loser_holding_days": 1.6,
+    "gross_profit": 1663.3,
+    "gross_loss": 6722.4,
+    "profit_factor": 0.25
   },
   "sell_accuracy": {
     "trades": 5,
-    "win_rate": 20.0
+    "win_rate": 20.0,
+    "wins": 1,
+    "losses": 4,
+    "avg_winner_pct": -0.46,
+    "avg_loser_pct": 0.78,
+    "largest_winner_pct": -0.46,
+    "largest_loser_pct": -0.0,
+    "avg_holding_days": 1.5,
+    "avg_winner_holding_days": 2.6,
+    "avg_loser_holding_days": 1.2,
+    "gross_profit": 113.1,
+    "gross_loss": 819.0,
+    "profit_factor": 0.14
   }
 }

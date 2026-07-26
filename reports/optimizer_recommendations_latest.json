@@ -6,12 +6,6 @@
     "confidence": "MEDIUM"
   },
   {
-    "category": "TECHNICAL",
-    "finding": "High-Tier2-score trades win 12.12% vs 0.0% for low-Tier2-score trades (+12.1pp).",
-    "suggestion": "Technical (Tier 2) weight looks well-calibrated.",
-    "confidence": "MEDIUM"
-  },
-  {
     "category": "SECTOR",
     "finding": "Financial Services: 0.0% win rate over 12 trades.",
     "suggestion": "Consider a sector-specific confidence penalty for Financial Services (this is exactly what Phase 3's Sector Templates would formalize).",
