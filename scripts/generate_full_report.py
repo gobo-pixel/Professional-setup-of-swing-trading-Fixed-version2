@@ -290,10 +290,39 @@ def main() -> None:
     # (filter by the "Date" column to see any day/month) rather than being
     # overwritten each run. Write the header only the first time the file
     # is created.
+    #
+    # CRITICAL: the header is written ONCE, ever. If FIELDNAMES has grown
+    # since then (adding new columns, as happens whenever a new diagnostic
+    # field is introduced), every row written after that point gets
+    # POSITIONALLY MISALIGNED when read back with csv.DictReader (which
+    # uses the file's original, shorter header) — a later column's VALUE
+    # silently lands under an EARLIER column's NAME. This was the actual
+    # cause of raw numeric scores appearing where rejection-reason TEXT
+    # was expected. Detect a mismatch and rotate to a fresh file (with a
+    # header matching the CURRENT FIELDNAMES) instead of silently
+    # continuing to misalign data.
     file_exists = Path(out_path).exists()
+    header_matches = True
+    if file_exists:
+        with open(out_path, newline="") as f:
+            existing_header = next(csv.reader(f), [])
+        if existing_header != FIELDNAMES:
+            header_matches = False
+            archive_path = out_path.replace(
+                ".csv", f"_pre_{date.today().isoformat()}_schema_change.csv"
+            )
+            Path(out_path).rename(archive_path)
+            logger.warning(
+                "full_report.csv's header no longer matches the current "
+                "FIELDNAMES (columns were added/changed since the header "
+                "was written) — archived the old file to %s and starting "
+                "a fresh one with the correct header, to avoid silently "
+                "misaligned reads going forward.", archive_path,
+            )
+
     with open(out_path, "a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
-        if not file_exists:
+        if not file_exists or not header_matches:
             writer.writeheader()
         writer.writerows(rows)
 
