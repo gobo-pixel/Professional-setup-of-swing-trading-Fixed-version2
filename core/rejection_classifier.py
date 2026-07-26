@@ -27,12 +27,17 @@ def classify_tier4_block(block_text: str) -> str:
         return CATEGORY_OTHER
     if "historical candles" in block or "insufficient history" in block:
         return CATEGORY_INSUFFICIENT_HISTORY
-    if "risk" in block or "unsafe" in block or "nan" in block or "circuit" in block:
+    if ("risk" in block or "unsafe" in block or "nan" in block or "circuit" in block
+            or "drawdown" in block or "daily loss" in block):
         return CATEGORY_RISK
     if "volume" in block or "liquidity" in block:
         return CATEGORY_LIQUIDITY
-    if "exposure" in block or "capital" in block or "position" in block or "reserve" in block:
+    if (
+        "exposure" in block or "capital" in block or "position" in block
+        or "reserve" in block or "correlation" in block or "already exists" in block
+        or "concentration" in block or "maximum portfolio" in block
+    ):
         return CATEGORY_PORTFOLIO
-    if "decision engine rejected" in block:
+    if "decision engine rejected" in block or "validation failed" in block:
         return CATEGORY_SCORE_THRESHOLD
     return CATEGORY_OTHER
