@@ -10,14 +10,10 @@ apply manually.
 
 from __future__ import annotations
 
-import json
-import time
 from dataclasses import dataclass, field
 from typing import Any
 
 from analytics.learning_engine import LearningEngine
-from core.notifications import notify
-from core.trading_calendar import now_ist
 
 
 @dataclass
@@ -263,16 +259,6 @@ class Optimizer:
             print(f"\n[{r.category}] (confidence: {r.confidence})")
             print(f"  Finding    : {r.finding}")
             print(f"  Suggestion : {r.suggestion}")
-
-        actionable = [r for r in recs if r.confidence in ("MEDIUM", "HIGH")]
-        if actionable:
-            summary_lines = "\n".join(f"[{r.category}] {r.finding}" for r in actionable)
-            notify(
-                event_type="optimizer_recommendation",
-                message=f"Optimizer Recommendation(s) available (review only):\n{summary_lines}",
-                severity="🟡 MEDIUM",
-                dedup_key=f"optimizer_recommendation::{time.strftime('%Y-%m-%d')}::{now_ist().strftime('%H:%M:%S.%f')}",
-            )
 
 
 if __name__ == "__main__":
