@@ -34,9 +34,13 @@
   },
   "tier_contribution": {
     "buy_tier2_avg": 0.0,
+    "buy_tier2_n": 1000,
     "buy_tier3_avg": 37.44,
+    "buy_tier3_n": 1000,
     "sell_tier2_avg": 0.0,
-    "sell_tier3_avg": 0.0
+    "sell_tier2_n": 1000,
+    "sell_tier3_avg": 0.0,
+    "sell_tier3_n": 1000
   },
   "tier4_rejection_reasons": {
     "30.21": 8,
