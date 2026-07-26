@@ -43,6 +43,29 @@ from analytics.analysis_engine import AnalysisEngine  # noqa: E402
 logger = get_logger(__name__)
 
 OUTPUT_PATH = "reports/analysis_summary.json"
+HISTORY_PATH = "reports/analysis_history.jsonl"
+
+
+def _load_history() -> list[dict]:
+    path = Path(HISTORY_PATH)
+    if not path.exists():
+        return []
+    entries = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    return entries
+
+
+def _append_history(entry: dict) -> None:
+    Path(HISTORY_PATH).parent.mkdir(parents=True, exist_ok=True)
+    with open(HISTORY_PATH, "a") as f:
+        f.write(json.dumps(entry, default=str) + "\n")
 
 
 def main() -> None:
@@ -77,6 +100,18 @@ def main() -> None:
     no_trade_n = signal_counts.get("NO_TRADE", 0)
     tier1 = result.get("tier1_pass_rate", {})
 
+    # ---------------- Historical comparison (load BEFORE appending today) ----------------
+    history = _load_history()
+    today_str = time.strftime("%Y-%m-%d")
+    prior_entries = [h for h in history if h.get("date") != today_str]
+    yesterday_entry = prior_entries[-1] if prior_entries else None
+    last_7_entries = prior_entries[-7:]
+
+    _append_history({
+        "date": today_str, "total_scans": total_scans, "buy": buy_n, "sell": sell_n,
+        "no_trade": no_trade_n, "tier1_buy_pct": tier1.get("buy"), "tier1_sell_pct": tier1.get("sell"),
+    })
+
     def _sector_label(sector: str) -> str:
         return "Unknown sector" if sector == "UNKNOWN" else sector
 
@@ -92,21 +127,71 @@ def main() -> None:
         f"SELL Signals     : {sell_n}",
         f"NO TRADE         : {no_trade_n}",
         "",
-        "Tier-1 Pass Rate",
-        f"BUY  : {tier1.get('buy', 0)}%",
-        f"SELL : {tier1.get('sell', 0)}%",
+        "Tier-1 Screening (initial trend/volume gate)",
+        f"BUY Pass Rate  : {tier1.get('buy', 0)}%",
+        f"SELL Pass Rate : {tier1.get('sell', 0)}%",
     ]
+    avg_7d_buy_tier1 = [e.get("tier1_buy_pct") for e in last_7_entries if e.get("tier1_buy_pct") is not None]
+    if avg_7d_buy_tier1:
+        avg_val = round(sum(avg_7d_buy_tier1) / len(avg_7d_buy_tier1), 1)
+        direction = "above" if tier1.get("buy", 0) > avg_val else ("below" if tier1.get("buy", 0) < avg_val else "in line with")
+        message_lines.append(
+            f"Meaning: {direction} the {len(avg_7d_buy_tier1)}-day average ({avg_val}%) — "
+            f"{tier1.get('buy', 0)}% of BUY candidates cleared the initial screen today."
+        )
+    else:
+        message_lines.append(
+            f"Meaning: {tier1.get('buy', 0)}% of BUY candidates cleared the initial screen today "
+            f"(no prior-day history yet to compare against)."
+        )
 
     if tier_contrib:
         message_lines.append("")
-        message_lines.append("Rule Contribution (avg score)")
+        message_lines.append("Rule Contribution (avg score across scanned candidates)")
         message_lines.append("(Tier2 = technical indicators score, Tier3 = fundamentals+news+market score)")
+
+        def _tier_line(label: str, avg_val, n: int) -> str:
+            if avg_val is None or n == 0:
+                return f"{label}: N/A — no candidates had this score recorded (0 sample)"
+            return f"{label}: {avg_val} (based on {n} candidates)"
+
+        message_lines.append(_tier_line(
+            "BUY Tier2", tier_contrib.get("buy_tier2_avg"), tier_contrib.get("buy_tier2_n", 0)
+        ))
+        message_lines.append(_tier_line(
+            "BUY Tier3", tier_contrib.get("buy_tier3_avg"), tier_contrib.get("buy_tier3_n", 0)
+        ))
+        message_lines.append(_tier_line(
+            "SELL Tier2", tier_contrib.get("sell_tier2_avg"), tier_contrib.get("sell_tier2_n", 0)
+        ))
+        message_lines.append(_tier_line(
+            "SELL Tier3", tier_contrib.get("sell_tier3_avg"), tier_contrib.get("sell_tier3_n", 0)
+        ))
         message_lines.append(
-            f"BUY  — Tier2: {tier_contrib.get('buy_tier2_avg', 0)}, Tier3: {tier_contrib.get('buy_tier3_avg', 0)}"
+            "So what: a genuinely low average (not N/A) means most scanned candidates "
+            "showed weak signals on that dimension today — not a bug, weight, or disabled rule."
         )
-        message_lines.append(
-            f"SELL — Tier2: {tier_contrib.get('sell_tier2_avg', 0)}, Tier3: {tier_contrib.get('sell_tier3_avg', 0)}"
-        )
+
+    # ---------------- 1b. Historical Comparison ----------------
+    if yesterday_entry or last_7_entries:
+        message_lines.append("")
+        message_lines.append("Historical Comparison")
+        if yesterday_entry:
+            for label, key in (("BUY", "buy"), ("SELL", "sell")):
+                prev_val = yesterday_entry.get(key, 0)
+                curr_val = buy_n if key == "buy" else sell_n
+                if prev_val:
+                    pct_change = round((curr_val - prev_val) / prev_val * 100, 1)
+                    arrow = "↑" if pct_change > 0 else ("↓" if pct_change < 0 else "→")
+                    message_lines.append(f"{label}: Yesterday {prev_val} → Today {curr_val}  {arrow} {pct_change:+.1f}%")
+                else:
+                    message_lines.append(f"{label}: Yesterday {prev_val} → Today {curr_val}")
+        if last_7_entries:
+            avg_buy_7d = round(sum(e.get("buy", 0) for e in last_7_entries) / len(last_7_entries), 1)
+            comparison = "Above Average" if buy_n > avg_buy_7d else ("Below Average" if buy_n < avg_buy_7d else "In Line")
+            message_lines.append(
+                f"{len(last_7_entries)}-Day Avg BUY: {avg_buy_7d} — Today: {buy_n} ({comparison})"
+            )
 
     # ---------------- 2. Market Regime (unchanged) ----------------
     if regime_pct:
@@ -229,7 +314,10 @@ def main() -> None:
         if biggest_reason[1] > 0:
             observations.append(f"Most rejected candidates failed on {biggest_reason[0]} ({biggest_reason[1]}).")
     if execution and execution.get("buy_executed", 0) == 0 and execution.get("buy_generated", 0) > 0:
-        observations.append("No BUY trades executed today — all eligible candidates were blocked at capital/liquidity/risk checks.")
+        if eligible == 0:
+            observations.append("No BUY trades reached the execution stage today — all were blocked earlier at signal/validation checks.")
+        else:
+            observations.append(f"{eligible} BUY candidate(s) reached the execution stage but none were executed — worth reviewing capital/liquidity/risk checks.")
     if observations:
         message_lines.append("")
         message_lines.append("AI Observation")
@@ -255,7 +343,13 @@ def main() -> None:
     message_lines.append(f"{_health_emoji(exec_level)} Execution Rate    : {exec_level.title()} ({exec_rate}%)")
     message_lines.append("   Rule: Healthy ≥5%, Watch 0-5%, Investigate at 0%")
     if exec_level == "investigate":
-        message_lines.append("Recommendation: review execution filters (capital/liquidity/risk) before touching strategy logic.")
+        message_lines.append("Recommendation")
+        message_lines.append(f"Execution stage produced {eligible} eligible trade(s).")
+        message_lines.append("Verify:")
+        message_lines.append("• Capital allocation")
+        message_lines.append("• Liquidity filter")
+        message_lines.append("• Portfolio rules")
+        message_lines.append("• Risk engine thresholds")
 
     # ---------------- 8b. Scan Efficiency ----------------
     message_lines.append("")
@@ -285,12 +379,12 @@ def main() -> None:
     message_lines.append(f"Trend Filter       : {trend_status} {trend_emoji}")
 
     exec_status = "Working" if execution.get("buy_executed", 0) > 0 else (
-        "Needs Investigation" if execution.get("buy_generated", 0) > 0 else "Idle"
+        "Needs Investigation" if execution.get("buy_generated", 0) > 0 else "No candidates reached this stage"
     )
-    exec_emoji = {"Working": "🟢", "Needs Investigation": "🔴", "Idle": "⚪"}[exec_status]
+    exec_emoji = {"Working": "🟢", "Needs Investigation": "🔴", "No candidates reached this stage": "⚪"}[exec_status]
     message_lines.append(f"Execution Filter   : {exec_status} {exec_emoji}")
 
-    portfolio_status = "Working" if funnel.get("rejected_by_portfolio", 0) > 0 else "Idle"
+    portfolio_status = "Working" if funnel.get("rejected_by_portfolio", 0) > 0 else "No candidates reached this stage"
     portfolio_emoji = "🟢" if portfolio_status == "Working" else "⚪"
     message_lines.append(f"Portfolio Filter   : {portfolio_status} {portfolio_emoji}")
 
