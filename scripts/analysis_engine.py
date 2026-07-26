@@ -71,20 +71,43 @@ def main() -> None:
     execution = result.get("execution_summary", {})
     tier_contrib = result.get("tier_contribution", {})
 
+    total_scans = result.get("total_scans", 0)
+    buy_n = signal_counts.get("BUY", 0)
+    sell_n = signal_counts.get("SELL", 0)
+    no_trade_n = signal_counts.get("NO_TRADE", 0)
+    tier1 = result.get("tier1_pass_rate", {})
+
+    def _sector_label(sector: str) -> str:
+        return "Unknown sector" if sector == "UNKNOWN" else sector
+
+    def _health_emoji(level: str) -> str:
+        return {"healthy": "🟢", "watch": "🟡", "investigate": "🔴"}.get(level, "🟡")
+
+    # ---------------- 1. Header ----------------
     message_lines = [
-        f"Analysis Summary — {result.get('total_scans', 0)} scans analyzed.",
-        f"BUY: {signal_counts.get('BUY', 0)} | SELL: {signal_counts.get('SELL', 0)} | "
-        f"NO_TRADE: {signal_counts.get('NO_TRADE', 0)}",
-        f"Tier-1 pass rate: {result.get('tier1_pass_rate', {})}",
+        "📊 Daily Scan Summary",
+        "",
+        f"Universe Scanned : {total_scans}",
+        f"BUY Signals      : {buy_n}",
+        f"SELL Signals     : {sell_n}",
+        f"NO TRADE         : {no_trade_n}",
+        "",
+        "Tier-1 Pass Rate",
+        f"BUY  : {tier1.get('buy', 0)}%",
+        f"SELL : {tier1.get('sell', 0)}%",
     ]
 
     if tier_contrib:
+        message_lines.append("")
+        message_lines.append("Rule Contribution (avg score)")
         message_lines.append(
-            f"Rule contribution (avg score) — BUY: Tier2={tier_contrib.get('buy_tier2_avg', 0)}, "
-            f"Tier3={tier_contrib.get('buy_tier3_avg', 0)} | SELL: Tier2={tier_contrib.get('sell_tier2_avg', 0)}, "
-            f"Tier3={tier_contrib.get('sell_tier3_avg', 0)}"
+            f"BUY  — Tier2: {tier_contrib.get('buy_tier2_avg', 0)}, Tier3: {tier_contrib.get('buy_tier3_avg', 0)}"
+        )
+        message_lines.append(
+            f"SELL — Tier2: {tier_contrib.get('sell_tier2_avg', 0)}, Tier3: {tier_contrib.get('sell_tier3_avg', 0)}"
         )
 
+    # ---------------- 2. Market Regime (unchanged) ----------------
     if regime_pct:
         message_lines.append("")
         message_lines.append("Market Regime")
@@ -94,9 +117,7 @@ def main() -> None:
                 label = {"BULL": "Bullish", "SIDEWAYS": "Sideways", "BEAR": "Bearish"}[regime]
                 message_lines.append(f"{emoji[regime]} {label}: {regime_pct[regime]}%")
 
-    def _sector_label(sector: str) -> str:
-        return "Unknown sector" if sector == "UNKNOWN" else sector
-
+    # ---------------- 3. Sector Analysis ----------------
     if top_sectors:
         message_lines.append("")
         message_lines.append("Top BUY Sectors")
@@ -105,44 +126,146 @@ def main() -> None:
                 message_lines.append(f"{i}. {_sector_label(sector)} ({count} BUY)")
     if weak_sectors:
         message_lines.append("")
-        message_lines.append("Weakest Sectors")
+        message_lines.append("Weakest BUY Sectors")
         for i, (sector, count) in enumerate(weak_sectors, 1):
-            message_lines.append(f"{i}. {_sector_label(sector)}")
+            message_lines.append(f"{i}. {_sector_label(sector)} ({count} BUY)")
 
+    # ---------------- 4. Rejection Funnel ----------------
+    # Honest note: these are the categories the classifier can actually
+    # tell apart (Trend/Risk/Portfolio/Liquidity/Score-Threshold/Other).
+    # A Momentum/News/Fundamental-specific split isn't derivable from
+    # current data without new, separate detector work — not fabricated
+    # here.
     if funnel:
         message_lines.append("")
-        message_lines.append("Rejection Funnel (BUY-side only — SELL tracked separately below)")
+        message_lines.append("Rejection Funnel (BUY-side; SELL tracked separately below)")
         message_lines.append(f"{funnel.get('buy_side_scanned', 0)} Scanned")
         message_lines.append(f"├── BUY Candidates: {funnel.get('buy_candidates', 0)}")
-        message_lines.append(f"├── Rejected by Trend: {funnel.get('rejected_by_trend', 0)}")
-        message_lines.append(f"├── Rejected by Risk Engine (signal stage): {funnel.get('rejected_by_risk', 0)}")
-        message_lines.append(f"├── Rejected by Portfolio: {funnel.get('rejected_by_portfolio', 0)}")
-        message_lines.append(f"├── Rejected by Liquidity: {funnel.get('rejected_by_liquidity', 0)}")
-        message_lines.append(f"├── Rejected by Score Threshold: {funnel.get('rejected_by_score_threshold', 0)}")
+        message_lines.append(f"├── Rejected — Trend: {funnel.get('rejected_by_trend', 0)}")
+        message_lines.append(f"├── Rejected — Risk (signal stage): {funnel.get('rejected_by_risk', 0)}")
+        message_lines.append(f"├── Rejected — Portfolio: {funnel.get('rejected_by_portfolio', 0)}")
+        message_lines.append(f"├── Rejected — Liquidity: {funnel.get('rejected_by_liquidity', 0)}")
+        message_lines.append(f"├── Rejected — Score Threshold: {funnel.get('rejected_by_score_threshold', 0)}")
         message_lines.append(f"├── Rejected — Other: {funnel.get('rejected_by_other', 0)}")
         message_lines.append(f"└── Executed: {funnel.get('executed', 0)}")
 
+    # ---------------- 5. Execution Summary (with Eligible) ----------------
     if execution:
+        reasons = execution.get("reasons", {})
+        # "Eligible" = candidates that were genuinely close to executing
+        # (blocked only by capital/liquidity/risk at the execution
+        # stage) — as opposed to score-threshold/other rejections,
+        # which were disqualified well before execution was even considered.
+        eligible = (
+            reasons.get("Capital / Portfolio Rules", 0)
+            + reasons.get("Risk Engine (execution stage)", 0)
+            + reasons.get("Liquidity", 0)
+        )
         message_lines.append("")
-        message_lines.append("Execution Summary")
-        message_lines.append(f"BUY Signals Generated: {execution.get('buy_generated', 0)}")
-        message_lines.append(f"BUY Executed: {execution.get('buy_executed', 0)}")
-        message_lines.append(f"BUY Rejected: {execution.get('buy_rejected', 0)}")
-        if execution.get("reasons"):
-            message_lines.append("Reasons")
-            for reason, count in execution["reasons"].items():
+        message_lines.append("BUY Execution")
+        message_lines.append(f"Signals Generated : {execution.get('buy_generated', 0)}")
+        message_lines.append(f"Eligible           : {eligible}")
+        message_lines.append(f"Executed           : {execution.get('buy_executed', 0)}")
+        message_lines.append(f"Not Executed       : {execution.get('buy_rejected', 0)}")
+        if reasons:
+            message_lines.append("Reason")
+            for reason, count in reasons.items():
                 message_lines.append(f"  {reason}: {count}")
 
-    if sell_gap.get("sell_signals", 0) > 0 and sell_gap.get("gap", 0) > 0:
+    # ---------------- 6. SELL Summary (reconciled) ----------------
+    if sell_gap.get("sell_signals", 0) > 0:
         message_lines.append("")
-        message_lines.append(f"SELL Signals: {sell_gap['sell_signals']}")
-        message_lines.append(f"SELL Trades Opened: {sell_gap['sell_trades_opened']}")
-        message_lines.append("Reason:")
+        message_lines.append("SELL Execution")
+        message_lines.append(f"Signals Generated : {sell_gap['sell_signals']}")
+        message_lines.append(f"Opened            : {sell_gap['sell_trades_opened']}")
+        message_lines.append(f"Rejected          : {sell_gap.get('gap', 0)}")
         if sell_gap.get("gap_reasons"):
+            message_lines.append("Reason")
             for reason, count in sell_gap["gap_reasons"].items():
-                message_lines.append(f"  {reason} ({count})")
-        else:
-            message_lines.append("  All SELL candidates failed final portfolio/risk validation.")
+                message_lines.append(f"  {reason}: {count}")
+
+    # ---------------- 7. AI Observation ----------------
+    # Rule-based, derived directly from the numbers above — not a
+    # separate LLM call, just plain-language sentences built from real
+    # computed values so the report is skimmable at a glance.
+    observations = []
+    if regime_pct:
+        dominant = max(regime_pct, key=regime_pct.get)
+        dominant_label = {"BULL": "bullish", "SIDEWAYS": "mixed/sideways", "BEAR": "bearish"}[dominant]
+        observations.append(f"Market regime was predominantly {dominant_label} today ({regime_pct[dominant]}%).")
+    if top_sectors and top_sectors[0][1] > 0:
+        observations.append(f"{_sector_label(top_sectors[0][0])} generated the most BUY opportunities ({top_sectors[0][1]}).")
+    if funnel:
+        biggest_reason = max(
+            [
+                ("Trend", funnel.get("rejected_by_trend", 0)),
+                ("Risk", funnel.get("rejected_by_risk", 0)),
+                ("Portfolio", funnel.get("rejected_by_portfolio", 0)),
+                ("Liquidity", funnel.get("rejected_by_liquidity", 0)),
+                ("Score Threshold", funnel.get("rejected_by_score_threshold", 0)),
+            ],
+            key=lambda kv: kv[1],
+        )
+        if biggest_reason[1] > 0:
+            observations.append(f"Most rejected candidates failed on {biggest_reason[0]} ({biggest_reason[1]}).")
+    if execution and execution.get("buy_executed", 0) == 0 and execution.get("buy_generated", 0) > 0:
+        observations.append("No BUY trades executed today — all eligible candidates were blocked at capital/liquidity/risk checks.")
+    if observations:
+        message_lines.append("")
+        message_lines.append("AI Observation")
+        for obs in observations:
+            message_lines.append(f"• {obs}")
+
+    # ---------------- 8. Strategy Health ----------------
+    exec_rate = (
+        round(execution.get("buy_executed", 0) / execution.get("buy_generated", 1) * 100, 1)
+        if execution.get("buy_generated") else 0.0
+    )
+    buy_opportunities_level = "healthy" if buy_n >= 50 else ("watch" if buy_n >= 15 else "investigate")
+    regime_spread = max(regime_pct.values()) - min(regime_pct.values()) if len(regime_pct) > 1 else 100
+    trend_level = "healthy" if regime_spread >= 40 else "watch"
+    exec_level = "healthy" if exec_rate >= 5 else ("watch" if exec_rate > 0 else "investigate")
+
+    message_lines.append("")
+    message_lines.append("Strategy Health")
+    message_lines.append(f"{_health_emoji(buy_opportunities_level)} BUY Opportunities : {buy_opportunities_level.title()} ({buy_n})")
+    message_lines.append(f"{_health_emoji(trend_level)} Market Trend      : {trend_level.title()}")
+    message_lines.append(f"{_health_emoji(exec_level)} Execution Rate    : {exec_level.title()} ({exec_rate}%)")
+    if exec_level == "investigate":
+        message_lines.append("Recommendation: review execution filters (capital/liquidity/risk) before touching strategy logic.")
+
+    # ---------------- 9. Numbers Consistency Check ----------------
+    # Mandatory reconciliation — verifies the report's own numbers add
+    # up before it's presented as trustworthy, instead of silently
+    # shipping a report whose totals don't match (which is exactly what
+    # was happening before this was added).
+    errors = []
+    if funnel:
+        funnel_sum = (
+            funnel.get("buy_candidates", 0) + funnel.get("rejected_by_trend", 0)
+            + funnel.get("rejected_by_risk", 0) + funnel.get("rejected_by_portfolio", 0)
+            + funnel.get("rejected_by_liquidity", 0) + funnel.get("rejected_by_score_threshold", 0)
+            + funnel.get("rejected_by_other", 0)
+        )
+        if funnel_sum != funnel.get("buy_side_scanned", 0):
+            errors.append(f"BUY funnel: parts sum to {funnel_sum}, expected {funnel.get('buy_side_scanned', 0)}")
+    if execution and execution.get("reasons"):
+        reasons_sum = sum(execution["reasons"].values())
+        if reasons_sum != execution.get("buy_rejected", 0):
+            errors.append(f"BUY execution reasons: sum to {reasons_sum}, expected {execution.get('buy_rejected', 0)}")
+    if sell_gap.get("gap_reasons"):
+        sell_reasons_sum = sum(sell_gap["gap_reasons"].values())
+        if sell_reasons_sum != sell_gap.get("gap", 0):
+            errors.append(f"SELL reasons: sum to {sell_reasons_sum}, expected {sell_gap.get('gap', 0)}")
+
+    message_lines.append("")
+    message_lines.append("Numbers Consistency Check")
+    if errors:
+        message_lines.append("❌ ERROR — totals do not reconcile:")
+        for e in errors:
+            message_lines.append(f"  • {e}")
+    else:
+        message_lines.append("✓ OK — all totals reconcile.")
 
     notify(
         event_type="analysis_summary",
