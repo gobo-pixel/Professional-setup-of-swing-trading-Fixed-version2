@@ -10,6 +10,7 @@ Responsibilities:
 
 from __future__ import annotations
 
+import time
 from dataclasses import asdict
 from datetime import datetime
 from typing import Iterable
@@ -36,6 +37,36 @@ class MarketDataProvider:
         period: str = "1y",
     ) -> pd.DataFrame:
         """Return normalized OHLCV dataframe."""
+        # Evidence from production: isolated single-symbol fetches
+        # reliably return ~273 rows (well above the 250-row validation
+        # threshold), but the SAME symbols fail "Insufficient historical
+        # candles" when scanned as part of a long, continuous 500-symbol
+        # Daily Scan — strongly suggesting Yahoo Finance silently
+        # throttles/returns fewer rows under sustained request volume,
+        # without raising an exception. Retry once specifically when
+        # the row count comes back suspiciously low, rather than
+        # blanket-delaying every single fetch (which would make a
+        # 500-symbol scan far slower for no benefit in the common case).
+        _MIN_EXPECTED_ROWS = 260
+        _ROW_COUNT_RETRY_DELAY_SECONDS = 3.0
+
+        for attempt in range(1, 3):
+            df = self._download(symbol, interval, period)
+            if len(df) >= _MIN_EXPECTED_ROWS or period != "1y" or interval != "1d":
+                break
+            if attempt == 1:
+                logger.warning(
+                    "%s returned only %d rows (expected ~273+) — likely transient "
+                    "throttling, retrying once after a short delay.", symbol, len(df),
+                )
+                time.sleep(_ROW_COUNT_RETRY_DELAY_SECONDS)
+
+        return self._normalize(df, symbol, interval)
+
+    def _download(self, symbol: str, interval: str, period: str) -> pd.DataFrame:
+        """Raw yf.download() call only — kept separate from _normalize()
+        so fetch()'s retry loop can check the raw row count before
+        spending time on normalization."""
         try:
             if period == "1y" and interval == "1d":
                 # period="1y" yields EXACTLY ~250 trading days, which
@@ -69,7 +100,9 @@ class MarketDataProvider:
                 )
         except Exception as exc:
             raise DataError(f"Failed to download data for {symbol}") from exc
+        return df
 
+    def _normalize(self, df: pd.DataFrame, symbol: str, interval: str) -> pd.DataFrame:
         if df.empty:
             raise DataError(f"No data returned for {symbol}")
 
