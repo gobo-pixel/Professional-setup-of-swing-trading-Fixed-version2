@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import time
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -76,11 +78,58 @@ class LearningEngine:
             "threshold_sensitivity": self._threshold_sensitivity(closed, report_by_symbol),
             "buy_accuracy": self._accuracy(closed, "BUY"),
             "sell_accuracy": self._accuracy(closed, "SELL"),
+            "best_worst_trade": self._best_worst_trade(closed),
+            "exit_reason_breakdown": self._exit_reason_breakdown(closed),
         }
 
         self._append_observation(observation)
 
         return observation
+
+    def _best_worst_trade(self, closed: list[dict]) -> dict[str, Any]:
+        """Across ALL closed trades (BUY+SELL), the single best and
+        worst by percent return — sign-aligned the same way _accuracy()
+        does (a SELL winner always shows positive %)."""
+        entries = []
+        for t in closed:
+            if t.get("status") != "CLOSED":
+                continue
+            rupee = self._pnl(t)
+            pct_raw = self._pnl_percent(t)
+            if math.isnan(rupee) or math.isnan(pct_raw):
+                continue
+            pct = abs(pct_raw) if rupee > 0 else -abs(pct_raw)
+            entries.append((t.get("symbol"), t.get("direction"), round(pct, 2)))
+        if not entries:
+            return {}
+        best = max(entries, key=lambda e: e[2])
+        worst = min(entries, key=lambda e: e[2])
+        return {
+            "best": {"symbol": best[0], "direction": best[1], "pct": best[2]},
+            "worst": {"symbol": worst[0], "direction": worst[1], "pct": worst[2]},
+        }
+
+    @staticmethod
+    def _classify_exit_reason(reasons_text: str) -> str:
+        text = (reasons_text or "").lower()
+        if "target" in text:
+            return "Target Hit"
+        if "trailing" in text or "break-even" in text or "stop" in text:
+            return "Trailing/Stop"
+        if "holding period" in text or "time" in text:
+            return "Time Exit"
+        if "risk" in text or "emergency" in text or "reversal" in text or "volatility" in text or "news" in text:
+            return "Risk Exit"
+        return "Other"
+
+    def _exit_reason_breakdown(self, closed: list[dict]) -> dict[str, int]:
+        counts: Counter = Counter()
+        for t in closed:
+            if t.get("status") != "CLOSED":
+                continue
+            category = self._classify_exit_reason(t.get("reasons", ""))
+            counts[category] += 1
+        return dict(counts.most_common())
 
     def _accuracy(self, closed: list[dict], direction: str) -> dict[str, Any]:
         trades = [t for t in closed if t.get("direction") == direction and t.get("status") == "CLOSED"]
@@ -88,16 +137,39 @@ class LearningEngine:
             return {"trades": 0, "win_rate": None}
 
         pnls_rupees = [self._pnl(t) for t in trades]
-        pnls_pct = [self._pnl_percent(t) for t in trades]
-        wins_idx = [i for i, p in enumerate(pnls_rupees) if p > 0]
-        losses_idx = [i for i, p in enumerate(pnls_rupees) if p <= 0]
+        pnls_pct_raw = [self._pnl_percent(t) for t in trades]
+        # Align percent SIGN with the rupee PnL's sign (the reliable
+        # ground truth for win/loss) — for SELL trades, the stored
+        # percent can follow a raw price-change convention (negative
+        # when price falls, which is PROFITABLE for a short), which
+        # reads as backwards/confusing. A winner should always show a
+        # positive %, a loser always negative, regardless of storage.
+        pnls_pct = [
+            abs(pct) if rupee > 0 else -abs(pct)
+            for rupee, pct in zip(pnls_rupees, pnls_pct_raw)
+        ]
+        # CRITICAL: a NaN pnl fails BOTH "> 0" and "<= 0" checks (a known
+        # floating-point quirk), silently vanishing from win/loss
+        # counting while still counting toward total trades — this was
+        # the exact cause of wins+losses not summing to total trades.
+        # Classify explicitly instead of relying on comparison operators.
+        wins_idx, losses_idx, data_issue_idx = [], [], []
+        for i, p in enumerate(pnls_rupees):
+            if math.isnan(p):
+                data_issue_idx.append(i)
+            elif p > 0:
+                wins_idx.append(i)
+            else:
+                losses_idx.append(i)
 
-        winner_pcts = [pnls_pct[i] for i in wins_idx]
-        loser_pcts = [pnls_pct[i] for i in losses_idx]
+        winner_pcts = [pnls_pct[i] for i in wins_idx if not math.isnan(pnls_pct[i])]
+        loser_pcts = [pnls_pct[i] for i in losses_idx if not math.isnan(pnls_pct[i])]
 
-        gross_profit = sum(p for p in pnls_rupees if p > 0)
-        gross_loss = abs(sum(p for p in pnls_rupees if p < 0))
+        gross_profit = sum(p for p in pnls_rupees if not math.isnan(p) and p > 0)
+        gross_loss = abs(sum(p for p in pnls_rupees if not math.isnan(p) and p < 0))
         profit_factor = round(gross_profit / gross_loss, 2) if gross_loss > 0 else None
+
+        classifiable = len(wins_idx) + len(losses_idx)
 
         all_trade_rows = self.trade_store.get_all_trades()
         holding_days_list = [
@@ -115,9 +187,10 @@ class LearningEngine:
 
         return {
             "trades": len(trades),
-            "win_rate": round(len(wins_idx) / len(trades) * 100, 2),
+            "win_rate": round(len(wins_idx) / classifiable * 100, 2) if classifiable else None,
             "wins": len(wins_idx),
             "losses": len(losses_idx),
+            "data_quality_issues": len(data_issue_idx),
             "avg_winner_pct": round(sum(winner_pcts) / len(winner_pcts), 2) if winner_pcts else None,
             "avg_loser_pct": round(sum(loser_pcts) / len(loser_pcts), 2) if loser_pcts else None,
             "largest_winner_pct": round(max(winner_pcts), 2) if winner_pcts else None,
