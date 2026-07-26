@@ -4,6 +4,16 @@ MODULE 1 — ANALYSIS ENGINE (CLI)
 Thin command-line wrapper around analytics.analysis_engine.AnalysisEngine
 (the single canonical implementation — no logic is duplicated here).
 
+Roadmap coverage (Phase 2, Module 1):
+    [x] BUY/SELL statistics — signal_counts
+    [x] NO_TRADE analysis   — no_trade_stats
+    [x] Rule contribution   — tier_contribution
+    [x] Tier analysis       — tier1_pass_rate, tier_contribution
+    [x] Sector statistics   — sector_stats, top_buy_sectors, weakest_buy_sectors
+    [x] Regime statistics   — regime_stats, regime_percentages
+    [x] Daily summaries     — daily_summary
+    [x] Rejection analysis  — top_rejection_reasons, rejection_funnel
+
 Reads reports/full_report.csv and produces a complete statistical
 breakdown: BUY/SELL/NO_TRADE counts, Tier-1/2/3 contribution, Tier-4
 rejection reasons, sector-wise stats, regime stats, top rejection reasons.
@@ -27,6 +37,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.logger import get_logger  # noqa: E402
 from core.notifications import notify  # noqa: E402
+from core.trading_calendar import now_ist  # noqa: E402
 from analytics.analysis_engine import AnalysisEngine  # noqa: E402
 
 logger = get_logger(__name__)
@@ -58,6 +69,7 @@ def main() -> None:
     weak_sectors = result.get("weakest_buy_sectors", [])
     funnel = result.get("rejection_funnel", {})
     execution = result.get("execution_summary", {})
+    tier_contrib = result.get("tier_contribution", {})
 
     message_lines = [
         f"Analysis Summary — {result.get('total_scans', 0)} scans analyzed.",
@@ -65,6 +77,13 @@ def main() -> None:
         f"NO_TRADE: {signal_counts.get('NO_TRADE', 0)}",
         f"Tier-1 pass rate: {result.get('tier1_pass_rate', {})}",
     ]
+
+    if tier_contrib:
+        message_lines.append(
+            f"Rule contribution (avg score) — BUY: Tier2={tier_contrib.get('buy_tier2_avg', 0)}, "
+            f"Tier3={tier_contrib.get('buy_tier3_avg', 0)} | SELL: Tier2={tier_contrib.get('sell_tier2_avg', 0)}, "
+            f"Tier3={tier_contrib.get('sell_tier3_avg', 0)}"
+        )
 
     if regime_pct:
         message_lines.append("")
@@ -75,26 +94,32 @@ def main() -> None:
                 label = {"BULL": "Bullish", "SIDEWAYS": "Sideways", "BEAR": "Bearish"}[regime]
                 message_lines.append(f"{emoji[regime]} {label}: {regime_pct[regime]}%")
 
+    def _sector_label(sector: str) -> str:
+        return "Unknown sector" if sector == "UNKNOWN" else sector
+
     if top_sectors:
         message_lines.append("")
         message_lines.append("Top BUY Sectors")
         for i, (sector, count) in enumerate(top_sectors, 1):
             if count > 0:
-                message_lines.append(f"{i}. {sector} ({count} BUY)")
+                message_lines.append(f"{i}. {_sector_label(sector)} ({count} BUY)")
     if weak_sectors:
         message_lines.append("")
         message_lines.append("Weakest Sectors")
         for i, (sector, count) in enumerate(weak_sectors, 1):
-            message_lines.append(f"{i}. {sector}")
+            message_lines.append(f"{i}. {_sector_label(sector)}")
 
     if funnel:
         message_lines.append("")
-        message_lines.append("Rejection Funnel")
-        message_lines.append(f"{funnel.get('scanned', 0)} Scanned")
+        message_lines.append("Rejection Funnel (BUY-side only — SELL tracked separately below)")
+        message_lines.append(f"{funnel.get('buy_side_scanned', 0)} Scanned")
         message_lines.append(f"├── BUY Candidates: {funnel.get('buy_candidates', 0)}")
         message_lines.append(f"├── Rejected by Trend: {funnel.get('rejected_by_trend', 0)}")
-        message_lines.append(f"├── Rejected by Risk Engine: {funnel.get('rejected_by_risk', 0)}")
+        message_lines.append(f"├── Rejected by Risk Engine (signal stage): {funnel.get('rejected_by_risk', 0)}")
         message_lines.append(f"├── Rejected by Portfolio: {funnel.get('rejected_by_portfolio', 0)}")
+        message_lines.append(f"├── Rejected by Liquidity: {funnel.get('rejected_by_liquidity', 0)}")
+        message_lines.append(f"├── Rejected by Score Threshold: {funnel.get('rejected_by_score_threshold', 0)}")
+        message_lines.append(f"├── Rejected — Other: {funnel.get('rejected_by_other', 0)}")
         message_lines.append(f"└── Executed: {funnel.get('executed', 0)}")
 
     if execution:
@@ -122,7 +147,7 @@ def main() -> None:
     notify(
         event_type="analysis_summary",
         message="\n".join(message_lines),
-        dedup_key=f"analysis_summary::{time.strftime('%Y-%m-%d')}",
+        dedup_key=f"analysis_summary::{time.strftime('%Y-%m-%d')}::{now_ist().strftime('%H:%M:%S.%f')}",
     )
 
 
