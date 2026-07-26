@@ -26,6 +26,17 @@ from core.rejection_classifier import classify_tier4_block
 from core.trading_calendar import now_ist
 
 
+def _looks_like_bare_number(text: str) -> bool:
+    """True if text is JUST a number (e.g. "59.96") with no other
+    characters — a rejection reason should always be a sentence, never
+    a bare score, so this catches data-alignment bugs defensively."""
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False
+
+
 class AnalysisEngine:
 
     def __init__(self, report_path: str = "reports/full_report.csv"):
@@ -128,10 +139,18 @@ class AnalysisEngine:
         # both of which caused the displayed reasons to undercount the
         # true gap.
         not_opened_rows = [r for r in sell_signal_rows if r.get("Stock") not in opened_sell_symbols]
+        category_labels = {
+            "insufficient_history": "Insufficient Historical Candles",
+            "liquidity": "Liquidity",
+            "risk": "Risk Engine",
+            "portfolio": "Portfolio",
+            "score_threshold": "Confidence Threshold",
+            "other": "Other / Not Recorded",
+        }
         sell_rejection_reasons: Counter = Counter()
         for r in not_opened_rows:
-            reason = (r.get("Tier4Block") or "").strip() or "Reason not recorded"
-            sell_rejection_reasons[reason] += 1
+            category = classify_tier4_block(r.get("Tier4Block"))
+            sell_rejection_reasons[category_labels.get(category, "Other / Not Recorded")] += 1
         report["sell_signal_vs_opened"] = {
             "sell_signals": len(sell_signal_rows),
             "sell_trades_opened": opened_sell_today,
@@ -167,10 +186,14 @@ class AnalysisEngine:
 
         # ---------------- Sector-wise stats ----------------
         sector_stats = defaultdict(lambda: Counter())
+        unknown_sector_symbols = []
         for r in rows:
             sector = r.get("Sector") or "UNKNOWN"
             sector_stats[sector][r.get("Signal", "")] += 1
+            if sector == "UNKNOWN" and r.get("Stock"):
+                unknown_sector_symbols.append(r["Stock"])
         report["sector_stats"] = {k: dict(v) for k, v in sector_stats.items()}
+        report["unknown_sector_symbols"] = unknown_sector_symbols[:15]  # cap for display
 
         # ---------------- Market Regime percentages ----------------
         total_regime_rows = sum(sum(v.values()) for v in sector_stats.values()) or 1
@@ -203,7 +226,8 @@ class AnalysisEngine:
         buy_candidate_rows = [r for r in rows if r.get("Signal") in ("BUY", "NO_TRADE")]
         rejected_trend = sum(1 for r in buy_candidate_rows if r.get("BuyTier1Passed") == "False")
         rejected_risk = rejected_portfolio = rejected_liquidity = 0
-        rejected_score_threshold = rejected_other = 0
+        rejected_score_threshold = rejected_other = rejected_insufficient_history = 0
+        other_reasons: Counter = Counter()
         for r in buy_candidate_rows:
             # Non-overlapping with "rejected_by_trend": only count
             # post-Tier1 rejections for rows that already PASSED Tier1,
@@ -220,8 +244,13 @@ class AnalysisEngine:
                 rejected_liquidity += 1
             elif category == "score_threshold":
                 rejected_score_threshold += 1
+            elif category == "insufficient_history":
+                rejected_insufficient_history += 1
             else:
                 rejected_other += 1
+                raw_reason = (r.get("Tier4Block") or "").strip()
+                if raw_reason and not _looks_like_bare_number(raw_reason):
+                    other_reasons[raw_reason] += 1
         executed_buy_today = self._count_opened_today("BUY")
         report["rejection_funnel"] = {
             # NOTE: this funnel covers BUY-side rows only (BUY + the
@@ -235,7 +264,9 @@ class AnalysisEngine:
             "rejected_by_portfolio": rejected_portfolio,
             "rejected_by_liquidity": rejected_liquidity,
             "rejected_by_score_threshold": rejected_score_threshold,
+            "rejected_by_insufficient_history": rejected_insufficient_history,
             "rejected_by_other": rejected_other,
+            "other_reasons_breakdown": dict(other_reasons.most_common(5)),
             "executed": executed_buy_today,
         }
 
@@ -256,6 +287,8 @@ class AnalysisEngine:
                 reason_buckets["Liquidity"] += 1
             elif category == "score_threshold":
                 reason_buckets["Score Threshold"] += 1
+            elif category == "insufficient_history":
+                reason_buckets["Insufficient Historical Candles"] += 1
             else:
                 reason_buckets["Other"] += 1
         report["execution_summary"] = {
