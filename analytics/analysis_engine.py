@@ -38,7 +38,21 @@ class AnalysisEngine:
             self.rows = []
             return 0
         with open(path, newline="") as f:
-            self.rows = list(csv.DictReader(f))
+            all_rows = list(csv.DictReader(f))
+
+        # reports/full_report.csv is APPEND-only (accumulates every
+        # day's scan forever, by design — see generate_full_report.py's
+        # own comment on this). Without filtering, every stat here
+        # silently mixes together however many days happen to be in
+        # the file (e.g. "1000 scans" from a 500-symbol watchlist
+        # really meant 2 accumulated days, not one). Filter to the
+        # LATEST date only so this reflects a single day's scan.
+        dates = {r["Date"] for r in all_rows if r.get("Date")}
+        if dates:
+            latest_date = max(dates)
+            self.rows = [r for r in all_rows if r.get("Date") == latest_date]
+        else:
+            self.rows = all_rows
         return len(self.rows)
 
     @staticmethod
@@ -175,12 +189,13 @@ class AnalysisEngine:
         # detector/threshold that doesn't exist in the strategy today.
         buy_candidate_rows = [r for r in rows if r.get("Signal") in ("BUY", "NO_TRADE")]
         rejected_trend = sum(1 for r in buy_candidate_rows if r.get("BuyTier1Passed") == "False")
-        rejected_risk = rejected_portfolio = 0
+        rejected_risk = rejected_portfolio = rejected_liquidity = 0
+        rejected_score_threshold = rejected_other = 0
         for r in buy_candidate_rows:
             # Non-overlapping with "rejected_by_trend": only count
-            # risk/portfolio rejections for rows that already PASSED
-            # Tier1, so each row is attributed to exactly one funnel
-            # stage instead of being double-counted.
+            # post-Tier1 rejections for rows that already PASSED Tier1,
+            # so each row is attributed to exactly one funnel stage
+            # instead of being double-counted or silently dropped.
             if r.get("Signal") != "NO_TRADE" or r.get("BuyTier1Passed") != "True":
                 continue
             category = classify_tier4_block(r.get("Tier4Block"))
@@ -188,13 +203,26 @@ class AnalysisEngine:
                 rejected_risk += 1
             elif category == "portfolio":
                 rejected_portfolio += 1
+            elif category == "liquidity":
+                rejected_liquidity += 1
+            elif category == "score_threshold":
+                rejected_score_threshold += 1
+            else:
+                rejected_other += 1
         executed_buy_today = self._count_opened_today("BUY")
         report["rejection_funnel"] = {
-            "scanned": len(rows),
+            # NOTE: this funnel covers BUY-side rows only (BUY + the
+            # NO_TRADE rows that were BUY candidates) — SELL signals
+            # are tracked separately below, so this total is normally
+            # LESS than the overall scan count.
+            "buy_side_scanned": len(buy_candidate_rows),
             "buy_candidates": signal_counts.get("BUY", 0),
             "rejected_by_trend": rejected_trend,
             "rejected_by_risk": rejected_risk,
             "rejected_by_portfolio": rejected_portfolio,
+            "rejected_by_liquidity": rejected_liquidity,
+            "rejected_by_score_threshold": rejected_score_threshold,
+            "rejected_by_other": rejected_other,
             "executed": executed_buy_today,
         }
 
@@ -210,14 +238,18 @@ class AnalysisEngine:
             if category == "portfolio":
                 reason_buckets["Capital / Portfolio Rules"] += 1
             elif category == "risk":
-                reason_buckets["Risk Engine"] += 1
+                reason_buckets["Risk Engine (execution stage)"] += 1
             elif category == "liquidity":
                 reason_buckets["Liquidity"] += 1
+            elif category == "score_threshold":
+                reason_buckets["Score Threshold"] += 1
+            else:
+                reason_buckets["Other"] += 1
         report["execution_summary"] = {
             "buy_generated": buy_generated,
             "buy_executed": buy_executed,
             "buy_rejected": buy_rejected,
-            "reasons": dict(reason_buckets.most_common(5)),
+            "reasons": dict(reason_buckets.most_common(6)),
         }
 
         # ---------------- Market-regime stats ----------------
