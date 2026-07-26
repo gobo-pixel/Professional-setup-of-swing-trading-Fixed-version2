@@ -175,18 +175,23 @@ def _overall_section(obs: dict, flags: list) -> list[str]:
         if n == 0:
             continue
         wins, losses, wr = acc.get("wins", 0), acc.get("losses", 0), acc.get("win_rate", 0)
+        data_issues = acc.get("data_quality_issues", 0)
         lines.append(f"🎯 OVERALL {label} PERFORMANCE")
         lines.append(f"{label} Trades Closed: {n}")
         lines.append(f"Wins: {wins}")
         lines.append(f"Losses: {losses}")
-        lines.append(f"Win Rate: {wr}%")
+        if data_issues:
+            lines.append(f"Data Quality Issues: {data_issues} (PnL unavailable/NaN — excluded from win/loss)")
+        lines.append(f"Win Rate: {wr}%" if wr is not None else "Win Rate: N/A")
         lines.append("👉 Matlab:")
-        lines.append(f"{n} {label} trades me sirf {wins} profitable rahi.")
+        classifiable = wins + losses
+        extra_note = f" ({data_issues} aur trades ka data missing/NaN tha)." if data_issues else "."
+        lines.append(f"{classifiable} classifiable {label} trades me sirf {wins} profitable rahi{extra_note}")
         lines.append("👉 Observation:")
-        if n >= MIN_TRADES_FOR_DECENT_SAMPLE and wr < 20:
+        if wr is not None and n >= MIN_TRADES_FOR_DECENT_SAMPLE and wr < 20:
             lines.append(f"Current {label} strategy ki performance bahut weak dikh rahi hai.")
             flags.append(("CRITICAL", f"{label} strategy — {n} trades, sirf {wins} winners."))
-        elif n >= MIN_TRADES_FOR_DECENT_SAMPLE and wr >= 55:
+        elif wr is not None and n >= MIN_TRADES_FOR_DECENT_SAMPLE and wr >= 55:
             lines.append(f"Current {label} strategy ki performance strong dikh rahi hai.")
             flags.append(("GOOD", f"{label} strategy — {wr}% win rate over {n} trades."))
         else:
