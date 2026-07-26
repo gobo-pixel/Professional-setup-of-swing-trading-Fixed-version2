@@ -172,10 +172,10 @@ class AnalysisEngine:
         sell_t2 = [self._f(r, "SellTier2Score") for r in rows if r.get("SellTier2Score")]
         sell_t3 = [self._f(r, "SellTier3Score") for r in rows if r.get("SellTier3Score")]
         report["tier_contribution"] = {
-            "buy_tier2_avg": self._avg(buy_t2),
-            "buy_tier3_avg": self._avg(buy_t3),
-            "sell_tier2_avg": self._avg(sell_t2),
-            "sell_tier3_avg": self._avg(sell_t3),
+            "buy_tier2_avg": self._avg(buy_t2), "buy_tier2_n": len(buy_t2),
+            "buy_tier3_avg": self._avg(buy_t3), "buy_tier3_n": len(buy_t3),
+            "sell_tier2_avg": self._avg(sell_t2), "sell_tier2_n": len(sell_t2),
+            "sell_tier3_avg": self._avg(sell_t3), "sell_tier3_n": len(sell_t3),
         }
 
         # ---------------- Tier-4 rejection reasons ----------------
@@ -332,8 +332,8 @@ class AnalysisEngine:
         return round(sum(vals) / len(vals) * 100, 2) if vals else 0.0
 
     @staticmethod
-    def _avg(values: list[float]) -> float:
-        return round(sum(values) / len(values), 2) if values else 0.0
+    def _avg(values: list[float]) -> float | None:
+        return round(sum(values) / len(values), 2) if values else None
 
     def print_report(self) -> None:
         r = self.analyze()
