@@ -64,12 +64,12 @@ class AnalysisEngine:
             return default
 
     @staticmethod
-    def _count_opened_today(direction: str, trade_journal_path: str = "storage/trades/trades_master.csv") -> int:
+    def _opened_today_rows(direction: str, trade_journal_path: str = "storage/trades/trades_master.csv") -> list[dict]:
         path = Path(trade_journal_path)
         if not path.exists():
-            return 0
+            return []
         today_str = now_ist().strftime("%Y-%m-%d")
-        count = 0
+        matched = []
         with open(path, newline="") as f:
             for row in csv.DictReader(f):
                 if row.get("action") != "OPEN" or row.get("direction") != direction:
@@ -80,8 +80,14 @@ class AnalysisEngine:
                     continue
                 row_date = time.strftime("%Y-%m-%d", time.gmtime(ts + 5.5 * 3600))  # UTC -> IST
                 if row_date == today_str:
-                    count += 1
-        return count
+                    matched.append(row)
+        return matched
+
+    def _count_opened_today(self, direction: str, trade_journal_path: str = "storage/trades/trades_master.csv") -> int:
+        return len(self._opened_today_rows(direction, trade_journal_path))
+
+    def _opened_today_symbols(self, direction: str, trade_journal_path: str = "storage/trades/trades_master.csv") -> set:
+        return {r.get("symbol") for r in self._opened_today_rows(direction, trade_journal_path)}
 
     def analyze(self) -> dict[str, Any]:
         rows = self.rows
@@ -115,15 +121,22 @@ class AnalysisEngine:
         sell_signal_rows = [r for r in rows if r.get("Signal") == "SELL"]
         opened_sell_today = self._count_opened_today("SELL")
         gap = len(sell_signal_rows) - opened_sell_today
-        sell_rejection_reasons = Counter(
-            r.get("Tier4Block", "").strip() for r in sell_signal_rows
-            if r.get("Tier4Block", "").strip()
-        )
+        opened_sell_symbols = self._opened_today_symbols("SELL")
+        # Only reasons for the symbols that did NOT open (the ones making
+        # up the gap) — was previously counting ALL sell_signal_rows
+        # regardless of whether they opened, plus truncating to the top 5,
+        # both of which caused the displayed reasons to undercount the
+        # true gap.
+        not_opened_rows = [r for r in sell_signal_rows if r.get("Stock") not in opened_sell_symbols]
+        sell_rejection_reasons: Counter = Counter()
+        for r in not_opened_rows:
+            reason = (r.get("Tier4Block") or "").strip() or "Reason not recorded"
+            sell_rejection_reasons[reason] += 1
         report["sell_signal_vs_opened"] = {
             "sell_signals": len(sell_signal_rows),
             "sell_trades_opened": opened_sell_today,
             "gap": max(gap, 0),
-            "gap_reasons": dict(sell_rejection_reasons.most_common(5)),
+            "gap_reasons": dict(sell_rejection_reasons.most_common(10)),
         }
 
         # ---------------- Tier-1 pass rate ----------------
