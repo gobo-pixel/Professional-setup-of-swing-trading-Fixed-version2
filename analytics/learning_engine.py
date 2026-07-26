@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Any
 
 from core.notifications import notify
+from core.trading_calendar import now_ist
 from storage.trades.trade_store import TradeStore
 
 
@@ -89,7 +90,7 @@ class LearningEngine:
                     f"BUY accuracy: {observation['buy_accuracy']}\n"
                     f"SELL accuracy: {observation['sell_accuracy']}"
                 ),
-                dedup_key=f"learning_summary::{time.strftime('%Y-%m-%d')}",
+                dedup_key=f"learning_summary::{time.strftime('%Y-%m-%d')}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
 
         return observation
