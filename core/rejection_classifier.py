@@ -17,6 +17,7 @@ CATEGORY_RISK = "risk"
 CATEGORY_LIQUIDITY = "liquidity"
 CATEGORY_PORTFOLIO = "portfolio"
 CATEGORY_SCORE_THRESHOLD = "score_threshold"
+CATEGORY_INSUFFICIENT_HISTORY = "insufficient_history"
 CATEGORY_OTHER = "other"
 
 
@@ -24,6 +25,8 @@ def classify_tier4_block(block_text: str) -> str:
     block = (block_text or "").lower()
     if not block:
         return CATEGORY_OTHER
+    if "historical candles" in block or "insufficient history" in block:
+        return CATEGORY_INSUFFICIENT_HISTORY
     if "risk" in block or "unsafe" in block or "nan" in block or "circuit" in block:
         return CATEGORY_RISK
     if "volume" in block or "liquidity" in block:
