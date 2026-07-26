@@ -34,8 +34,27 @@ def main() -> None:
         return
 
     affected: list[dict] = []
+    all_dates: set[str] = set()
     with open(report_path, newline="") as f:
         for row in csv.DictReader(f):
+            if row.get("Date"):
+                all_dates.add(row["Date"])
+
+    if not all_dates:
+        print("No 'Date' column values found — cannot determine the latest scan day.")
+        return
+
+    latest_date = max(all_dates)
+    print(
+        f"Note: reports/full_report.csv is APPEND-only (accumulates every "
+        f"day's scan forever) — filtering to the LATEST date only: {latest_date}\n"
+        f"(found {len(all_dates)} distinct scan date(s) in the file total)\n"
+    )
+
+    with open(report_path, newline="") as f:
+        for row in csv.DictReader(f):
+            if row.get("Date") != latest_date:
+                continue
             block_text = (row.get("Tier4Block") or "")
             if "Insufficient historical candles" in block_text:
                 affected.append(row)
