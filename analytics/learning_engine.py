@@ -171,7 +171,10 @@ class LearningEngine:
                 continue
             by_sector.setdefault(sector, []).append(self._pnl(t))
         return {
-            sector: {"trades": len(pnls), "win_rate": round(sum(1 for p in pnls if p > 0) / len(pnls) * 100, 2)}
+            sector: {
+                "trades": len(pnls), "wins": sum(1 for p in pnls if p > 0),
+                "win_rate": round(sum(1 for p in pnls if p > 0) / len(pnls) * 100, 2),
+            }
             for sector, pnls in by_sector.items()
         }
 
@@ -183,7 +186,10 @@ class LearningEngine:
                 continue
             by_regime.setdefault(regime, []).append(self._pnl(t))
         return {
-            regime: {"trades": len(pnls), "win_rate": round(sum(1 for p in pnls if p > 0) / len(pnls) * 100, 2)}
+            regime: {
+                "trades": len(pnls), "wins": sum(1 for p in pnls if p > 0),
+                "win_rate": round(sum(1 for p in pnls if p > 0) / len(pnls) * 100, 2),
+            }
             for regime, pnls in by_regime.items()
         }
 
@@ -204,6 +210,8 @@ class LearningEngine:
         return {
             "with_news_win_rate": self._win_rate(with_news),
             "without_news_win_rate": self._win_rate(without_news),
+            "with_news_trades": len(with_news),
+            "without_news_trades": len(without_news),
         }
 
     def _fundamental_effectiveness(self, closed, report_by_symbol) -> dict[str, Any]:
@@ -237,6 +245,8 @@ class LearningEngine:
         return {
             "high_technical_win_rate": self._win_rate(high_tech),
             "low_technical_win_rate": self._win_rate(low_tech),
+            "high_technical_trades": len(high_tech),
+            "low_technical_trades": len(low_tech),
         }
 
     def _rule_effectiveness(self, closed, report_by_symbol) -> dict[str, Any]:
