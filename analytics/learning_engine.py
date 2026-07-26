@@ -19,8 +19,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from core.notifications import notify
-from core.trading_calendar import now_ist
 from storage.trades.trade_store import TradeStore
 
 
@@ -82,25 +80,87 @@ class LearningEngine:
 
         self._append_observation(observation)
 
-        if observation["closed_trades_observed"] > 0:
-            notify(
-                event_type="learning_summary",
-                message=(
-                    f"Learning Summary — {observation['closed_trades_observed']} closed trades observed.\n"
-                    f"BUY accuracy: {observation['buy_accuracy']}\n"
-                    f"SELL accuracy: {observation['sell_accuracy']}"
-                ),
-                dedup_key=f"learning_summary::{time.strftime('%Y-%m-%d')}::{now_ist().strftime('%H:%M:%S.%f')}",
-            )
-
         return observation
 
     def _accuracy(self, closed: list[dict], direction: str) -> dict[str, Any]:
         trades = [t for t in closed if t.get("direction") == direction and t.get("status") == "CLOSED"]
         if not trades:
             return {"trades": 0, "win_rate": None}
-        wins = sum(1 for t in trades if self._pnl(t) > 0)
-        return {"trades": len(trades), "win_rate": round(wins / len(trades) * 100, 2)}
+
+        pnls_rupees = [self._pnl(t) for t in trades]
+        pnls_pct = [self._pnl_percent(t) for t in trades]
+        wins_idx = [i for i, p in enumerate(pnls_rupees) if p > 0]
+        losses_idx = [i for i, p in enumerate(pnls_rupees) if p <= 0]
+
+        winner_pcts = [pnls_pct[i] for i in wins_idx]
+        loser_pcts = [pnls_pct[i] for i in losses_idx]
+
+        gross_profit = sum(p for p in pnls_rupees if p > 0)
+        gross_loss = abs(sum(p for p in pnls_rupees if p < 0))
+        profit_factor = round(gross_profit / gross_loss, 2) if gross_loss > 0 else None
+
+        all_trade_rows = self.trade_store.get_all_trades()
+        holding_days_list = [
+            d for t in trades
+            if (d := self._estimate_holding_days(t, all_trade_rows)) is not None
+        ]
+        winner_holding = [
+            d for i in wins_idx
+            if (d := self._estimate_holding_days(trades[i], all_trade_rows)) is not None
+        ]
+        loser_holding = [
+            d for i in losses_idx
+            if (d := self._estimate_holding_days(trades[i], all_trade_rows)) is not None
+        ]
+
+        return {
+            "trades": len(trades),
+            "win_rate": round(len(wins_idx) / len(trades) * 100, 2),
+            "wins": len(wins_idx),
+            "losses": len(losses_idx),
+            "avg_winner_pct": round(sum(winner_pcts) / len(winner_pcts), 2) if winner_pcts else None,
+            "avg_loser_pct": round(sum(loser_pcts) / len(loser_pcts), 2) if loser_pcts else None,
+            "largest_winner_pct": round(max(winner_pcts), 2) if winner_pcts else None,
+            "largest_loser_pct": round(min(loser_pcts), 2) if loser_pcts else None,
+            "avg_holding_days": round(sum(holding_days_list) / len(holding_days_list), 1) if holding_days_list else None,
+            "avg_winner_holding_days": round(sum(winner_holding) / len(winner_holding), 1) if winner_holding else None,
+            "avg_loser_holding_days": round(sum(loser_holding) / len(loser_holding), 1) if loser_holding else None,
+            "gross_profit": round(gross_profit, 2),
+            "gross_loss": round(gross_loss, 2),
+            "profit_factor": profit_factor,
+        }
+
+    @staticmethod
+    def _estimate_holding_days(closed_trade: dict, all_trade_rows: list[dict]) -> float | None:
+        """OPEN and CLOSE rows aren't linked by a shared trade id (each
+        save_trade() call gets its own auto-assigned id) — so holding
+        days is ESTIMATED by matching this closed trade's symbol to the
+        most recent prior OPEN row for that same symbol. Reasonable for
+        this system since it doesn't hold multiple overlapping
+        positions in the same symbol, but genuinely an estimate, not
+        an exact link — documented here rather than presented as exact."""
+        symbol = closed_trade.get("symbol")
+        try:
+            close_ts = float(closed_trade.get("timestamp") or 0)
+        except (TypeError, ValueError):
+            return None
+        if not symbol or not close_ts:
+            return None
+
+        candidate_open_ts = None
+        for row in all_trade_rows:
+            if row.get("symbol") != symbol or row.get("action") != "OPEN":
+                continue
+            try:
+                open_ts = float(row.get("timestamp") or 0)
+            except (TypeError, ValueError):
+                continue
+            if open_ts < close_ts and (candidate_open_ts is None or open_ts > candidate_open_ts):
+                candidate_open_ts = open_ts
+
+        if candidate_open_ts is None:
+            return None
+        return round((close_ts - candidate_open_ts) / 86400, 2)
 
     def _sector_performance(self, closed, report_by_symbol) -> dict[str, Any]:
         by_sector: dict[str, list[float]] = {}
@@ -307,6 +367,13 @@ class LearningEngine:
     def _pnl(trade: dict) -> float:
         try:
             return float(trade.get("realized_pnl") or 0)
+        except ValueError:
+            return 0.0
+
+    @staticmethod
+    def _pnl_percent(trade: dict) -> float:
+        try:
+            return float(trade.get("realized_pnl_percent") or 0)
         except ValueError:
             return 0.0
 
