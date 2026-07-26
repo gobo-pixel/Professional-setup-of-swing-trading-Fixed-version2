@@ -29,34 +29,45 @@ from market.market_regime import MarketRegimeEngine  # noqa: E402
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--symbol", default="ICICIBANK.NS")
+    parser.add_argument("--symbol", default=None, help="Single symbol to trace")
+    parser.add_argument(
+        "--symbols", default=None,
+        help="Comma-separated list of symbols to trace (overrides --symbol)",
+    )
     args = parser.parse_args()
-    symbol = args.symbol
 
-    print(f"=== Tracing row-count through the real pipeline for {symbol} ===\n")
+    if args.symbols:
+        symbols = [s.strip() for s in args.symbols.split(",") if s.strip()]
+    else:
+        symbols = [args.symbol or "ICICIBANK.NS"]
 
     data_engine = DataEngine()
-    bundle = data_engine.fetch(symbol=symbol)
-    dataframe = bundle.market
-    print(f"Stage 1 — bundle.market (raw fetch): {len(dataframe)} rows")
-    print(f"  columns: {list(dataframe.columns)}")
-    print(f"  first timestamp: {dataframe.iloc[0].get('timestamp')}")
-    print(f"  last timestamp: {dataframe.iloc[-1].get('timestamp')}")
-
     features = FeatureEngineeringEngine()
-    dataframe_2 = features.generate(dataframe)
-    print(f"\nStage 2 — after features.generate(): {len(dataframe_2)} rows")
-    if len(dataframe_2) != len(dataframe):
-        print(f"  !!! ROW COUNT CHANGED: {len(dataframe)} -> {len(dataframe_2)}")
-
     regime = MarketRegimeEngine()
-    dataframe_3 = regime.evaluate(dataframe_2)
-    print(f"\nStage 3 — after regime.evaluate(): {len(dataframe_3)} rows")
-    if len(dataframe_3) != len(dataframe_2):
-        print(f"  !!! ROW COUNT CHANGED: {len(dataframe_2)} -> {len(dataframe_3)}")
 
-    print(f"\n=== FINAL row count reaching validation_engine: {len(dataframe_3)} ===")
-    print(f"=== Passes minimum_history (>=250)? {len(dataframe_3) >= 250} ===")
+    for symbol in symbols:
+        print(f"\n{'=' * 20} {symbol} {'=' * 20}")
+        try:
+            bundle = data_engine.fetch(symbol=symbol)
+            dataframe = bundle.market
+            print(f"Stage 1 — bundle.market (raw fetch): {len(dataframe)} rows")
+
+            dataframe_2 = features.generate(dataframe)
+            if len(dataframe_2) != len(dataframe):
+                print(f"  !!! ROW COUNT CHANGED after features: {len(dataframe)} -> {len(dataframe_2)}")
+            else:
+                print(f"Stage 2 — after features.generate(): {len(dataframe_2)} rows (unchanged)")
+
+            dataframe_3 = regime.evaluate(dataframe_2)
+            if len(dataframe_3) != len(dataframe_2):
+                print(f"  !!! ROW COUNT CHANGED after regime: {len(dataframe_2)} -> {len(dataframe_3)}")
+            else:
+                print(f"Stage 3 — after regime.evaluate(): {len(dataframe_3)} rows (unchanged)")
+
+            passes = len(dataframe_3) >= 250
+            print(f"FINAL: {len(dataframe_3)} rows — passes minimum_history(>=250)? {passes}")
+        except Exception as exc:
+            print(f"  EXCEPTION for {symbol}: {type(exc).__name__}: {exc}")
 
 
 if __name__ == "__main__":
