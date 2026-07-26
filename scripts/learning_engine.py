@@ -147,6 +147,7 @@ def _render_side(accuracy: dict, side: str) -> list[str]:
     lines.append(_confidence_label(n))
     if n < 50:
         lines.append(f"({n} closed trades only)")
+    lines.append("Minimum recommended: 100 closed trades")
     lines.append("Recommendations are observational only.")
 
     profit_factor = accuracy.get("profit_factor")
@@ -254,6 +255,7 @@ def _yesterday_followup_section(picks_history: list[dict]) -> list[str]:
 def _best_candidate_section(report_rows: list[dict], direction: str) -> list[str]:
     score_col = "BuyOverallScore" if direction == "BUY" else "SellOverallScore"
     tier1_col = "BuyTier1Passed" if direction == "BUY" else "SellTier1Passed"
+    tech_col = "BuyTier2Score" if direction == "BUY" else "SellTier2Score"
     candidates = [r for r in report_rows if r.get("Signal") == direction and r.get(score_col)]
     if not candidates:
         return []
@@ -277,20 +279,54 @@ def _best_candidate_section(report_rows: list[dict], direction: str) -> list[str
             pass
     lines.append("")
     lines.append("Why?")
-    if best.get(tier1_col) == "True":
-        lines.append("✅ Strong Trend")
+    # Show actual scores, not generic checkmarks — genuinely informative
+    # rather than a template. For SELL, "Positive News" is confusing
+    # (reads as a bullish signal) — use direction-appropriate wording.
+    trend_ok = best.get(tier1_col) == "True"
+    news_val = None
+    fundamental_val = None
+    tech_val = None
     try:
-        if float(best.get("NewsScore") or 0) >= 60:
-            lines.append("✅ Positive News")
+        news_val = float(best.get("NewsScore") or 0)
     except (TypeError, ValueError):
         pass
     try:
-        if float(best.get("FundamentalScore") or 0) >= 60:
-            lines.append("✅ Strong Fundamentals")
+        fundamental_val = float(best.get("FundamentalScore") or 0)
     except (TypeError, ValueError):
         pass
-    if len(lines) == 8:  # only the header/blank lines, no checks passed
-        lines.append("(No individual signal crossed the strong-signal threshold today.)")
+    try:
+        tech_val = float(best.get(tech_col) or 0)
+    except (TypeError, ValueError):
+        pass
+
+    if tech_val is not None:
+        lines.append(f"Technical Score  : {tech_val}")
+    if direction == "BUY":
+        if news_val is not None:
+            lines.append(f"News Score       : {news_val}")
+        if fundamental_val is not None:
+            lines.append(f"Fundamental Score: {fundamental_val}")
+        if trend_ok:
+            lines.append("(Trend gate passed)")
+    else:
+        # For SELL, frame news/fundamentals as bearish-relevant instead
+        # of "positive" (which reads backwards for a sell signal).
+        if news_val is not None:
+            label = "Negative News Score" if news_val < 50 else "News Score (not bearish — worth checking)"
+            lines.append(f"{label}: {news_val}")
+        if trend_ok:
+            lines.append("(Bearish trend gate passed)")
+
+    contributors = []
+    if tech_val is not None and tech_val >= 60:
+        contributors.append("Technical")
+    if direction == "BUY" and fundamental_val is not None and fundamental_val >= 60:
+        contributors.append("Fundamentals")
+    if direction == "BUY" and news_val is not None and news_val >= 60:
+        contributors.append("News")
+    if contributors:
+        lines.append(f"Reason: {' + '.join(contributors)} were the strongest contributors.")
+
     return lines
 
 
@@ -339,7 +375,42 @@ def _trend_vs_yesterday_section(observation: dict, metrics_history: list[dict]) 
     return lines if len(lines) > 1 else []
 
 
-def _strategy_alert_section(observation: dict) -> list[str]:
+def _best_worst_trade_section(observation: dict) -> list[str]:
+    bw = observation.get("best_worst_trade", {})
+    if not bw:
+        return []
+    lines = []
+    best, worst = bw.get("best", {}), bw.get("worst", {})
+    if best:
+        sign = "+" if best["pct"] >= 0 else ""
+        lines.append("🏅 Best Closed Trade")
+        lines.append(f"{best['symbol']} ({best['direction']})")
+        lines.append(f"{sign}{best['pct']}%")
+        lines.append("")
+    if worst:
+        sign = "+" if worst["pct"] >= 0 else ""
+        lines.append("💥 Worst Closed Trade")
+        lines.append(f"{worst['symbol']} ({worst['direction']})")
+        lines.append(f"{sign}{worst['pct']}%")
+    return lines
+
+
+def _exit_reason_section(observation: dict) -> list[str]:
+    breakdown = observation.get("exit_reason_breakdown", {})
+    if not breakdown:
+        return []
+    lines = ["Most Common Exit"]
+    for reason, count in breakdown.items():
+        lines.append(reason)
+        lines.append(f"{count}")
+    return lines
+
+
+def _strategy_alert_section(observation: dict, metrics_history: list[dict]) -> list[str]:
+    today_str = time.strftime("%Y-%m-%d")
+    prior_entries = [m for m in metrics_history if m.get("date") != today_str]
+    previous = prior_entries[-1] if prior_entries else None
+
     lines = []
     for direction, label in (("buy_accuracy", "BUY"), ("sell_accuracy", "SELL")):
         acc = observation.get(direction, {})
@@ -348,20 +419,25 @@ def _strategy_alert_section(observation: dict) -> list[str]:
         if n < 10 or wr is None:
             continue
         MIN_WIN_RATE = 40
+        prev_wr = previous.get(f"{label.lower()}_win_rate") if previous else None
+        prev_line = f"Previous       : {prev_wr}%" if prev_wr is not None else "Previous       : N/A (no prior data)"
         if wr < MIN_WIN_RATE:
             if lines:
                 lines.append("")
             lines.append(f"🚨 ALERT — {label} Win Rate")
-            lines.append(f"{wr}%")
-            lines.append(f"Below minimum threshold ({MIN_WIN_RATE}%)")
+            lines.append(prev_line)
+            lines.append(f"Today          : {wr}%")
+            lines.append(f"Threshold      : {MIN_WIN_RATE}%")
+            lines.append("Status         : 🔴")
             lines.append("Action")
             lines.append("Investigate strategy before optimization.")
         elif wr >= 55:
             if lines:
                 lines.append("")
             lines.append(f"🟢 ALERT — {label} Win Rate")
-            lines.append(f"{wr}%")
-            lines.append("Healthy")
+            lines.append(prev_line)
+            lines.append(f"Today          : {wr}%")
+            lines.append("Status         : 🟢 Healthy")
     return lines
 
 
@@ -401,6 +477,7 @@ def _ai_conclusion(observation: dict) -> list[str]:
     lowest_confidence = total_n < 50
     if lowest_confidence:
         sentences.append("Dataset is still small, so this should inform monitoring, not strategy changes yet.")
+        sentences.append("No strategy changes recommended yet.")
     else:
         any_critical = any(
             acc.get("trades", 0) >= 10 and (acc.get("win_rate") or 100) < 20
@@ -502,9 +579,19 @@ def main() -> None:
         message_lines.extend(trend_section)
         message_lines.append("━━━━━━━━━━━━━━━━━━")
 
-    alert_section = _strategy_alert_section(observation)
+    alert_section = _strategy_alert_section(observation, metrics_history)
     if alert_section:
         message_lines.extend(alert_section)
+        message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    bw_section = _best_worst_trade_section(observation)
+    if bw_section:
+        message_lines.extend(bw_section)
+        message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    exit_section = _exit_reason_section(observation)
+    if exit_section:
+        message_lines.extend(exit_section)
         message_lines.append("━━━━━━━━━━━━━━━━━━")
 
     message_lines.extend(_ai_conclusion(observation))
