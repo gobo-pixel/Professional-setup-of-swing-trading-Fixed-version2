@@ -25,16 +25,7 @@
     "sell_trades_opened": 0,
     "gap": 26,
     "gap_reasons": {
-      "59.96": 2,
-      "66.95": 2,
-      "61.0": 2,
-      "66.65": 2,
-      "61.38": 2,
-      "60.7": 2,
-      "71.11": 2,
-      "59.23": 2,
-      "72.25": 2,
-      "58.72": 2
+      "Other / Not Recorded": 26
     }
   },
   "tier1_pass_rate": {
@@ -114,6 +105,10 @@
       "SELL": 2
     }
   },
+  "unknown_sector_symbols": [
+    "JSWDULUX.NS",
+    "JSWDULUX.NS"
+  ],
   "regime_percentages": {
     "SIDEWAYS": 34.6,
     "BULL": 32.2,
@@ -155,7 +150,9 @@
     "rejected_by_portfolio": 0,
     "rejected_by_liquidity": 0,
     "rejected_by_score_threshold": 0,
+    "rejected_by_insufficient_history": 0,
     "rejected_by_other": 210,
+    "other_reasons_breakdown": {},
     "executed": 0
   },
   "execution_summary": {
