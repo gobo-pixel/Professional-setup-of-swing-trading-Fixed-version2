@@ -25,12 +25,15 @@ Usage:
 
 from __future__ import annotations
 
+import csv
 import json
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+import yfinance as yf  # noqa: E402
 
 from core.logger import get_logger  # noqa: E402
 from core.notifications import notify  # noqa: E402
@@ -39,12 +42,17 @@ from analytics.learning_engine import LearningEngine  # noqa: E402
 
 logger = get_logger(__name__)
 
+PICKS_HISTORY_PATH = "reports/learning_picks_history.jsonl"
+METRICS_HISTORY_PATH = "reports/learning_metrics_history.jsonl"
+FULL_REPORT_PATH = "reports/full_report.csv"
+
 OUTPUT_PATH = "reports/learning_observation_latest.json"
 
 
 def _pct(value) -> str:
     if value is None:
         return "N/A"
+    value = value + 0.0  # normalizes -0.0 to 0.0, avoiding a "+-0.0%" display bug
     sign = "+" if value >= 0 else ""
     return f"{sign}{value}%"
 
@@ -57,20 +65,40 @@ def _confidence_label(n: int) -> str:
     return "HIGH"
 
 
+def _profit_factor_label(pf) -> str:
+    if pf is None:
+        return "N/A"
+    if pf > 1.5:
+        return f"{pf} 🟢 (Good)"
+    if pf >= 1.0:
+        return f"{pf} 🟡 (Average)"
+    return f"{pf} 🔴 (Loss-making)"
+
+
 def _render_side(accuracy: dict, side: str) -> list[str]:
     n = accuracy.get("trades", 0)
     if n == 0:
         return [f"{side} Trades Closed", "0", "(no closed trades to report yet)"]
 
+    wins = accuracy.get("wins", 0)
+    losses = accuracy.get("losses", 0)
+    data_issues = accuracy.get("data_quality_issues", 0)
+    win_rate = accuracy.get("win_rate")
+
     lines = [
         f"{side} Trades Closed",
         f"{n}",
         "Wins",
-        f"{accuracy.get('wins', 0)}",
+        f"{wins}",
         "Losses",
-        f"{accuracy.get('losses', 0)}",
+        f"{losses}",
+    ]
+    if data_issues:
+        lines.append("Data Quality Issues")
+        lines.append(f"{data_issues} (PnL unavailable/NaN — excluded from win/loss, not from total)")
+    lines.extend([
         "Win Rate",
-        f"{accuracy.get('win_rate', 0)}%",
+        f"{win_rate}%" if win_rate is not None else "N/A",
         "Average Winner",
         _pct(accuracy.get("avg_winner_pct")),
         "Average Loser",
@@ -81,31 +109,37 @@ def _render_side(accuracy: dict, side: str) -> list[str]:
         _pct(accuracy.get("largest_loser_pct")),
         "Average Holding",
         f"{accuracy.get('avg_holding_days')} Days" if accuracy.get("avg_holding_days") is not None else "N/A",
-    ]
+    ])
+
+    winner_hold = accuracy.get("avg_winner_holding_days")
+    loser_hold = accuracy.get("avg_loser_holding_days")
+    if winner_hold is not None or loser_hold is not None:
+        lines.append(
+            f"  (Winners held {winner_hold if winner_hold is not None else 'N/A'} days avg, "
+            f"Losers held {loser_hold if loser_hold is not None else 'N/A'} days avg)"
+        )
 
     lines.append("━━━━━━━━━━━━━━━━━━")
     lines.append("Observation")
     observations = []
-    winner_hold = accuracy.get("avg_winner_holding_days")
-    loser_hold = accuracy.get("avg_loser_holding_days")
     if winner_hold is not None and loser_hold is not None:
         if winner_hold > loser_hold * 1.2:
-            observations.append("Winning trades generally run much longer than losing trades.")
+            observations.append(f"Winning trades ran longer on average ({winner_hold}d vs {loser_hold}d) than losing trades.")
         elif loser_hold > winner_hold * 1.2:
-            observations.append("Losing trades are being held longer than winners — consider tighter stop discipline.")
+            observations.append(f"Losing trades are being held longer ({loser_hold}d vs {winner_hold}d) — consider tighter stop discipline.")
     largest_loser = accuracy.get("largest_loser_pct")
     if largest_loser is not None:
         if largest_loser >= -5:
-            observations.append("Losses remain controlled below 5%.")
+            observations.append(f"Losses remain controlled below 5% (worst: {largest_loser}%).")
         else:
             observations.append(f"Largest loss ({largest_loser}%) exceeds 5% — worth reviewing stop-loss discipline.")
-    win_rate = accuracy.get("win_rate", 0)
-    if win_rate < 40:
-        observations.append("Current win rate is low and requires further investigation.")
-    elif win_rate >= 55:
-        observations.append("Win rate is currently strong.")
+    if win_rate is not None:
+        if win_rate < 40:
+            observations.append(f"{side} win rate ({win_rate}%) is low and requires further investigation.")
+        elif win_rate >= 55:
+            observations.append(f"{side} win rate ({win_rate}%) is currently strong.")
     if not observations:
-        observations.append("No strong pattern detected yet — needs more closed trades.")
+        observations.append(f"No strong {side}-side pattern detected yet — needs more closed trades.")
     for obs in observations:
         lines.append(f"• {obs}")
 
@@ -113,18 +147,275 @@ def _render_side(accuracy: dict, side: str) -> list[str]:
     lines.append(_confidence_label(n))
     if n < 50:
         lines.append(f"({n} closed trades only)")
+    lines.append("Recommendations are observational only.")
 
     profit_factor = accuracy.get("profit_factor")
-    if profit_factor is not None:
+    gross_profit = accuracy.get("gross_profit")
+    gross_loss = accuracy.get("gross_loss")
+    if profit_factor is not None or gross_profit is not None:
         lines.append("━━━━━━━━━━━━━━━━━━")
         lines.append("Profit Factor")
         lines.append("Gross Profit")
-        lines.append(f"₹{accuracy.get('gross_profit', 0)}")
+        lines.append(f"₹{gross_profit}")
         lines.append("Gross Loss")
-        lines.append(f"₹{accuracy.get('gross_loss', 0)}")
+        lines.append(f"₹{gross_loss}")
+        lines.append("Net P&L")
+        net = round((gross_profit or 0) - (gross_loss or 0), 2)
+        sign = "+" if net >= 0 else ""
+        lines.append(f"{sign}₹{net}")
         lines.append("Profit Factor")
-        lines.append(f"{profit_factor}")
+        lines.append(_profit_factor_label(profit_factor))
 
+    return lines
+
+
+def _load_today_report_rows() -> list[dict]:
+    path = Path(FULL_REPORT_PATH)
+    if not path.exists():
+        return []
+    with open(path, newline="") as f:
+        all_rows = list(csv.DictReader(f))
+    dates = {r.get("Date") for r in all_rows if r.get("Date")}
+    if not dates:
+        return all_rows
+    latest_date = max(dates)
+    return [r for r in all_rows if r.get("Date") == latest_date]
+
+
+def _load_picks_history() -> list[dict]:
+    path = Path(PICKS_HISTORY_PATH)
+    if not path.exists():
+        return []
+    entries = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    return entries
+
+
+def _append_picks_history(entry: dict) -> None:
+    Path(PICKS_HISTORY_PATH).parent.mkdir(parents=True, exist_ok=True)
+    with open(PICKS_HISTORY_PATH, "a") as f:
+        f.write(json.dumps(entry, default=str) + "\n")
+
+
+def _yesterday_followup_section(picks_history: list[dict]) -> list[str]:
+    today_str = time.strftime("%Y-%m-%d")
+    prior_entries = [p for p in picks_history if p.get("date") != today_str]
+    if not prior_entries:
+        return []
+    yesterday_date = max(e["date"] for e in prior_entries)
+    yesterday_picks = [e for e in prior_entries if e["date"] == yesterday_date]
+    if not yesterday_picks:
+        return []
+
+    lines = ["📅 Yesterday's Top Picks", ""]
+    any_bad = False
+    for pick in yesterday_picks:
+        symbol = pick.get("symbol")
+        entry_price = pick.get("entry_price")
+        direction = pick.get("direction")
+        if not symbol or not entry_price:
+            continue
+        try:
+            df = yf.download(symbol, period="5d", progress=False, auto_adjust=False)
+            if df.empty:
+                continue
+            current_price = float(df["Close"].iloc[-1])
+        except Exception as exc:
+            logger.warning("Could not fetch follow-up price for %s: %s", symbol, exc)
+            continue
+
+        pct_change = round((current_price - entry_price) / entry_price * 100, 1)
+        # For BUY, a price increase is good; for SELL, a price decrease is good.
+        is_good = pct_change > 0 if direction == "BUY" else pct_change < 0
+        display_pct = pct_change if direction == "BUY" else -pct_change
+        icon = "✅" if is_good else "❌"
+        if not is_good:
+            any_bad = True
+        sign = "+" if display_pct >= 0 else ""
+        lines.append(direction)
+        lines.append(symbol)
+        lines.append(f"{icon} {sign}{display_pct}%")
+        lines.append("")
+
+    if len(lines) <= 2:
+        return []
+    lines.append("Status")
+    lines.append("Needs Investigation" if any_bad else "Playing Out Well")
+    return lines
+
+
+def _best_candidate_section(report_rows: list[dict], direction: str) -> list[str]:
+    score_col = "BuyOverallScore" if direction == "BUY" else "SellOverallScore"
+    tier1_col = "BuyTier1Passed" if direction == "BUY" else "SellTier1Passed"
+    candidates = [r for r in report_rows if r.get("Signal") == direction and r.get(score_col)]
+    if not candidates:
+        return []
+
+    def _score(r):
+        try:
+            return float(r[score_col])
+        except (TypeError, ValueError):
+            return -1.0
+
+    best = max(candidates, key=_score)
+    emoji = "🏆" if direction == "BUY" else "🎯"
+    lines = [f"{emoji} Today's Best {direction}", "", f"Stock        : {best.get('Stock', 'N/A')}"]
+    lines.append(f"Score        : {round(_score(best), 1)}")
+    if best.get("Confidence"):
+        lines.append(f"Confidence   : {best['Confidence']}%")
+    if best.get("probability"):
+        try:
+            lines.append(f"Probability  : {round(float(best['probability']), 1)}%")
+        except (TypeError, ValueError):
+            pass
+    lines.append("")
+    lines.append("Why?")
+    if best.get(tier1_col) == "True":
+        lines.append("✅ Strong Trend")
+    try:
+        if float(best.get("NewsScore") or 0) >= 60:
+            lines.append("✅ Positive News")
+    except (TypeError, ValueError):
+        pass
+    try:
+        if float(best.get("FundamentalScore") or 0) >= 60:
+            lines.append("✅ Strong Fundamentals")
+    except (TypeError, ValueError):
+        pass
+    if len(lines) == 8:  # only the header/blank lines, no checks passed
+        lines.append("(No individual signal crossed the strong-signal threshold today.)")
+    return lines
+
+
+def _load_metrics_history() -> list[dict]:
+    path = Path(METRICS_HISTORY_PATH)
+    if not path.exists():
+        return []
+    entries = []
+    with open(path) as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    entries.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+    return entries
+
+
+def _append_metrics_history(entry: dict) -> None:
+    Path(METRICS_HISTORY_PATH).parent.mkdir(parents=True, exist_ok=True)
+    with open(METRICS_HISTORY_PATH, "a") as f:
+        f.write(json.dumps(entry, default=str) + "\n")
+
+
+def _trend_vs_yesterday_section(observation: dict, metrics_history: list[dict]) -> list[str]:
+    today_str = time.strftime("%Y-%m-%d")
+    prior_entries = [m for m in metrics_history if m.get("date") != today_str]
+    if not prior_entries:
+        return []
+    yesterday = prior_entries[-1]
+
+    lines = ["📊 Trend vs Yesterday"]
+    for direction, label in (("buy_accuracy", "BUY"), ("sell_accuracy", "SELL")):
+        today_acc = observation.get(direction, {})
+        today_n = today_acc.get("trades", 0)
+        yesterday_n = yesterday.get(f"{label.lower()}_trades", 0)
+        if today_n == 0 and yesterday_n == 0:
+            continue
+        if yesterday_n:
+            pct_change = round((today_n - yesterday_n) / yesterday_n * 100, 1)
+            arrow = "↑" if pct_change > 0 else ("↓" if pct_change < 0 else "→")
+            lines.append(f"{label} Trades Closed: {yesterday_n} → {today_n}  {arrow} {pct_change:+.1f}%")
+        else:
+            lines.append(f"{label} Trades Closed: {yesterday_n} → {today_n}")
+    return lines if len(lines) > 1 else []
+
+
+def _strategy_alert_section(observation: dict) -> list[str]:
+    lines = []
+    for direction, label in (("buy_accuracy", "BUY"), ("sell_accuracy", "SELL")):
+        acc = observation.get(direction, {})
+        n = acc.get("trades", 0)
+        wr = acc.get("win_rate")
+        if n < 10 or wr is None:
+            continue
+        MIN_WIN_RATE = 40
+        if wr < MIN_WIN_RATE:
+            if lines:
+                lines.append("")
+            lines.append(f"🚨 ALERT — {label} Win Rate")
+            lines.append(f"{wr}%")
+            lines.append(f"Below minimum threshold ({MIN_WIN_RATE}%)")
+            lines.append("Action")
+            lines.append("Investigate strategy before optimization.")
+        elif wr >= 55:
+            if lines:
+                lines.append("")
+            lines.append(f"🟢 ALERT — {label} Win Rate")
+            lines.append(f"{wr}%")
+            lines.append("Healthy")
+    return lines
+
+
+def _ai_conclusion(observation: dict) -> list[str]:
+    """3-4 plain sentences synthesizing the whole observation — the
+    reader's takeaway without needing to parse every section above."""
+    lines = ["🧠 AI Conclusion"]
+    sentences = []
+
+    buy_acc = observation.get("buy_accuracy", {})
+    sell_acc = observation.get("sell_accuracy", {})
+
+    # Overall verdict
+    sides_summary = []
+    for label, acc in (("BUY", buy_acc), ("SELL", sell_acc)):
+        n = acc.get("trades", 0)
+        wr = acc.get("win_rate")
+        if n > 0 and wr is not None:
+            sides_summary.append((label, n, wr))
+    if sides_summary:
+        parts = [f"{label} win rate is {wr}% over {n} trades" for label, n, wr in sides_summary]
+        sentences.append("Overall, " + " and ".join(parts) + ".")
+
+    # Biggest weak dimension across sector/regime/news/technical
+    weak_points = []
+    for sector, stats in observation.get("sector_performance", {}).items():
+        if stats.get("trades", 0) >= 5 and stats.get("win_rate", 100) == 0:
+            weak_points.append(f"{sector} sector (0% over {stats['trades']} trades)")
+    for regime, stats in observation.get("regime_performance", {}).items():
+        if stats.get("trades", 0) >= 5 and stats.get("win_rate", 100) == 0:
+            weak_points.append(f"{regime} regime (0% over {stats['trades']} trades)")
+    if weak_points:
+        sentences.append(f"The weakest spot right now is {weak_points[0]}.")
+
+    # Directional recommendation
+    total_n = buy_acc.get("trades", 0) + sell_acc.get("trades", 0)
+    lowest_confidence = total_n < 50
+    if lowest_confidence:
+        sentences.append("Dataset is still small, so this should inform monitoring, not strategy changes yet.")
+    else:
+        any_critical = any(
+            acc.get("trades", 0) >= 10 and (acc.get("win_rate") or 100) < 20
+            for acc in (buy_acc, sell_acc)
+        )
+        if any_critical:
+            sentences.append("The dataset is now large enough that this weak performance deserves a closer strategy review.")
+        else:
+            sentences.append("Nothing here crosses the threshold for a strategy change — keep monitoring.")
+
+    if not sentences:
+        sentences.append("Not enough data yet to draw a clear conclusion.")
+
+    for s in sentences:
+        lines.append(s)
     return lines
 
 
@@ -149,21 +440,79 @@ def main() -> None:
     print(f"Fundamental effectiveness: {observation['fundamental_effectiveness']}")
     print(f"Technical effectiveness : {observation['technical_effectiveness']}")
 
-    if observation["closed_trades_observed"] == 0:
-        return
+    # ---------------- Best Trade Candidate + Yesterday Follow-up setup ----------------
+    # Load history BEFORE appending today's entries, so comparisons are
+    # against genuinely prior days, not today itself.
+    today_report_rows = _load_today_report_rows()
+    picks_history = _load_picks_history()
+    metrics_history = _load_metrics_history()
+
+    today_str = time.strftime("%Y-%m-%d")
+    for direction in ("BUY", "SELL"):
+        score_col = "BuyOverallScore" if direction == "BUY" else "SellOverallScore"
+        candidates = [r for r in today_report_rows if r.get("Signal") == direction and r.get(score_col)]
+        if not candidates:
+            continue
+        try:
+            best = max(candidates, key=lambda r: float(r[score_col]))
+            entry_price = float(best.get("EntryPrice") or 0)
+            if entry_price > 0:
+                _append_picks_history({
+                    "date": today_str, "symbol": best.get("Stock"), "direction": direction,
+                    "entry_price": entry_price,
+                })
+        except (TypeError, ValueError):
+            continue
+
+    buy_acc, sell_acc = observation.get("buy_accuracy", {}), observation.get("sell_accuracy", {})
+    _append_metrics_history({
+        "date": today_str, "buy_trades": buy_acc.get("trades", 0), "sell_trades": sell_acc.get("trades", 0),
+        "buy_win_rate": buy_acc.get("win_rate"), "sell_win_rate": sell_acc.get("win_rate"),
+    })
 
     message_lines = ["🧠 LEARNING SUMMARY", "━━━━━━━━━━━━━━━━━━"]
-    message_lines.extend(_render_side(observation["buy_accuracy"], "BUY"))
 
-    sell_acc = observation.get("sell_accuracy", {})
+    for direction in ("BUY", "SELL"):
+        section = _best_candidate_section(today_report_rows, direction)
+        if section:
+            message_lines.extend(section)
+            message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    followup_section = _yesterday_followup_section(picks_history)
+    if followup_section:
+        message_lines.extend(followup_section)
+        message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    if observation["closed_trades_observed"] == 0:
+        notify(
+            event_type="learning_summary",
+            message="\n".join(message_lines),
+            dedup_key=f"learning_summary::{today_str}::{now_ist().strftime('%H:%M:%S.%f')}",
+        )
+        return
+
+    message_lines.extend(_render_side(observation["buy_accuracy"], "BUY"))
     if sell_acc.get("trades", 0) > 0:
         message_lines.append("")
         message_lines.extend(_render_side(sell_acc, "SELL"))
+    message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    trend_section = _trend_vs_yesterday_section(observation, metrics_history)
+    if trend_section:
+        message_lines.extend(trend_section)
+        message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    alert_section = _strategy_alert_section(observation)
+    if alert_section:
+        message_lines.extend(alert_section)
+        message_lines.append("━━━━━━━━━━━━━━━━━━")
+
+    message_lines.extend(_ai_conclusion(observation))
 
     notify(
         event_type="learning_summary",
         message="\n".join(message_lines),
-        dedup_key=f"learning_summary::{time.strftime('%Y-%m-%d')}::{now_ist().strftime('%H:%M:%S.%f')}",
+        dedup_key=f"learning_summary::{today_str}::{now_ist().strftime('%H:%M:%S.%f')}",
     )
 
 
