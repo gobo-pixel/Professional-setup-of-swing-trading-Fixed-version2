@@ -1,24 +1,6 @@
 {
-  "2026-07-26": [
-    "scan_started::2026-07-26::06:27:41.527333",
-    "scan_completed::2026-07-26::06:36:36.268331",
-    "scan_started::2026-07-26::07:24:09.228330",
-    "scan_completed::2026-07-26::07:35:41.982152",
-    "analysis_summary::2026-07-26::09:29:49.198074",
-    "learning_summary::2026-07-26::09:29:49.958767",
-    "optimizer_recommendation::2026-07-26::09:29:50.633975",
-    "analysis_summary::2026-07-26::17:10:39.379601",
-    "learning_summary::2026-07-26::17:10:40.382076",
-    "optimizer_recommendation::2026-07-26::17:10:41.292722",
-    "analysis_summary::2026-07-26::22:46:23.071169",
-    "learning_summary::2026-07-26::22:46:24.716614",
-    "optimizer_recommendation::2026-07-26::22:46:25.452758",
-    "analysis_summary::2026-07-26::23:30:42.073423",
-    "learning_summary::2026-07-26::23:30:43.677356",
-    "optimizer_recommendation::2026-07-26::23:30:44.562957",
-    "analysis_summary::2026-07-26::00:01:42.126293",
-    "learning_summary::2026-07-26::00:01:43.895748",
-    "optimizer_recommendation::2026-07-26::00:01:44.738868",
-    "scan_skipped::2026-07-26::00:22:50.067701"
+  "2026-07-27": [
+    "news::MFSL.NS::Max Financial Services Ltd (BOM:500271) Q3 2026 Earnings Call Highlights: Strong Growth Amidst ...",
+    "mi_summary::2026-07-27 18:27:30.829866"
   ]
 }
