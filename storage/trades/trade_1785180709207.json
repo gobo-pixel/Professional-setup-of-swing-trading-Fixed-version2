@@ -1,0 +1,16 @@
+{
+  "symbol": "LAURUSLABS.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 6,
+  "entry_price": 1601.2,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 79.27,
+  "reasons": "",
+  "id": "trade_1785180709207",
+  "timestamp": 1785180709.20713
+}

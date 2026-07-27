@@ -1,0 +1,16 @@
+{
+  "symbol": "NUVAMA.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 2,
+  "entry_price": 1980.1,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.93,
+  "reasons": "",
+  "id": "trade_1785180714064",
+  "timestamp": 1785180714.0645454
+}

@@ -1,0 +1,18 @@
+{
+  "symbol": "JUBLFOOD.NS",
+  "direction": "SELL",
+  "action": "CLOSE",
+  "quantity": 65,
+  "entry_price": 412.3,
+  "exit_price": 418.25,
+  "status": "CLOSED",
+  "realized_pnl": -386.74999999999926,
+  "realized_pnl_percent": -1.443123938879454,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 1.443123938879454,
+  "regime": "BEAR",
+  "confidence": 51.41,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; News sentiment now works against this SELL position (100/100).",
+  "id": "trade_1785179914810",
+  "timestamp": 1785179914.810325
+}

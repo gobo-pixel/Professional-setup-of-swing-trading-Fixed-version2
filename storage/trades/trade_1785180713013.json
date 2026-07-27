@@ -1,0 +1,16 @@
+{
+  "symbol": "NESTLEIND.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 6,
+  "entry_price": 1443.5,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 70.85,
+  "reasons": "",
+  "id": "trade_1785180713013",
+  "timestamp": 1785180713.0130522
+}
