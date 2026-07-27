@@ -156,6 +156,21 @@ def main() -> None:
                 "open_positions_now": final_open_positions,
             }, f, indent=2, default=str)
 
+        opened_count = len(summary["opened_today"])
+        closed_count = len(summary["closed_today"])
+        expected_open_now = opened_at_start - closed_count + opened_count
+        reconciliation_line = (
+            f"\n\nPosition Count Check\n"
+            f"Previous Open ({opened_at_start}) - Closed ({closed_count}) + Opened ({opened_count}) "
+            f"= {expected_open_now}\n"
+            + (
+                f"✓ Matches actual open positions ({final_open_positions})."
+                if expected_open_now == final_open_positions
+                else f"❌ MISMATCH — actual open positions is {final_open_positions}, "
+                     f"expected {expected_open_now} (difference of {final_open_positions - expected_open_now})."
+            )
+        )
+
         notify(
             event_type="daily_portfolio_summary",
             message=(
@@ -168,12 +183,13 @@ def main() -> None:
                 f"Cash Balance: {remaining_balance:.2f}\n"
                 f"Realized PnL: {snap.get('total_pnl', 0):.2f} "
                 f"({snap.get('portfolio_return_percent', 0):.2f}%)\n"
-                f"Opened: {len(summary['opened_today'])} | "
-                f"Closed: {len(summary['closed_today'])} | "
+                f"Opened: {opened_count} | "
+                f"Closed: {closed_count} | "
                 f"Monitored: {monitored_count}\n"
                 f"Open Positions Now: {final_open_positions}\n"
                 f"Reason:\n{reason}"
                 f"{opened_lines}"
+                f"{reconciliation_line}"
             ),
             dedup_key=f"portfolio_summary::{summary['date']}::{now_ist().strftime('%H:%M:%S.%f')}",
         )
