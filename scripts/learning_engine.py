@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import sys
 import time
 from pathlib import Path
@@ -211,9 +212,19 @@ def _yesterday_followup_section(picks_history: list[dict]) -> list[str]:
     if not prior_entries:
         return []
     yesterday_date = max(e["date"] for e in prior_entries)
-    yesterday_picks = [e for e in prior_entries if e["date"] == yesterday_date]
-    if not yesterday_picks:
+    yesterday_picks_raw = [e for e in prior_entries if e["date"] == yesterday_date]
+    if not yesterday_picks_raw:
         return []
+
+    # De-duplicate: the workflow can run multiple times on the same
+    # calendar day (manual tests, retries), each appending a new entry
+    # with the same date — keep only the LAST (most recent) entry per
+    # (symbol, direction) pair, not every duplicate.
+    dedup: dict[tuple, dict] = {}
+    for pick in yesterday_picks_raw:
+        key = (pick.get("symbol"), pick.get("direction"))
+        dedup[key] = pick
+    yesterday_picks = list(dedup.values())
 
     lines = ["📅 Yesterday's Top Picks", ""]
     any_bad = False
@@ -230,6 +241,10 @@ def _yesterday_followup_section(picks_history: list[dict]) -> list[str]:
             current_price = float(df["Close"].iloc[-1])
         except Exception as exc:
             logger.warning("Could not fetch follow-up price for %s: %s", symbol, exc)
+            continue
+
+        if math.isnan(current_price):
+            logger.warning("Follow-up price for %s came back NaN — skipping.", symbol)
             continue
 
         pct_change = round((current_price - entry_price) / entry_price * 100, 1)
@@ -312,8 +327,12 @@ def _best_candidate_section(report_rows: list[dict], direction: str) -> list[str
         # For SELL, frame news/fundamentals as bearish-relevant instead
         # of "positive" (which reads backwards for a sell signal).
         if news_val is not None:
-            label = "Negative News Score" if news_val < 50 else "News Score (not bearish — worth checking)"
-            lines.append(f"{label}: {news_val}")
+            if news_val == 0:
+                lines.append("News              : No news data available for this stock today.")
+            elif news_val < 50:
+                lines.append(f"News (bearish-supportive): {news_val}")
+            else:
+                lines.append(f"News Score (not bearish — worth checking): {news_val}")
         if trend_ok:
             lines.append("(Bearish trend gate passed)")
 
