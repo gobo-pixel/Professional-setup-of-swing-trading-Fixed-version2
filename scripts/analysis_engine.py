@@ -177,13 +177,22 @@ def main() -> None:
         message_lines.append("")
         message_lines.append("Historical Comparison")
         if yesterday_entry:
+            prev_universe = yesterday_entry.get("total_scans", 0)
+            universe_changed = prev_universe and prev_universe != total_scans
+            if universe_changed:
+                message_lines.append(f"Note: Universe changed: {prev_universe} → {total_scans} — raw counts below aren't directly comparable, so % of universe is shown too.")
             for label, key in (("BUY", "buy"), ("SELL", "sell")):
                 prev_val = yesterday_entry.get(key, 0)
                 curr_val = buy_n if key == "buy" else sell_n
                 if prev_val:
                     pct_change = round((curr_val - prev_val) / prev_val * 100, 1)
                     arrow = "↑" if pct_change > 0 else ("↓" if pct_change < 0 else "→")
-                    message_lines.append(f"{label}: Yesterday {prev_val} → Today {curr_val}  {arrow} {pct_change:+.1f}%")
+                    line = f"{label}: Yesterday {prev_val} → Today {curr_val}  {arrow} {pct_change:+.1f}%"
+                    if universe_changed and prev_universe and total_scans:
+                        prev_rate = round(prev_val / prev_universe * 100, 1)
+                        curr_rate = round(curr_val / total_scans * 100, 1)
+                        line += f"  (as % of universe: {prev_rate}% → {curr_rate}%)"
+                    message_lines.append(line)
                 else:
                     message_lines.append(f"{label}: Yesterday {prev_val} → Today {curr_val}")
         if last_7_entries:
