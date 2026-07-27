@@ -262,40 +262,67 @@ def main() -> None:
                 message_lines.append(f"│     • {reason}: {count}")
         message_lines.append(f"└── Executed: {funnel.get('executed', 0)}")
 
-    # ---------------- 5. Execution Summary (with Eligible) ----------------
+    # ---------------- 5. Execution Summary (redesigned) ----------------
+    DAILY_CANDIDATE_LIMIT = 20  # matches execution/scanner.py's max_trade_candidates
+    buy_attempted = execution.get("buy_generated", 0) if execution else 0
     if execution:
-        reasons = execution.get("reasons", {})
-        # "Eligible" = candidates that were genuinely close to executing
-        # (blocked only by capital/liquidity/risk at the execution
-        # stage) — as opposed to score-threshold/other rejections,
-        # which were disqualified well before execution was even considered.
-        eligible = (
-            reasons.get("Capital / Portfolio Rules", 0)
-            + reasons.get("Risk Engine (execution stage)", 0)
-            + reasons.get("Liquidity", 0)
-        )
+        reasons = dict(execution.get("reasons", {}))
+        not_attempted = reasons.pop("Not Attempted (ranked below daily candidate limit)", 0)
+        buy_attempted = execution.get("buy_generated", 0) - not_attempted
+        # Whatever's left in "Other" here (after risk/portfolio/liquidity/
+        # score-threshold/history are already split out) is most likely
+        # a capital constraint at the ACTUAL execution moment — which
+        # happens later than the Daily Scan and isn't written back to
+        # Tier4Block anywhere, so this is a best-explanation relabel,
+        # not a verified certainty.
+        other_count = reasons.pop("Other", 0)
+        if other_count:
+            reasons["Insufficient Capital (most likely — see note below)"] = other_count
+
+        executed = execution.get("buy_executed", 0)
         message_lines.append("")
         message_lines.append("BUY Execution")
-        message_lines.append(f"Signals Generated : {execution.get('buy_generated', 0)}")
-        message_lines.append(f"Eligible           : {eligible}")
-        message_lines.append(f"Executed           : {execution.get('buy_executed', 0)}")
-        message_lines.append(f"Not Executed       : {execution.get('buy_rejected', 0)}")
-        if reasons:
-            message_lines.append("Reason")
-            for reason, count in reasons.items():
-                message_lines.append(f"  {reason}: {count}")
+        message_lines.append(f"Signals Generated     : {execution.get('buy_generated', 0)}")
+        message_lines.append(f"Daily Candidate Limit : {DAILY_CANDIDATE_LIMIT}")
+        message_lines.append(f"Executed              : {executed}")
+        message_lines.append(f"Not Executed          : {execution.get('buy_rejected', 0)}")
+        message_lines.append("Reasons")
+        if not_attempted:
+            message_lines.append(f"• Ranked below daily candidate limit : {not_attempted}")
+        for reason, count in reasons.items():
+            message_lines.append(f"• {reason} : {count}")
+        if other_count:
+            message_lines.append(
+                "Note: \"Insufficient Capital\" here is inferred, not directly recorded — "
+                "these candidates ranked within the daily limit but had no risk/portfolio/"
+                "liquidity/score reason logged, and actual capital availability at execution "
+                "time (hours after the scan) isn't written back anywhere the scan can see."
+            )
 
-    # ---------------- 6. SELL Summary (reconciled) ----------------
+    # ---------------- 6. SELL Summary (redesigned, same structure) ----------------
     if sell_gap.get("sell_signals", 0) > 0:
+        gap_reasons = dict(sell_gap.get("gap_reasons", {}))
+        sell_not_attempted = gap_reasons.pop("Not Attempted (ranked below daily candidate limit)", 0)
+        sell_other_count = gap_reasons.pop("Other / Not Recorded", 0)
+        if sell_other_count:
+            gap_reasons["Insufficient Capital (most likely — see note below)"] = sell_other_count
+
         message_lines.append("")
         message_lines.append("SELL Execution")
-        message_lines.append(f"Signals Generated : {sell_gap['sell_signals']}")
-        message_lines.append(f"Opened            : {sell_gap['sell_trades_opened']}")
-        message_lines.append(f"Rejected          : {sell_gap.get('gap', 0)}")
-        if sell_gap.get("gap_reasons"):
-            message_lines.append("Reason")
-            for reason, count in sell_gap["gap_reasons"].items():
-                message_lines.append(f"  {reason}: {count}")
+        message_lines.append(f"Signals Generated     : {sell_gap['sell_signals']}")
+        message_lines.append(f"Daily Candidate Limit : {DAILY_CANDIDATE_LIMIT}")
+        message_lines.append(f"Executed              : {sell_gap['sell_trades_opened']}")
+        message_lines.append(f"Not Executed          : {sell_gap.get('gap', 0)}")
+        message_lines.append("Reasons")
+        if sell_not_attempted:
+            message_lines.append(f"• Ranked below daily candidate limit : {sell_not_attempted}")
+        for reason, count in gap_reasons.items():
+            message_lines.append(f"• {reason} : {count}")
+        if sell_other_count:
+            message_lines.append(
+                "Note: \"Insufficient Capital\" here is inferred, not directly recorded — "
+                "same reasoning as the BUY side above."
+            )
 
     # ---------------- 7. AI Observation ----------------
     # Rule-based, derived directly from the numbers above — not a
@@ -323,10 +350,10 @@ def main() -> None:
         if biggest_reason[1] > 0:
             observations.append(f"Most rejected candidates failed on {biggest_reason[0]} ({biggest_reason[1]}).")
     if execution and execution.get("buy_executed", 0) == 0 and execution.get("buy_generated", 0) > 0:
-        if eligible == 0:
+        if buy_attempted == 0:
             observations.append("No BUY trades reached the execution stage today — all were blocked earlier at signal/validation checks.")
         else:
-            observations.append(f"{eligible} BUY candidate(s) reached the execution stage but none were executed — worth reviewing capital/liquidity/risk checks.")
+            observations.append(f"{buy_attempted} BUY candidate(s) were within the daily limit but none were executed — worth reviewing capital/liquidity/risk checks.")
     if observations:
         message_lines.append("")
         message_lines.append("AI Observation")
@@ -353,7 +380,7 @@ def main() -> None:
     message_lines.append("   Rule: Healthy ≥5%, Watch 0-5%, Investigate at 0%")
     if exec_level == "investigate":
         message_lines.append("Recommendation")
-        message_lines.append(f"Execution stage produced {eligible} eligible trade(s).")
+        message_lines.append(f"Execution stage produced {buy_attempted} candidate(s) within the daily limit.")
         message_lines.append("Verify:")
         message_lines.append("• Capital allocation")
         message_lines.append("• Liquidity filter")
