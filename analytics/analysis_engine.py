@@ -147,8 +147,23 @@ class AnalysisEngine:
             "score_threshold": "Confidence Threshold",
             "other": "Other / Not Recorded",
         }
+
+        def _sell_score(row):
+            try:
+                return float(row.get("SellOverallScore") or 0)
+            except (TypeError, ValueError):
+                return 0.0
+
+        MAX_DAILY_CANDIDATES = 20
+        all_sell_signal_rows = sell_signal_rows
+        sell_ranked_all = sorted(all_sell_signal_rows, key=_sell_score, reverse=True)
+        sell_attempted_symbols = {r.get("Stock") for r in sell_ranked_all[:MAX_DAILY_CANDIDATES]}
+
         sell_rejection_reasons: Counter = Counter()
         for r in not_opened_rows:
+            if r.get("Stock") not in sell_attempted_symbols:
+                sell_rejection_reasons["Not Attempted (ranked below daily candidate limit)"] += 1
+                continue
             category = classify_tier4_block(r.get("Tier4Block"))
             sell_rejection_reasons[category_labels.get(category, "Other / Not Recorded")] += 1
         report["sell_signal_vs_opened"] = {
@@ -271,12 +286,36 @@ class AnalysisEngine:
         }
 
         # ---------------- Execution Summary ----------------
+        # Paper Trading runs its OWN separate scan with a hard cap
+        # (max_trade_candidates=20 in execution/scanner.py) — it only
+        # ever considers its top-20-by-score BUY candidates per day.
+        # Any Daily-Scan BUY signal ranked below that cutoff was NEVER
+        # ATTEMPTED by Paper Trading at all, which is different from a
+        # genuine Tier4Block-based rejection and was previously
+        # miscounted into an unhelpful "Other" bucket.
+        MAX_DAILY_CANDIDATES = 20
         buy_generated = signal_counts.get("BUY", 0)
         buy_executed = executed_buy_today
         buy_rejected = max(buy_generated - buy_executed, 0)
+        opened_buy_symbols = self._opened_today_symbols("BUY")
+
+        def _buy_score(row):
+            try:
+                return float(row.get("BuyOverallScore") or 0)
+            except (TypeError, ValueError):
+                return 0.0
+
+        buy_signal_rows_not_opened = [
+            r for r in rows if r.get("Signal") == "BUY" and r.get("Stock") not in opened_buy_symbols
+        ]
+        all_buy_signal_rows = [r for r in rows if r.get("Signal") == "BUY"]
+        ranked_all = sorted(all_buy_signal_rows, key=_buy_score, reverse=True)
+        attempted_symbols = {r.get("Stock") for r in ranked_all[:MAX_DAILY_CANDIDATES]}
+
         reason_buckets = Counter()
-        for r in rows:
-            if r.get("Signal") != "BUY":
+        for r in buy_signal_rows_not_opened:
+            if r.get("Stock") not in attempted_symbols:
+                reason_buckets["Not Attempted (ranked below daily candidate limit)"] += 1
                 continue
             category = classify_tier4_block(r.get("Tier4Block"))
             if category == "portfolio":
