@@ -420,6 +420,11 @@ class PaperTradingEngine:
                         "pnl_pct": pnl_pct, "pnl_rupees": closed.realized_pnl,
                         "trigger": trigger, "holding_days": holding_days,
                         "trade_id": trade_id, "exit_score": exit_eval.exit_score,
+                        "exit_threshold": exit_eval.threshold,
+                        "exit_reasons": [
+                            r for r in (exit_eval.reasons or [])
+                            if not r.lower().startswith("exit score")
+                        ][:3],
                         "target1_status": target1_status, "target2_status": target2_status,
                         "stop_loss_status": stop_loss_status,
                     })
@@ -917,8 +922,18 @@ class PaperTradingEngine:
         lines.append(f"Return: {sign}{c['pnl_pct']:.2f}%  |  P&L: ₹{c['pnl_rupees']:.2f}")
         lines.append(f"Holding Days: {c.get('holding_days', 'N/A')}")
         lines.append(f"Exit Reason: {short_trigger.get(c['trigger'], c['trigger'])}")
+        exit_reasons = c.get("exit_reasons") or []
+        if exit_reasons:
+            lines.append("Reason:")
+            for r in exit_reasons:
+                lines.append(f"  • {r}")
         if c.get("exit_score") is not None:
-            lines.append(f"Exit Score: {c['exit_score']:.1f}/100")
+            threshold = c.get("exit_threshold")
+            if threshold is not None:
+                lines.append(f"Exit Score: {c['exit_score']:.1f} / 100")
+                lines.append(f"Threshold : {threshold:.0f}")
+            else:
+                lines.append(f"Exit Score: {c['exit_score']:.1f}/100")
         t1 = c.get("target1_status")
         t2 = c.get("target2_status")
         sl = c.get("stop_loss_status")
