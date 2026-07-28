@@ -1,41 +1,6 @@
 {
-  "2026-07-27": [
+  "2026-07-28": [
     "news::MFSL.NS::Max Financial Services Ltd (BOM:500271) Q3 2026 Earnings Call Highlights: Strong Growth Amidst ...",
-    "mi_summary::2026-07-27 18:27:30.829866",
-    "mi_summary::2026-07-27 19:16:47.526925",
-    "mi_summary::2026-07-27 21:29:32.182821",
-    "mi_summary::2026-07-27 22:46:36.910548",
-    "mi_summary::2026-07-28 00:23:32.142805",
-    "scan_started::2026-07-27::00:38:52.432662",
-    "scan_completed::2026-07-27::00:47:31.148408",
-    "paper_trading_started::2026-07-27::00:48:20.534467",
-    "monitoring_summary::2026-07-27::00:48:43.488884",
-    "holding_status::2026-07-27::00:48:44.044159",
-    "candidates_not_executed::2026-07-27::01:01:46.142951",
-    "trade_opened::GODIGIT.NS::2026-07-27::01:01:46.521258",
-    "trade_opened::RRKABEL.NS::2026-07-27::01:01:47.039211",
-    "trade_opened::CROMPTON.NS::2026-07-27::01:01:47.567127",
-    "trade_opened::UNITDSPR.NS::2026-07-27::01:01:48.110312",
-    "trade_opened::MARICO.NS::2026-07-27::01:01:48.653209",
-    "trade_opened::LAURUSLABS.NS::2026-07-27::01:01:49.207493",
-    "trade_opened::LLOYDSME.NS::2026-07-27::01:01:49.753269",
-    "trade_opened::ACE.NS::2026-07-27::01:01:50.293274",
-    "trade_opened::DATAPATTNS.NS::2026-07-27::01:01:50.836399",
-    "trade_opened::EXIDEIND.NS::2026-07-27::01:01:51.369731",
-    "trade_opened::IREDA.NS::2026-07-27::01:01:51.924035",
-    "trade_opened::ITI.NS::2026-07-27::01:01:52.465445",
-    "trade_opened::NESTLEIND.NS::2026-07-27::01:01:53.013495",
-    "trade_opened::BALRAMCHIN.NS::2026-07-27::01:01:53.524911",
-    "trade_opened::NUVAMA.NS::2026-07-27::01:01:54.064961",
-    "trade_opened::KARURVYSYA.NS::2026-07-27::01:01:54.611760",
-    "trade_opened::EICHERMOT.NS::2026-07-27::01:01:55.142827",
-    "trade_opened::BAJAJ-AUTO.NS::2026-07-27::01:01:55.684932",
-    "trade_opened::ASTERDM.NS::2026-07-27::01:01:56.219276",
-    "trade_opened::BIOCON.NS::2026-07-27::01:01:56.758551",
-    "portfolio_summary::2026-07-27::01:01:57.318493",
-    "analysis_summary::2026-07-27::01:01:58.153553",
-    "learning_summary::2026-07-27::01:02:01.087112",
-    "optimizer_recommendation::2026-07-27::01:02:01.861084",
-    "mi_summary::2026-07-28 02:21:42.962620"
+    "mi_summary::2026-07-28 17:30:34.525527"
   ]
 }
