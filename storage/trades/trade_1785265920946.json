@@ -1,0 +1,18 @@
+{
+  "symbol": "NESTLEIND.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 6,
+  "entry_price": 1443.5,
+  "exit_price": 1446.1,
+  "status": "CLOSED",
+  "realized_pnl": 15.599999999999454,
+  "realized_pnl_percent": 0.18011776931069684,
+  "max_profit_percent": 0.18011776931069684,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 54.79,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1785265920946",
+  "timestamp": 1785265920.9468734
+}

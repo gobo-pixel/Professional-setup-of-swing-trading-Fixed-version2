@@ -1,0 +1,18 @@
+{
+  "symbol": "GODIGIT.NS",
+  "direction": "SELL",
+  "action": "CLOSE",
+  "quantity": 19,
+  "entry_price": 256.2,
+  "exit_price": 254.8,
+  "status": "CLOSED",
+  "realized_pnl": 26.599999999999568,
+  "realized_pnl_percent": 0.5464480874316852,
+  "max_profit_percent": 0.5464480874316852,
+  "max_drawdown_percent": 0.0,
+  "regime": "BEAR",
+  "confidence": 55.85,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; News sentiment now works against this SELL position (100/100).",
+  "id": "trade_1785265926571",
+  "timestamp": 1785265926.5710251
+}

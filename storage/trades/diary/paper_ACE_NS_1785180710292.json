@@ -69,15 +69,28 @@
     "Expected Hold : 15 days",
     "Trade Grade : B"
   ],
-  "daily_log": [],
+  "daily_log": [
+    {
+      "date": "2026-07-28",
+      "current_price": 1061.8,
+      "current_pnl": 89.59999999999945,
+      "current_buy_confidence": 67.51,
+      "current_sell_confidence": 18.86,
+      "current_exit_score": 15.4,
+      "recommendation": "HOLD",
+      "notes": [
+        "Exit score 15.4/100 (threshold 60.0) -> HOLD."
+      ]
+    }
+  ],
   "status": "OPEN",
   "exit_date": null,
   "exit_price": null,
   "exit_reason": null,
-  "holding_days": 0,
+  "holding_days": 1,
   "max_profit_percent": 0.0,
   "max_drawdown_percent": 0.0,
   "final_pnl": null,
   "created_at": 1785180710.2924755,
-  "updated_at": 1785180710.2924757
+  "updated_at": 1785265921.746541
 }

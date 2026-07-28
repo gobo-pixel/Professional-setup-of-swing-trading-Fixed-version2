@@ -1,0 +1,18 @@
+{
+  "symbol": "ASTERDM.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 7,
+  "entry_price": 785.65,
+  "exit_price": 801.5,
+  "status": "CLOSED",
+  "realized_pnl": 110.95000000000016,
+  "realized_pnl_percent": 2.0174377903646694,
+  "max_profit_percent": 2.0174377903646694,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 76.68,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1785265929182",
+  "timestamp": 1785265929.1821783
+}
