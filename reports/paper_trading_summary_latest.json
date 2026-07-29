@@ -1,45 +1,21 @@
 {
-  "date": "2026-07-28",
-  "opening_balance": 1020.650000000066,
-  "total_capital_in_positions": 413375.64999999997,
-  "remaining_balance": 82934.40000000002,
-  "portfolio_value": 496310.05,
-  "realized_pnl": -1728.4999999999882,
-  "portfolio_return_percent": -0.7379900000000024,
+  "date": "2026-07-29",
+  "opening_balance": 82934.40000000002,
+  "total_capital_in_positions": 355701.74999999994,
+  "remaining_balance": 147406.34999999998,
+  "portfolio_value": 503108.0999999999,
+  "realized_pnl": -2827.1499999999915,
+  "portfolio_return_percent": 0.6216199999999836,
   "opened_today": [],
   "closed_today": [
     {
-      "symbol": "NUVAMA.NS",
-      "pnl": -127.0
+      "symbol": "ADANIENSOL.NS",
+      "pnl": -617.3999999999992
     },
     {
-      "symbol": "NESTLEIND.NS",
-      "pnl": 15.599999999999454
-    },
-    {
-      "symbol": "GODIGIT.NS",
-      "pnl": 26.599999999999568
-    },
-    {
-      "symbol": "ASTERDM.NS",
-      "pnl": 110.95000000000016
-    },
-    {
-      "symbol": "CHENNPETRO.NS",
-      "pnl": -1411.1999999999994
-    },
-    {
-      "symbol": "MFSL.NS",
-      "pnl": -122.39999999999691
-    },
-    {
-      "symbol": "CROMPTON.NS",
-      "pnl": 36.7500000000004
-    },
-    {
-      "symbol": "LAURUSLABS.NS",
-      "pnl": 673.2000000000003
+      "symbol": "INDUSINDBK.NS",
+      "pnl": -365.8499999999988
     }
   ],
-  "open_positions_now": 22
+  "open_positions_now": 20
 }
