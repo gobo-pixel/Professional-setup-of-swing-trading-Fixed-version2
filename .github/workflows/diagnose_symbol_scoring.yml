@@ -1,0 +1,23 @@
+name: Diagnose Symbol Scoring
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: "Comma-separated symbols to investigate"
+        required: true
+        default: "DATAPATTNS.NS,NUVAMA.NS,CROMPTON.NS"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run diagnose_symbol_scoring.py
+        run: PYTHONPATH=. python scripts/diagnose_symbol_scoring.py --symbols "${{ inputs.symbols }}"
