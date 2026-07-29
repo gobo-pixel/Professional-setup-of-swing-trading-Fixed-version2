@@ -54,6 +54,13 @@ class ExitEvaluation:
     hard_risk_reason: str | None
     reasons: list[str] = field(default_factory=list)
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    # Set ONLY when a stop-loss or target was breached intraday (via
+    # day_low/day_high) — a real stop/target ORDER executes immediately
+    # at that touch, not at whatever price is current by the time this
+    # periodic check runs. When set, the caller should use THIS price
+    # to close the position, not current_price, so P&L reflects what
+    # actually would have happened rather than a later, unrelated price.
+    suggested_exit_price: float | None = None
 
 
 class ExitEngine:
@@ -113,6 +120,7 @@ class ExitEngine:
         day_high = position.get("day_high")
         day_low = position.get("day_low")
 
+        suggested_exit_price = None
         if stop_loss:
             if direction == "BUY":
                 # Use the day's LOW if available — catches a genuine
@@ -130,6 +138,7 @@ class ExitEngine:
                     f"Stop-loss breached (intraday {'low' if direction == 'BUY' else 'high'}"
                     f"={touch_price}, stop={stop_loss})."
                 )
+                suggested_exit_price = touch_price
 
         # Target-hit hard-check (NEW — targets were previously display
         # only, never triggered an actual exit). Uses Target 1 (the
@@ -149,6 +158,7 @@ class ExitEngine:
                     f"Target 1 reached (intraday {'high' if direction == 'BUY' else 'low'}"
                     f"={touch_price}, target={target1})."
                 )
+                suggested_exit_price = touch_price
 
         if not hard_risk_triggered and not risk_safe:
             hard_risk_triggered = True
@@ -256,4 +266,5 @@ class ExitEngine:
             hard_risk_reason=hard_risk_reason,
             reasons=reasons,
             diagnostics=diagnostics,
+            suggested_exit_price=suggested_exit_price,
         )
