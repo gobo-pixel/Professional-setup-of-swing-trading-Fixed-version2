@@ -1,21 +1,5 @@
 {
-  "2026-07-28": [
-    "news::MFSL.NS::Max Financial Services Ltd (BOM:500271) Q3 2026 Earnings Call Highlights: Strong Growth Amidst ...",
-    "mi_summary::2026-07-28 17:30:34.525527",
-    "mi_summary::2026-07-28 18:38:00.613038",
-    "mi_summary::2026-07-28 21:14:55.875433",
-    "mi_summary::2026-07-28 22:27:41.101634",
-    "mi_summary::2026-07-29 00:23:36.408311",
-    "scan_started::2026-07-28::00:33:14.841627",
-    "scan_completed::2026-07-28::00:41:13.735446",
-    "paper_trading_started::2026-07-28::00:41:52.857196",
-    "monitoring_summary::2026-07-28::00:42:21.861300",
-    "holding_status::2026-07-28::00:42:22.337476",
-    "candidates_not_executed::2026-07-28::00:50:33.192306",
-    "portfolio_summary::2026-07-28::00:50:33.570259",
-    "analysis_summary::2026-07-28::00:50:34.365305",
-    "learning_summary::2026-07-28::00:50:35.890688",
-    "optimizer_recommendation::2026-07-28::00:50:36.816538",
-    "mi_summary::2026-07-29 02:15:33.691874"
+  "2026-07-29": [
+    "mi_summary::2026-07-29 17:34:41.906939"
   ]
 }
