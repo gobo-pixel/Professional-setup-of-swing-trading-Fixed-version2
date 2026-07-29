@@ -347,13 +347,25 @@ class PaperTradingEngine:
 
             if exit_eval.action == "EXIT":
                 closed = None
+                # A stop-loss/target breach detected via day_low/day_high
+                # means a real order would have executed AT that touch
+                # price, not whatever price is current by the time this
+                # periodic check runs (which can be significantly
+                # different if price has since moved further) — use
+                # that price when it's available, so P&L reflects what
+                # actually would have happened.
+                actual_exit_price = (
+                    exit_eval.suggested_exit_price
+                    if exit_eval.suggested_exit_price is not None
+                    else current_price
+                )
                 try:
-                    closed = self.portfolio.engine.close_position(symbol=symbol, exit_price=current_price)
+                    closed = self.portfolio.engine.close_position(symbol=symbol, exit_price=actual_exit_price)
                     if closed is not None:
                         self.trade_store.save_trade({
                             "symbol": closed.symbol, "direction": closed.direction, "action": "CLOSE",
                             "quantity": closed.quantity, "entry_price": closed.entry_price,
-                            "exit_price": current_price, "status": "CLOSED",
+                            "exit_price": actual_exit_price, "status": "CLOSED",
                             "realized_pnl": closed.realized_pnl,
                             "realized_pnl_percent": closed.realized_pnl_percent,
                             "max_profit_percent": closed.max_profit_percent,
@@ -374,6 +386,18 @@ class PaperTradingEngine:
                             "HIT" if dist_stop is not None and dist_stop <= 0
                             else "NOT HIT" if dist_stop is not None else "N/A"
                         )
+                        # dist_stop only compares the LATEST current_price
+                        # against the stop level — it can show "NOT HIT"
+                        # even when the exit was genuinely triggered by an
+                        # INTRADAY dip/spike (day_low/day_high) that
+                        # recovered by the time this runs, contradicting
+                        # the Exit Reason shown right above it (the exact
+                        # bug reported). exit_eval.hard_risk_reason is the
+                        # actual source of truth for why the exit
+                        # happened, so it overrides here when it
+                        # specifically says the stop was breached.
+                        if exit_eval.hard_risk_reason and "stop-loss breached" in exit_eval.hard_risk_reason.lower():
+                            stop_loss_status = "HIT"
                         self.diary.close_trade(
                             trade_id=trade_id, exit_date=today, exit_price=current_price,
                             exit_reason=exit_eval.hard_risk_reason or "; ".join(exit_eval.reasons[-1:]),
@@ -416,7 +440,7 @@ class PaperTradingEngine:
                     trigger = self._classify_exit_trigger(exit_eval)
                     closed_details.append({
                         "symbol": symbol, "direction": closed.direction,
-                        "entry_price": closed.entry_price, "exit_price": current_price,
+                        "entry_price": closed.entry_price, "exit_price": actual_exit_price,
                         "pnl_pct": pnl_pct, "pnl_rupees": closed.realized_pnl,
                         "trigger": trigger, "holding_days": holding_days,
                         "trade_id": trade_id, "exit_score": exit_eval.exit_score,
@@ -425,6 +449,7 @@ class PaperTradingEngine:
                             r for r in (exit_eval.reasons or [])
                             if not r.lower().startswith("exit score")
                         ][:3],
+                        "risk_factor_detail": self._top_risk_factors(result.diagnostics),
                         "target1_status": target1_status, "target2_status": target2_status,
                         "stop_loss_status": stop_loss_status,
                     })
@@ -908,6 +933,30 @@ class PaperTradingEngine:
         return "\n".join(lines)
 
     @staticmethod
+    def _top_risk_factors(diagnostics: dict, top_n: int = 2) -> list[str]:
+        """RiskManager already computes individual risk-dimension
+        scores (volatility_risk, liquidity_risk, news_risk, market_risk,
+        portfolio_risk, sector_risk, atr_risk, gap_risk, overnight_risk)
+        — this surfaces the highest-scoring ones so "Risk engine flagged
+        this symbol as unsafe" can say WHICH risk, not just that one exists."""
+        labels = {
+            "volatility_risk": "Volatility", "liquidity_risk": "Liquidity",
+            "news_risk": "News", "market_risk": "Market", "portfolio_risk": "Portfolio",
+            "sector_risk": "Sector", "atr_risk": "ATR (volatility)", "gap_risk": "Overnight Gap",
+            "overnight_risk": "Overnight Hold",
+        }
+        scored = []
+        for key, label in labels.items():
+            val = diagnostics.get(key)
+            if val is not None:
+                try:
+                    scored.append((label, float(val)))
+                except (TypeError, ValueError):
+                    continue
+        scored.sort(key=lambda kv: kv[1], reverse=True)
+        return [f"{label}: {val:.0f}/100" for label, val in scored[:top_n] if val >= 40]
+
+    @staticmethod
     def _render_closed_trade_block(c: dict, short_trigger: dict) -> list[str]:
         """Full detail lines for one closed trade — Symbol/Direction/
         Entry/Exit/Return%/PnL/Holding Days/Exit Score/Target1/Target2/
@@ -927,6 +976,9 @@ class PaperTradingEngine:
             lines.append("Reason:")
             for r in exit_reasons:
                 lines.append(f"  • {r}")
+                if "flagged this symbol as unsafe" in r.lower():
+                    for factor in c.get("risk_factor_detail") or []:
+                        lines.append(f"      - {factor}")
         if c.get("exit_score") is not None:
             threshold = c.get("exit_threshold")
             if threshold is not None:
