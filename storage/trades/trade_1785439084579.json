@@ -1,0 +1,18 @@
+{
+  "symbol": "ITI.NS",
+  "direction": "SELL",
+  "action": "CLOSE",
+  "quantity": 24,
+  "entry_price": 275.15,
+  "exit_price": 277.15,
+  "status": "CLOSED",
+  "realized_pnl": -48.0,
+  "realized_pnl_percent": -0.7268762493185535,
+  "max_profit_percent": 0.6360167181537344,
+  "max_drawdown_percent": 0.7268762493185535,
+  "regime": "BEAR",
+  "confidence": 76.56,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; No fresh news \u2014 news component does not contribute to the exit score.",
+  "id": "trade_1785439084579",
+  "timestamp": 1785439084.5798156
+}

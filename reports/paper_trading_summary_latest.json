@@ -1,21 +1,21 @@
 {
-  "date": "2026-07-29",
-  "opening_balance": 82934.40000000002,
-  "total_capital_in_positions": 355701.74999999994,
-  "remaining_balance": 147406.34999999998,
-  "portfolio_value": 503108.0999999999,
-  "realized_pnl": -2827.1499999999915,
-  "portfolio_return_percent": 0.6216199999999836,
+  "date": "2026-07-30",
+  "opening_balance": 147406.34999999998,
+  "total_capital_in_positions": 345014.8,
+  "remaining_balance": 162256.34999999992,
+  "portfolio_value": 507271.1499999999,
+  "realized_pnl": 1368.7000000000098,
+  "portfolio_return_percent": 1.4542299999999813,
   "opened_today": [],
   "closed_today": [
     {
-      "symbol": "ADANIENSOL.NS",
-      "pnl": -617.3999999999992
+      "symbol": "ITI.NS",
+      "pnl": -48.0
     },
     {
-      "symbol": "INDUSINDBK.NS",
-      "pnl": -365.8499999999988
+      "symbol": "IREDA.NS",
+      "pnl": -23.799999999999244
     }
   ],
-  "open_positions_now": 20
+  "open_positions_now": 18
 }
