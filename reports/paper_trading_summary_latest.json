@@ -1,21 +1,25 @@
 {
-  "date": "2026-07-30",
-  "opening_balance": 147406.34999999998,
-  "total_capital_in_positions": 345014.8,
-  "remaining_balance": 162256.34999999992,
-  "portfolio_value": 507271.1499999999,
-  "realized_pnl": 1368.7000000000098,
-  "portfolio_return_percent": 1.4542299999999813,
+  "date": "2026-07-31",
+  "opening_balance": 162256.34999999992,
+  "total_capital_in_positions": 281968.49999999994,
+  "remaining_balance": 228860.2,
+  "portfolio_value": 510828.69999999995,
+  "realized_pnl": 658.6000000000058,
+  "portfolio_return_percent": 2.1657399999999907,
   "opened_today": [],
   "closed_today": [
     {
-      "symbol": "ITI.NS",
-      "pnl": -48.0
+      "symbol": "BALRAMCHIN.NS",
+      "pnl": -110.80000000000018
     },
     {
-      "symbol": "IREDA.NS",
-      "pnl": -23.799999999999244
+      "symbol": "JUBLINGREA.NS",
+      "pnl": -448.19999999999754
+    },
+    {
+      "symbol": "SONACOMS.NS",
+      "pnl": -249.1000000000024
     }
   ],
-  "open_positions_now": 18
+  "open_positions_now": 15
 }

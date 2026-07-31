@@ -159,16 +159,29 @@
         "Fundamentals have deteriorated for this BUY position (60/100).",
         "Exit score 12.1/100 (threshold 60.0) -> HOLD."
       ]
+    },
+    {
+      "date": "2026-07-31",
+      "current_price": 368.35,
+      "current_pnl": 1431.0000000000032,
+      "current_buy_confidence": 63.47,
+      "current_sell_confidence": 35.17,
+      "current_exit_score": 16.89,
+      "recommendation": "HOLD",
+      "notes": [
+        "Fundamentals have deteriorated for this BUY position (60/100).",
+        "Exit score 16.9/100 (threshold 60.0) -> HOLD."
+      ]
     }
   ],
   "status": "OPEN",
   "exit_date": null,
   "exit_price": null,
   "exit_reason": null,
-  "holding_days": 7,
+  "holding_days": 8,
   "max_profit_percent": 0.0,
   "max_drawdown_percent": 0.0,
   "final_pnl": null,
   "created_at": 1784926020.611603,
-  "updated_at": 1785439096.124029
+  "updated_at": 1785525399.456031
 }
