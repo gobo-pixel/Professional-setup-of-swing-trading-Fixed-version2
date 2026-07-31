@@ -34,6 +34,31 @@ from market import macro_intelligence
 logger = get_logger(__name__)
 
 
+def _signed_news_bias(scored_item: dict[str, Any]) -> float:
+    """
+    SentimentEngine.evaluate() returns an UNSIGNED 0-100 magnitude in
+    "impact_score" (50=weak/neutral, 100=strong) plus a separate polarity
+    string in "sentiment" (POSITIVE/NEGATIVE/NEUTRAL) — it does not encode
+    direction as a signed number by itself. This converts the pair into a
+    signed bias in [-1, +1], so downstream scoring can distinguish good
+    news from bad news instead of both maxing out identically.
+
+    This mirrors market_intelligence/market_intelligence_engine.py's
+    _signed_bias() (same formula, kept as a separate local copy here to
+    avoid a cross-module dependency between two independent subsystems).
+    Ported here to fix the previously-documented "news_score always
+    clips to 100" limitation (see prior "Known Limitations" note).
+    """
+    impact = float(scored_item.get("impact_score", 50.0))
+    magnitude = max(0.0, (impact - 50.0) / 50.0)  # 0 (neutral) .. 1 (max)
+    polarity = scored_item.get("sentiment", "NEUTRAL")
+    if polarity == "POSITIVE":
+        return magnitude
+    if polarity == "NEGATIVE":
+        return -magnitude
+    return 0.0
+
+
 @dataclass(slots=True)
 class ScanResult:
     symbol: str
@@ -180,20 +205,15 @@ class MarketScanner:
 
         news_items = self.sentiment.evaluate(bundle.news or [])
         if news_items:
-            # KNOWN LIMITATION (see CHANGELOG.md "Known Limitations" #1):
-            # SentimentEngine.impact_score is an UNSIGNED 0-100
-            # magnitude, not a signed [-1,+1] bias as this formula
-            # assumes — news_score below almost always clips to 100
-            # (positive) whenever any news exists. A correct signed
-            # conversion already exists in
-            # market_intelligence/market_intelligence_engine.py's
-            # _signed_bias() but has NOT been ported here, since
-            # doing so changes BUY/SELL scoring behavior and needs
-            # backtesting/regression first.
-            avg_impact = sum(i.get("impact_score", 0.0) for i in news_items) / len(
-                news_items
-            )
-            news_score = max(0.0, min(100.0, 50.0 + avg_impact * 50.0))
+            # Fixed: previously averaged the raw (unsigned) impact_score
+            # directly, which mathematically always clipped news_score
+            # to 100 regardless of whether the news was positive or
+            # negative (proven via static + runtime audit). Now uses
+            # the signed bias (magnitude + polarity combined), so
+            # negative news correctly pulls the score down instead of
+            # being indistinguishable from positive news.
+            avg_bias = sum(_signed_news_bias(i) for i in news_items) / len(news_items)
+            news_score = max(0.0, min(100.0, 50.0 + avg_bias * 50.0))
         else:
             news_score = None  # genuinely no news -> must NOT interfere with score/confidence/probability
 
