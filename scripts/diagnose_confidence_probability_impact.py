@@ -39,7 +39,11 @@ NEWS_AFTER_WORST = 0.0  # worst case: news was actually fully negative
 # overall_score / technical_score / fundamental_score come straight from
 # full_report.csv's OverallScore / TechnicalScore / FundamentalScore columns.
 STOCKS: list[tuple[str, str, float, float, float]] = [
-    # ("DATAPATTNS.NS", "BUY", 67.8, 75.0, 48.67),
+    ("DATAPATTNS.NS", "BUY", 67.8, 75.0, 48.67),
+    ("NUVAMA.NS", "BUY", 69.49, 70.0, 43.27),
+    ("CROMPTON.NS", "SELL", 70.17, 95.0, 40.5),
+    ("ANANDRATHI.NS", "BUY", 62.7, 65.0, 43.0),
+    # ... jitни bhi chahiए utni add karo
 ]
 
 
