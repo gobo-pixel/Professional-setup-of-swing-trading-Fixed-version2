@@ -308,6 +308,13 @@ class PaperTradingEngine:
             else:
                 status_label = "HOLD"
 
+            if pos.direction == "SELL":
+                target1_pct = round((pos.entry_price - target1_v) / pos.entry_price * 100, 2) if target1_v and pos.entry_price else None
+                target2_pct = round((pos.entry_price - target2_v) / pos.entry_price * 100, 2) if target2_v and pos.entry_price else None
+            else:
+                target1_pct = round((target1_v - pos.entry_price) / pos.entry_price * 100, 2) if target1_v and pos.entry_price else None
+                target2_pct = round((target2_v - pos.entry_price) / pos.entry_price * 100, 2) if target2_v and pos.entry_price else None
+
             holding_status_rows.append({
                 "trade_id": trade_id, "symbol": symbol, "direction": pos.direction,
                 "holding_days": holding_days,
@@ -316,6 +323,7 @@ class PaperTradingEngine:
                 "pnl_pct": pos.unrealized_pnl_percent, "pnl_rupees": pos.unrealized_pnl,
                 "highest_pnl": pos.max_profit_percent, "lowest_pnl": -pos.max_drawdown_percent,
                 "dist_target1": dist_target1, "dist_target2": dist_target2, "dist_stop": dist_stop,
+                "target1_pct": target1_pct, "target2_pct": target2_pct,
                 "probability": result.probability,
                 "buy_confidence": result.diagnostics.get("buy_decision_confidence", 0.0),
                 "sell_confidence": result.diagnostics.get("sell_decision_confidence", 0.0),
@@ -575,21 +583,45 @@ class PaperTradingEngine:
                 status_lines.append(f"Entry: {r['entry_price']} | Current: {r['current_price']}")
                 status_lines.append(f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})")
                 status_lines.append(f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%")
+                t1_label = f" ({r['target1_pct']}%)" if r.get("target1_pct") is not None else ""
+                t2_label = f" ({r['target2_pct']}%)" if r.get("target2_pct") is not None else ""
                 if r["dist_target1"] is not None:
                     if r["dist_target1"] > 0:
-                        status_lines.append(f"Target 1 Progress: {-r['dist_target1']:.2f}% remaining")
+                        status_lines.append(f"Target 1{t1_label} progress:- {-r['dist_target1']:.2f}% remaining")
                     else:
-                        status_lines.append(f"Target 1: REACHED ({abs(r['dist_target1']):.2f}% Beyond)")
+                        status_lines.append(f"Target 1{t1_label}: REACHED ({abs(r['dist_target1']):.2f}% Beyond)")
                 if r["dist_target2"] is not None:
                     if r["dist_target2"] > 0:
-                        status_lines.append(f"Target 2 Progress: {-r['dist_target2']:.2f}% remaining")
+                        status_lines.append(f"Target 2{t2_label} progress:- {-r['dist_target2']:.2f}% remaining")
                     else:
-                        status_lines.append(f"Target 2: REACHED ({abs(r['dist_target2']):.2f}% Beyond)")
+                        status_lines.append(f"Target 2{t2_label}: REACHED ({abs(r['dist_target2']):.2f}% Beyond)")
                 if r["dist_stop"] is not None:
                     status_lines.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
                 status_lines.append(f"Probability: {r['probability']:.1f}%")
                 status_lines.append(f"BUY Confidence: {r['buy_confidence']:.1f}% | SELL Confidence: {r['sell_confidence']:.1f}%")
                 status_lines.append("")
+
+            # Portfolio-level aggregate — added specifically so the
+            # overall picture (is the portfolio net up or down right
+            # now, across ALL open positions) is visible in the same
+            # notification, without needing to manually total each
+            # position's P&L. Uses the SAME pnl_rupees/pnl_pct fields
+            # already computed per-position above (no new calculation
+            # logic, just a sum).
+            total_unrealized_rupees = sum(r["pnl_rupees"] for r in holding_status_rows)
+            winning = sum(1 for r in holding_status_rows if r["pnl_rupees"] > 0)
+            losing = sum(1 for r in holding_status_rows if r["pnl_rupees"] <= 0)
+
+            status_lines.append("━━━━━━━━━━━━━━━━━━")
+            status_lines.append("📊 Portfolio Summary (all open positions)")
+            status_lines.append(f"Positions Held: {len(holding_status_rows)} ({winning} winning, {losing} losing)")
+            sign = "+" if total_unrealized_rupees >= 0 else ""
+            status_lines.append(f"Total Unrealized P&L: {sign}₹{total_unrealized_rupees:.2f}")
+            status_lines.append(
+                "(This is separate from Realized PnL in the Daily Portfolio Summary — "
+                "this reflects only currently-open positions, mark-to-market at today's prices.)"
+            )
+
             notify(
                 event_type="holding_status",
                 message="\n".join(status_lines).strip(),
