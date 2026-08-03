@@ -1,0 +1,26 @@
+{
+  "total_trades": 0,
+  "win_rate": 0.0,
+  "profit_factor": 0.0,
+  "cagr": 0.0,
+  "max_drawdown": 0.0,
+  "sharpe": 0.0,
+  "sortino": 0.0,
+  "expectancy": 0.0,
+  "avg_rr": 0.0,
+  "buy_trades": 0,
+  "sell_trades": 0,
+  "buy_accuracy": 0.0,
+  "sell_accuracy": 0.0,
+  "regime_breakdown": {
+    "UNKNOWN": {
+      "days": 5,
+      "win_rate": 0.0,
+      "avg_daily_return_pct": 0.0
+    }
+  },
+  "walk_forward_windows": [],
+  "false_positives": 0,
+  "false_negatives": null,
+  "final_equity": 500000.0
+}
