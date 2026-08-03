@@ -1,0 +1,40 @@
+name: Clean Slate (Reset Trading Data)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type CONFIRM (exact, uppercase) to actually delete. Anything else runs a dry-run only."
+        required: true
+        default: "dry-run"
+
+jobs:
+  clean_slate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Run Clean Slate
+        run: |
+          if [ "${{ inputs.confirm }}" = "CONFIRM" ]; then
+            python scripts/clean_slate.py --confirm
+          else
+            python scripts/clean_slate.py
+          fi
+
+      - name: Commit cleared state back to repo
+        if: ${{ inputs.confirm == 'CONFIRM' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- reports/ storage/trades/ storage/reports/
+          git diff --staged --quiet || git commit -m "Clean slate: reset trading/analysis data $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git push
+          
