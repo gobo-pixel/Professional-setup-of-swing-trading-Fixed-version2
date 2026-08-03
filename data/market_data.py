@@ -78,7 +78,18 @@ class MarketDataProvider:
                 # production. Fetch a genuine buffer of extra calendar
                 # days instead, so trimming has margin without ever
                 # touching the validation threshold itself.
-                end = datetime.now()
+                #
+                # CONFIRMED BUG (found via user-reported price mismatch
+                # against Zerodha/Google, cross-checked at the same
+                # closed-market moment): yfinance's `end` parameter is
+                # EXCLUSIVE — end="2026-08-03" returns data only THROUGH
+                # 2026-08-02, even though that day's own session has
+                # already closed by the time this runs (scan runs at
+                # 23:30 IST, hours after the 15:30 IST close). This made
+                # "latest_close" silently one trading day stale, always.
+                # Adding one day makes the exclusive boundary genuinely
+                # include today's already-closed session.
+                end = datetime.now() + pd.Timedelta(days=1)
                 start = end - pd.Timedelta(days=400)
                 df = yf.download(
                     tickers=symbol,
