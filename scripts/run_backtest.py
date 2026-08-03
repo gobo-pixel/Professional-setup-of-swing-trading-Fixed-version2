@@ -108,7 +108,7 @@ def _load_watchlist_symbols() -> list[str] | None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--period", default="2y", choices=["1y", "2y", "5y", "10y", "max"])
+    parser.add_argument("--period", default="2y", choices=["3mo", "6mo", "1y", "2y", "5y", "10y", "max"])
     parser.add_argument("--symbols", default=None, help="Comma-separated symbol list (default: representative 11-sector sample)")
     parser.add_argument("--initial-capital", type=float, default=500000.0)
     args = parser.parse_args()
