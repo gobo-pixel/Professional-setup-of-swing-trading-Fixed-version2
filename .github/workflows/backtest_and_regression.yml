@@ -9,6 +9,8 @@ on:
         default: "2y"
         type: choice
         options:
+          - "3mo"
+          - "6mo"
           - "1y"
           - "2y"
           - "5y"
