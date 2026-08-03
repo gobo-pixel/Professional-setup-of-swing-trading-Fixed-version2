@@ -182,7 +182,15 @@ class BacktestEngine:
 
             for candidate in candidates:
                 price = candidate.diagnostics.get("latest_close")
-                if not price:
+                # "if not price" alone does NOT catch NaN — NaN is
+                # truthy in Python (bool(float('nan')) is True) — so a
+                # NaN price would silently pass through into trade
+                # execution, producing NaN PnL that cascades into NaN
+                # CAGR/Sortino/Expectancy in the final report (confirmed
+                # via a real backtest run). Explicit isnan check
+                # required, matching the same fix already applied in
+                # paper_trading_engine.py.
+                if not price or (isinstance(price, float) and math.isnan(price)):
                     continue
 
                 order = OrderRequest(
@@ -219,9 +227,16 @@ class BacktestEngine:
                                     rr_values.append(
                                         closed.max_profit_percent / max(closed.max_drawdown_percent, 1e-9)
                                     )
-                                buy_total += 1
+                                # Count by the CLOSED POSITION's actual
+                                # direction (it was a SELL position being
+                                # covered here), not by candidate.action
+                                # (BUY) — this is what was previously
+                                # inverted, causing "BUY Accuracy" to
+                                # only ever reflect short-covers instead
+                                # of genuine BUY-entry trades.
+                                sell_total += 1
                                 if closed.realized_pnl > 0:
-                                    buy_wins += 1
+                                    sell_wins += 1
                     else:
                         portfolio.add_position(
                             symbol=candidate.symbol,
@@ -231,6 +246,7 @@ class BacktestEngine:
                         )
                 elif candidate.action == "SELL":
                     if candidate.symbol in portfolio.state.open_positions:
+                        existing_direction = portfolio.state.open_positions[candidate.symbol].direction
                         closed = portfolio.close_position(symbol=candidate.symbol, exit_price=order_result.avg_price)
                         if closed is not None:
                             self._record_closed_trade(
@@ -246,9 +262,24 @@ class BacktestEngine:
                                 rr_values.append(
                                     closed.max_profit_percent / max(closed.max_drawdown_percent, 1e-9)
                                 )
-                            sell_total += 1
-                            if closed.realized_pnl > 0:
-                                sell_wins += 1
+                            # FIXED: previously always counted here as
+                            # "sell_total" regardless of what direction
+                            # the closed position actually was. Since
+                            # the overwhelmingly common lifecycle is
+                            # BUY-entry -> SELL-signal-closes-it, this
+                            # silently mislabeled nearly every genuine
+                            # BUY trade's outcome as a SELL trade,
+                            # making "BUY Accuracy" reflect only the
+                            # rare short-cover case (confirmed via a
+                            # real backtest: 1 BUY trade vs 314 SELL).
+                            if existing_direction == "BUY":
+                                buy_total += 1
+                                if closed.realized_pnl > 0:
+                                    buy_wins += 1
+                            else:
+                                sell_total += 1
+                                if closed.realized_pnl > 0:
+                                    sell_wins += 1
                     else:
                         portfolio.add_position(
                             symbol=candidate.symbol,
