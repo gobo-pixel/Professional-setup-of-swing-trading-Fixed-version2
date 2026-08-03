@@ -1,0 +1,16 @@
+{
+  "symbol": "PIDILITIND.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 9,
+  "entry_price": 1611.4,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 73.43,
+  "reasons": "",
+  "id": "trade_1785785892504",
+  "timestamp": 1785785892.5046072
+}

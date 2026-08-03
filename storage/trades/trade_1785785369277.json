@@ -1,0 +1,18 @@
+{
+  "symbol": "UNITDSPR.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 6,
+  "entry_price": 1467.2,
+  "exit_price": 1515.9,
+  "status": "CLOSED",
+  "realized_pnl": 292.2000000000003,
+  "realized_pnl_percent": 3.319247546346786,
+  "max_profit_percent": 4.409760087241006,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 56.0,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; Fundamentals have deteriorated for this BUY position (68/100).",
+  "id": "trade_1785785369277",
+  "timestamp": 1785785369.2776272
+}

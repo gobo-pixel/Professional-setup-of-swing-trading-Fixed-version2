@@ -1,0 +1,16 @@
+{
+  "symbol": "BEL.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 57,
+  "entry_price": 387.85,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 71.41,
+  "reasons": "",
+  "id": "trade_1785785892007",
+  "timestamp": 1785785892.0079696
+}

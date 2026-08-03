@@ -1,0 +1,16 @@
+{
+  "symbol": "LICHSGFIN.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 29,
+  "entry_price": 523.1,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 73.07,
+  "reasons": "",
+  "id": "trade_1785785886888",
+  "timestamp": 1785785886.8882418
+}

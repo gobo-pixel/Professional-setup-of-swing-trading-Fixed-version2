@@ -1,25 +1,142 @@
 {
-  "date": "2026-07-31",
-  "opening_balance": 162256.34999999992,
-  "total_capital_in_positions": 281968.49999999994,
-  "remaining_balance": 228860.2,
-  "portfolio_value": 510828.69999999995,
-  "realized_pnl": 658.6000000000058,
-  "portfolio_return_percent": 2.1657399999999907,
-  "opened_today": [],
-  "closed_today": [
+  "date": "2026-08-03",
+  "opening_balance": 228860.2,
+  "total_capital_in_positions": 507868.74000000005,
+  "remaining_balance": 4752.159999999991,
+  "portfolio_value": 512620.9,
+  "realized_pnl": 2352.80000000001,
+  "portfolio_return_percent": 2.5241800000000048,
+  "opened_today": [
     {
-      "symbol": "BALRAMCHIN.NS",
-      "pnl": -110.80000000000018
+      "symbol": "MOTHERSON.NS",
+      "action": "BUY",
+      "price": 150.75,
+      "quantity": 155
     },
     {
-      "symbol": "JUBLINGREA.NS",
-      "pnl": -448.19999999999754
+      "symbol": "GAIL.NS",
+      "action": "BUY",
+      "price": 181.44,
+      "quantity": 124
     },
     {
-      "symbol": "SONACOMS.NS",
-      "pnl": -249.1000000000024
+      "symbol": "HDFCLIFE.NS",
+      "action": "SELL",
+      "price": 548.5,
+      "quantity": 33
+    },
+    {
+      "symbol": "ANANTRAJ.NS",
+      "action": "BUY",
+      "price": 624.5,
+      "quantity": 23
+    },
+    {
+      "symbol": "BELRISE.NS",
+      "action": "BUY",
+      "price": 236.73,
+      "quantity": 76
+    },
+    {
+      "symbol": "DIVISLAB.NS",
+      "action": "BUY",
+      "price": 8056.0,
+      "quantity": 1
+    },
+    {
+      "symbol": "WOCKPHARMA.NS",
+      "action": "BUY",
+      "price": 1959.7,
+      "quantity": 6
+    },
+    {
+      "symbol": "TITAN.NS",
+      "action": "BUY",
+      "price": 4875.2,
+      "quantity": 3
+    },
+    {
+      "symbol": "LICHSGFIN.NS",
+      "action": "SELL",
+      "price": 523.1,
+      "quantity": 29
+    },
+    {
+      "symbol": "BAJFINANCE.NS",
+      "action": "BUY",
+      "price": 1141.2,
+      "quantity": 15
+    },
+    {
+      "symbol": "NETWEB.NS",
+      "action": "BUY",
+      "price": 4524.0,
+      "quantity": 2
+    },
+    {
+      "symbol": "HBLENGINE.NS",
+      "action": "SELL",
+      "price": 718.7,
+      "quantity": 16
+    },
+    {
+      "symbol": "SYNGENE.NS",
+      "action": "SELL",
+      "price": 385.9,
+      "quantity": 30
+    },
+    {
+      "symbol": "ZEEL.NS",
+      "action": "BUY",
+      "price": 114.55,
+      "quantity": 129
+    },
+    {
+      "symbol": "IRCTC.NS",
+      "action": "SELL",
+      "price": 489.8,
+      "quantity": 30
+    },
+    {
+      "symbol": "TVSMOTOR.NS",
+      "action": "BUY",
+      "price": 4313.1,
+      "quantity": 3
+    },
+    {
+      "symbol": "ABCAPITAL.NS",
+      "action": "BUY",
+      "price": 404.3,
+      "quantity": 43
+    },
+    {
+      "symbol": "NESTLEIND.NS",
+      "action": "BUY",
+      "price": 1509.6,
+      "quantity": 11
+    },
+    {
+      "symbol": "BEL.NS",
+      "action": "SELL",
+      "price": 387.85,
+      "quantity": 57
+    },
+    {
+      "symbol": "PIDILITIND.NS",
+      "action": "BUY",
+      "price": 1611.4,
+      "quantity": 9
     }
   ],
-  "open_positions_now": 15
+  "closed_today": [
+    {
+      "symbol": "DATAPATTNS.NS",
+      "pnl": -303.5
+    },
+    {
+      "symbol": "UNITDSPR.NS",
+      "pnl": 292.2000000000003
+    }
+  ],
+  "open_positions_now": 29
 }
