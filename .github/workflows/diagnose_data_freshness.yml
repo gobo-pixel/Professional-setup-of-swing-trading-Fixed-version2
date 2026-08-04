@@ -1,0 +1,23 @@
+name: Diagnose Data Freshness
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Symbol to check (e.g. DIVISLAB.NS)"
+        required: true
+        default: "DIVISLAB.NS"
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run diagnose_data_freshness.py
+        run: PYTHONPATH=. python scripts/diagnose_data_freshness.py --symbol "${{ inputs.symbol }}"
