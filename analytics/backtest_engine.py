@@ -1,4 +1,4 @@
-"""
+""
 PHASE 2 — MODULE 4: INSTITUTIONAL BACKTESTING ENGINE
 
 Replays historical OHLCV data day-by-day through the REAL production
@@ -24,6 +24,7 @@ Usage:
 from __future__ import annotations
 
 import math
+from collections import Counter
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -78,6 +79,17 @@ class BacktestResult:
             "happened next, which Module 1 (Analysis Engine) does",
             "separately using the full_report.csv history.",
         ]
+        error_count = m.get("error_count", 0)
+        total_attempts = m.get("total_scan_attempts", 0)
+        if error_count:
+            error_rate = round(error_count / total_attempts * 100, 1) if total_attempts else 0.0
+            lines.append("")
+            lines.append(f"⚠️ Scan Errors: {error_count} / {total_attempts} attempts ({error_rate}%)")
+            for err_type, count in m.get("error_breakdown", {}).items():
+                sample = m.get("error_samples", {}).get(err_type, "")
+                lines.append(f"  {err_type}: {count}x — e.g. \"{sample}\"")
+            if error_rate > 50:
+                lines.append("  NOTE: majority of attempts failed with errors — this likely explains a low/zero trade count above, not weak signal quality.")
         return "\n".join(lines)
 
 
@@ -135,6 +147,9 @@ class BacktestEngine:
         gross_loss = 0.0
         rr_values = []
         buy_wins = buy_total = sell_wins = sell_total = 0
+        error_type_counts: Counter = Counter()
+        error_sample_messages: dict[str, str] = {}
+        total_scan_attempts = 0
 
         for step in range(min_history, total_steps):
             broker_status = {
@@ -173,6 +188,14 @@ class BacktestEngine:
                 market_state=market_state,
                 bundles=bundles,
             )
+
+            for r in scan_results:
+                total_scan_attempts += 1
+                if r.action == "ERROR":
+                    err_type = r.diagnostics.get("error_type", "UnknownError")
+                    error_type_counts[err_type] += 1
+                    if err_type not in error_sample_messages:
+                        error_sample_messages[err_type] = str(r.diagnostics.get("error", ""))[:200]
 
             candidates = sorted(
                 (r for r in scan_results if r.action in ("BUY", "SELL") and r.portfolio_allowed),
@@ -325,6 +348,10 @@ class BacktestEngine:
             result, initial_capital, wins, losses, gross_profit, gross_loss,
             rr_values, buy_wins, buy_total, sell_wins, sell_total,
         )
+        result.metrics["total_scan_attempts"] = total_scan_attempts
+        result.metrics["error_count"] = sum(error_type_counts.values())
+        result.metrics["error_breakdown"] = dict(error_type_counts.most_common(5))
+        result.metrics["error_samples"] = error_sample_messages
         return result
 
     def _record_closed_trade(self, result, closed, candidate, wins, losses):
