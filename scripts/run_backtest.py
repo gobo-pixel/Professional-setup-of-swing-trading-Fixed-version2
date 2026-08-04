@@ -38,6 +38,7 @@ import json
 import logging
 import sys
 import time
+from datetime import datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -121,9 +122,33 @@ def main() -> None:
     print(f"Fetching {args.period} of historical data for {len(symbols)} symbol(s)...")
     historical_data = {}
     fundamentals = {}
+    # ValidationEngine requires len(dataframe) >= 250 rows at every
+    # simulation step (decision/validation_engine.py). Fetching EXACTLY
+    # the requested period (e.g. "1y" ≈ 249 rows) means the dataset
+    # never reaches 250 even at its own last row — every single
+    # simulated day fails validation, producing zero trades regardless
+    # of period length (confirmed via a real backtest run: 625 genuine
+    # BUY/SELL signals, 100% rejected on "Insufficient historical
+    # candles"). Fetch a buffer of extra calendar days beyond the
+    # requested period, matching the same fix already applied in
+    # data/market_data.py for live scanning.
+    PERIOD_BUFFER_DAYS = {
+        "3mo": 90, "6mo": 90, "1y": 90, "2y": 90, "5y": 120, "10y": 150, "max": 0,
+    }
     for symbol in symbols:
         try:
-            df = yf.download(symbol, period=args.period, progress=False, auto_adjust=False)
+            if args.period == "max":
+                df = yf.download(symbol, period="max", progress=False, auto_adjust=False)
+            else:
+                end = datetime.now() + timedelta(days=1)  # yfinance end= is exclusive
+                requested_days = {
+                    "3mo": 90, "6mo": 180, "1y": 365, "2y": 730, "5y": 1825, "10y": 3650,
+                }[args.period]
+                start = end - timedelta(days=requested_days + PERIOD_BUFFER_DAYS[args.period])
+                df = yf.download(
+                    symbol, start=start.strftime("%Y-%m-%d"), end=end.strftime("%Y-%m-%d"),
+                    progress=False, auto_adjust=False,
+                )
             if df.empty:
                 logger.warning("No historical data for %s — skipping.", symbol)
                 continue
