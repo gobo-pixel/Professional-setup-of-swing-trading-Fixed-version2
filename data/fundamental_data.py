@@ -61,25 +61,50 @@ _INDUSTRY_TO_SECTOR = {
 }
 
 
+_FIELDS = {
+    "marketCap": "market_cap",
+    "trailingPE": "pe",
+    "priceToBook": "pb",
+    "pegRatio": "peg",
+    "returnOnEquity": "roe",
+    "debtToEquity": "debt_to_equity",
+    "earningsGrowth": "earnings_growth",
+    "revenueGrowth": "revenue_growth",
+    "totalCash": "cash",
+    "operatingCashflow": "operating_cashflow",
+    "ebitda": "ebitda",
+    "bookValue": "book_value",
+    "sector": "sector",
+    "industry": "industry",
+}
+
+
+def normalize_fundamentals(info: dict[str, Any], symbol: str) -> dict[str, Any]:
+    """Map yfinance's raw camelCase .info keys (trailingPE, returnOnEquity,
+    debtToEquity, ...) to the snake_case schema strategy/fundamental_scoring.py
+    expects (pe, roe, debt_to_equity, ...). Without this mapping, none of the
+    keys match, buy_fundamental_score()/sell_fundamental_score() silently fall
+    back to their defaults for every field, and every candidate gets the SAME
+    constant fundamental score regardless of the real company data — this was
+    confirmed as the root cause of a backtest producing zero BUY trades across
+    an entire year (fundamental score constant-favored SELL for every symbol,
+    every day). Standalone so both FundamentalDataProvider.fetch() and any
+    caller that already has a fetched .info dict (e.g. run_backtest.py) can
+    reuse the exact same mapping instead of drifting apart."""
+    result: dict[str, Any] = {"symbol": symbol}
+    for source_key, target_key in _FIELDS.items():
+        result[target_key] = info.get(source_key)
+    if not result.get("sector") and result.get("industry"):
+        inferred = _INDUSTRY_TO_SECTOR.get(str(result["industry"]).strip().lower())
+        if inferred:
+            result["sector"] = inferred
+    return result
+
+
 class FundamentalDataProvider:
     """Fetch normalized fundamental metrics."""
 
-    _FIELDS = {
-        "marketCap": "market_cap",
-        "trailingPE": "pe",
-        "priceToBook": "pb",
-        "pegRatio": "peg",
-        "returnOnEquity": "roe",
-        "debtToEquity": "debt_to_equity",
-        "earningsGrowth": "earnings_growth",
-        "revenueGrowth": "revenue_growth",
-        "totalCash": "cash",
-        "operatingCashflow": "operating_cashflow",
-        "ebitda": "ebitda",
-        "bookValue": "book_value",
-        "sector": "sector",
-        "industry": "industry",
-    }
+    _FIELDS = _FIELDS
 
     def fetch(self, symbol: str) -> dict[str, Any]:
         """
@@ -105,21 +130,12 @@ class FundamentalDataProvider:
         if not info:
             raise DataError(f"No fundamental data available for '{symbol}'.")
 
-        result: dict[str, Any] = {"symbol": symbol}
-
-        for source_key, target_key in self._FIELDS.items():
-            result[target_key] = info.get(source_key)
-
-        # Industry-based sector fallback — only when yfinance's own
-        # "sector" is genuinely missing but "industry" is present.
-        if not result.get("sector") and result.get("industry"):
-            inferred = _INDUSTRY_TO_SECTOR.get(str(result["industry"]).strip().lower())
-            if inferred:
-                result["sector"] = inferred
-                logger.info(
-                    "Sector missing for %s — inferred '%s' from industry '%s'.",
-                    symbol, inferred, result["industry"],
-                )
+        result = normalize_fundamentals(info, symbol)
+        if result.get("sector") and result.get("industry") and result["sector"] != info.get("sector"):
+            logger.info(
+                "Sector missing for %s — inferred '%s' from industry '%s'.",
+                symbol, result["sector"], result["industry"],
+            )
 
         if not result.get("sector"):
             logger.warning(
