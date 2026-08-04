@@ -108,7 +108,7 @@ class PortfolioEngine:
         quantity: int,
         entry_price: float,
         direction: str,
-    ) -> None:
+    ) -> bool:
 
         if symbol in self.state.open_positions:
 
@@ -117,7 +117,7 @@ class PortfolioEngine:
                 symbol,
             )
 
-            return
+            return False
 
         position_value = quantity * entry_price
 
@@ -128,7 +128,7 @@ class PortfolioEngine:
                 symbol,
             )
 
-            return
+            return False
 
         self.state.open_positions[symbol] = PortfolioPosition(
             symbol=symbol,
@@ -145,6 +145,8 @@ class PortfolioEngine:
         self.state.available_capital -= position_value
 
         self.state.updated_at = time.time()
+
+        return True
 
     def _track_extremes(self, pos: "PortfolioPosition") -> None:
         """Update running highest/lowest price seen while a position is
