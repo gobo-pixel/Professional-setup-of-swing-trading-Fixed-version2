@@ -5,6 +5,11 @@ on:
     workflows: ["Daily Scan"]
     types: [completed]
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Bypass NSE trading-day check (testing on holidays)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -42,7 +47,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: PYTHONPATH=. python scripts/run_paper_trading.py
+        run: PYTHONPATH=. python scripts/run_paper_trading.py ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
 
       - name: Run Analysis Engine (only after a successful trading-day cycle)
         if: steps.paper_trading.outputs.ran_cycle == 'true'
