@@ -54,9 +54,9 @@ class PaperTradingEngine:
     # MAIN DAILY CYCLE
     # ==========================================================
 
-    def run_cycle(self, symbols: list[str]) -> dict[str, Any]:
+    def run_cycle(self, symbols: list[str], force: bool = False) -> dict[str, Any]:
         today_date = date.today()
-        if not is_trading_day(today_date):
+        if not force and not is_trading_day(today_date):
             logger.info("Not an NSE trading day (%s) — skipping cycle entirely. "
                         "No new entries, no monitoring (no fresh market data exists anyway).",
                         today_date.isoformat())
@@ -683,10 +683,19 @@ class PaperTradingEngine:
                 if not price or (isinstance(price, float) and math.isnan(price)):
                     continue
 
-                self.portfolio.engine.add_position(
+                added = self.portfolio.engine.add_position(
                     symbol=candidate.symbol, quantity=candidate.position_size,
                     entry_price=price, direction=candidate.action,
                 )
+                if not added:
+                    # Rejected — symbol already held, or insufficient
+                    # capital (add_position() already logged why).
+                    # Previously this was NOT checked, so a rejected
+                    # attempt still got recorded as if it succeeded
+                    # (counted in "Opened", written to the diary/CSV,
+                    # and notified on Telegram) — the confirmed cause
+                    # of the Position Count Check mismatch.
+                    continue
                 self.portfolio.register_sector(candidate.symbol, candidate.diagnostics.get("sector"))
 
                 trade_id = self._new_trade_id(candidate.symbol)
