@@ -27,7 +27,7 @@ class VirtualPortfolio:
 
     def __init__(
         self,
-        initial_capital: float = 200_000.0,
+        initial_capital: float = 500_000.0,
         state_path: str = "storage/trades/virtual_portfolio_state.json",
     ):
         self.initial_capital = initial_capital
