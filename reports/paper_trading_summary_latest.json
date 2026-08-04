@@ -1,0 +1,103 @@
+{
+  "date": "2026-08-04",
+  "opening_balance": 500000.0,
+  "total_capital_in_positions": 477095.35,
+  "remaining_balance": 22904.649999999936,
+  "portfolio_value": 499999.9999999999,
+  "realized_pnl": 0.0,
+  "portfolio_return_percent": -2.328306436538696e-14,
+  "opened_today": [
+    {
+      "symbol": "SAREGAMA.NS",
+      "action": "BUY",
+      "price": 542.55,
+      "quantity": 43
+    },
+    {
+      "symbol": "MARICO.NS",
+      "action": "BUY",
+      "price": 875.0,
+      "quantity": 41
+    },
+    {
+      "symbol": "MOTHERSON.NS",
+      "action": "BUY",
+      "price": 151.0,
+      "quantity": 305
+    },
+    {
+      "symbol": "PIDILITIND.NS",
+      "action": "BUY",
+      "price": 1620.0,
+      "quantity": 22
+    },
+    {
+      "symbol": "DABUR.NS",
+      "action": "SELL",
+      "price": 409.65,
+      "quantity": 88
+    },
+    {
+      "symbol": "HDFCLIFE.NS",
+      "action": "SELL",
+      "price": 535.95,
+      "quantity": 72
+    },
+    {
+      "symbol": "ATHERENERG.NS",
+      "action": "BUY",
+      "price": 1450.4,
+      "quantity": 22
+    },
+    {
+      "symbol": "EMAMILTD.NS",
+      "action": "SELL",
+      "price": 391.8,
+      "quantity": 49
+    },
+    {
+      "symbol": "CAMS.NS",
+      "action": "BUY",
+      "price": 809.4,
+      "quantity": 43
+    },
+    {
+      "symbol": "NAM-INDIA.NS",
+      "action": "BUY",
+      "price": 1202.0,
+      "quantity": 17
+    },
+    {
+      "symbol": "AUROPHARMA.NS",
+      "action": "BUY",
+      "price": 1585.9,
+      "quantity": 17
+    },
+    {
+      "symbol": "NESTLEIND.NS",
+      "action": "BUY",
+      "price": 1520.0,
+      "quantity": 23
+    },
+    {
+      "symbol": "MANAPPURAM.NS",
+      "action": "BUY",
+      "price": 356.6,
+      "quantity": 91
+    },
+    {
+      "symbol": "TITAN.NS",
+      "action": "BUY",
+      "price": 4935.0,
+      "quantity": 6
+    },
+    {
+      "symbol": "LICHSGFIN.NS",
+      "action": "SELL",
+      "price": 512.0,
+      "quantity": 61
+    }
+  ],
+  "closed_today": [],
+  "open_positions_now": 15
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "MOTHERSON.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 305,
+  "entry_price": 151.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 79.74,
+  "reasons": "",
+  "id": "trade_1785848197883",
+  "timestamp": 1785848197.8839943
+}

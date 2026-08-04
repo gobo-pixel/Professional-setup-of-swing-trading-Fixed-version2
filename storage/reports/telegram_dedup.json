@@ -1,6 +1,27 @@
 {
   "2026-08-04": [
     "scan_started::2026-08-04::18:03:14.199624",
-    "scan_completed::2026-08-04::18:14:05.773165"
+    "scan_completed::2026-08-04::18:14:05.773165",
+    "paper_trading_started::2026-08-04::18:14:50.879381",
+    "monitoring_summary_empty::2026-08-04::18:14:51.472538",
+    "candidates_not_executed::2026-08-04::18:26:35.435609",
+    "trade_opened::SAREGAMA.NS::2026-08-04::18:26:35.911350",
+    "trade_opened::MARICO.NS::2026-08-04::18:26:37.264508",
+    "trade_opened::MOTHERSON.NS::2026-08-04::18:26:37.884364",
+    "trade_opened::PIDILITIND.NS::2026-08-04::18:26:38.420592",
+    "trade_opened::DABUR.NS::2026-08-04::18:26:38.974160",
+    "trade_opened::HDFCLIFE.NS::2026-08-04::18:26:39.494928",
+    "trade_opened::ATHERENERG.NS::2026-08-04::18:26:40.030379",
+    "trade_opened::EMAMILTD.NS::2026-08-04::18:26:40.567114",
+    "trade_opened::CAMS.NS::2026-08-04::18:26:41.121756",
+    "trade_opened::NAM-INDIA.NS::2026-08-04::18:26:41.666317",
+    "trade_opened::AUROPHARMA.NS::2026-08-04::18:26:42.187257",
+    "trade_opened::NESTLEIND.NS::2026-08-04::18:26:42.702331",
+    "trade_opened::MANAPPURAM.NS::2026-08-04::18:26:43.247269",
+    "trade_opened::TITAN.NS::2026-08-04::18:26:43.781078",
+    "trade_opened::LICHSGFIN.NS::2026-08-04::18:26:44.295207",
+    "portfolio_summary::2026-08-04::18:26:44.814088",
+    "analysis_summary::2026-08-04::18:26:45.679668",
+    "learning_summary::2026-08-04::18:26:47.620769"
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "symbol": "ATHERENERG.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 22,
+  "entry_price": 1450.4,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.04,
+  "reasons": "",
+  "id": "trade_1785848200030",
+  "timestamp": 1785848200.0300095
+}

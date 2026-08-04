@@ -1,0 +1,185 @@
+{
+  "timestamp": 1785848206.8300123,
+  "closed_trades_observed": 0,
+  "sector_performance": {},
+  "regime_performance": {},
+  "news_effectiveness": {
+    "with_news_win_rate": null,
+    "without_news_win_rate": null,
+    "with_news_trades": 0,
+    "without_news_trades": 0
+  },
+  "fundamental_effectiveness": {
+    "strong_fundamentals_win_rate": null,
+    "weak_fundamentals_win_rate": null
+  },
+  "technical_effectiveness": {
+    "high_technical_win_rate": null,
+    "low_technical_win_rate": null,
+    "high_technical_trades": 0,
+    "low_technical_trades": 0
+  },
+  "rule_effectiveness": {},
+  "redundant_rule_pairs": [
+    {
+      "rule_a": "price_above_ema20",
+      "rule_b": "keltner",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "price_above_vwap",
+      "rule_b": "vwap_confirmation",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "market_trend",
+      "rule_b": "bull_market",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "market_trend",
+      "rule_b": "market_score",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "macd_cross",
+      "rule_b": "macd_histogram",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "bull_market",
+      "rule_b": "market_score",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "breadth",
+      "rule_b": "sector",
+      "agreement_rate": 100.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "confirmed_breakout",
+      "rule_b": "breadth",
+      "agreement_rate": 96.2,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "confirmed_breakout",
+      "rule_b": "sector",
+      "agreement_rate": 96.2,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "price_above_ema20",
+      "rule_b": "bollinger",
+      "agreement_rate": 95.2,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "breakout",
+      "rule_b": "confirmed_breakout",
+      "agreement_rate": 95.2,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "bollinger",
+      "rule_b": "keltner",
+      "agreement_rate": 95.2,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "bollinger",
+      "rule_b": "donchian",
+      "agreement_rate": 93.4,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "gap_filter",
+      "rule_b": "atr_filter",
+      "agreement_rate": 93.0,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "price_above_ema20",
+      "rule_b": "donchian",
+      "agreement_rate": 91.4,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "breakout",
+      "rule_b": "breadth",
+      "agreement_rate": 91.4,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "breakout",
+      "rule_b": "sector",
+      "agreement_rate": 91.4,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "keltner",
+      "rule_b": "donchian",
+      "agreement_rate": 91.4,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "williams_r",
+      "rule_b": "donchian",
+      "agreement_rate": 91.2,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "ema_alignment",
+      "rule_b": "market_trend",
+      "agreement_rate": 90.6,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "ema_alignment",
+      "rule_b": "bull_market",
+      "agreement_rate": 90.6,
+      "sample_size": 500
+    },
+    {
+      "rule_a": "ema_alignment",
+      "rule_b": "market_score",
+      "agreement_rate": 90.6,
+      "sample_size": 500
+    }
+  ],
+  "threshold_sensitivity": {
+    "0-5": {
+      "trades": 0,
+      "win_rate": null
+    },
+    "5-10": {
+      "trades": 0,
+      "win_rate": null
+    },
+    "10-20": {
+      "trades": 0,
+      "win_rate": null
+    },
+    "20+": {
+      "trades": 0,
+      "win_rate": null
+    }
+  },
+  "buy_accuracy": {
+    "trades": 0,
+    "win_rate": null
+  },
+  "sell_accuracy": {
+    "trades": 0,
+    "win_rate": null
+  },
+  "best_worst_trade": {},
+  "exit_reason_breakdown": {}
+}
