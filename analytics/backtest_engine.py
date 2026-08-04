@@ -115,7 +115,7 @@ class BacktestEngine:
         historical_data: dict[str, pd.DataFrame],
         fundamentals: dict[str, dict] | None = None,
         initial_capital: float = 100000.0,
-        min_history: int = 60,
+        min_history: int = 250,
         max_candidates_per_day: int = 10,
     ) -> BacktestResult:
         """
