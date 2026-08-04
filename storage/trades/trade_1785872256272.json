@@ -1,0 +1,16 @@
+{
+  "symbol": "EICHERMOT.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 1,
+  "entry_price": 8050.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 78.92,
+  "reasons": "",
+  "id": "trade_1785872256272",
+  "timestamp": 1785872256.2723935
+}

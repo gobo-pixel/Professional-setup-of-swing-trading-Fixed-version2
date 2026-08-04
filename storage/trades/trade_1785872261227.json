@@ -1,0 +1,16 @@
+{
+  "symbol": "DIVISLAB.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 1,
+  "entry_price": 8585.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.37,
+  "reasons": "",
+  "id": "trade_1785872261227",
+  "timestamp": 1785872261.2278562
+}

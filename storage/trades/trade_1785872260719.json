@@ -1,0 +1,16 @@
+{
+  "symbol": "WOCKPHARMA.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 3,
+  "entry_price": 2028.4,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 75.25,
+  "reasons": "",
+  "id": "trade_1785872260719",
+  "timestamp": 1785872260.7193277
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "SHRIRAMFIN.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 11,
+  "entry_price": 1090.2,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.66,
+  "reasons": "",
+  "id": "trade_1785872254761",
+  "timestamp": 1785872254.7614956
+}

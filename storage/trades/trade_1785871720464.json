@@ -1,0 +1,18 @@
+{
+  "symbol": "TITAN.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 6,
+  "entry_price": 4935.0,
+  "exit_price": 4851.8,
+  "status": "CLOSED",
+  "realized_pnl": -499.1999999999989,
+  "realized_pnl_percent": -1.6859169199594695,
+  "max_profit_percent": 1.3171225937183384,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 73.32,
+  "reasons": "HARD RISK EXIT: Stop-loss breached (intraday low=4851.8, stop=4859.68).",
+  "id": "trade_1785871720464",
+  "timestamp": 1785871720.4646688
+}

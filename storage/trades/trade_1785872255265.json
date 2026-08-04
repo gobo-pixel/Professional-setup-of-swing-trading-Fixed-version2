@@ -1,0 +1,16 @@
+{
+  "symbol": "REDINGTON.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 26,
+  "entry_price": 347.85,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 79.53,
+  "reasons": "",
+  "id": "trade_1785872255265",
+  "timestamp": 1785872255.2654428
+}

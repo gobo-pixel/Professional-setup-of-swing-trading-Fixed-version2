@@ -1,0 +1,16 @@
+{
+  "symbol": "JSWSTEEL.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 9,
+  "entry_price": 1292.3,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 78.67,
+  "reasons": "",
+  "id": "trade_1785872257286",
+  "timestamp": 1785872257.2866006
+}

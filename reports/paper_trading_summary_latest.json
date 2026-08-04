@@ -1,103 +1,136 @@
 {
   "date": "2026-08-04",
-  "opening_balance": 500000.0,
-  "total_capital_in_positions": 477095.35,
-  "remaining_balance": 22904.649999999936,
-  "portfolio_value": 499999.9999999999,
-  "realized_pnl": 0.0,
-  "portfolio_return_percent": -2.328306436538696e-14,
+  "opening_balance": 22904.649999999936,
+  "total_capital_in_positions": 497322.30000000005,
+  "remaining_balance": 443.0500000000766,
+  "portfolio_value": 497765.35000000015,
+  "realized_pnl": -8400.65,
+  "portfolio_return_percent": -0.44692999999996974,
   "opened_today": [
     {
-      "symbol": "SAREGAMA.NS",
+      "symbol": "ABCAPITAL.NS",
       "action": "BUY",
-      "price": 542.55,
-      "quantity": 43
+      "price": 424.35,
+      "quantity": 27
     },
     {
-      "symbol": "MARICO.NS",
+      "symbol": "SHRIRAMFIN.NS",
       "action": "BUY",
-      "price": 875.0,
-      "quantity": 41
+      "price": 1090.2,
+      "quantity": 11
     },
     {
-      "symbol": "MOTHERSON.NS",
+      "symbol": "REDINGTON.NS",
       "action": "BUY",
-      "price": 151.0,
-      "quantity": 305
+      "price": 347.85,
+      "quantity": 26
     },
     {
-      "symbol": "PIDILITIND.NS",
+      "symbol": "PAYTM.NS",
       "action": "BUY",
-      "price": 1620.0,
-      "quantity": 22
-    },
-    {
-      "symbol": "DABUR.NS",
-      "action": "SELL",
-      "price": 409.65,
-      "quantity": 88
-    },
-    {
-      "symbol": "HDFCLIFE.NS",
-      "action": "SELL",
-      "price": 535.95,
-      "quantity": 72
-    },
-    {
-      "symbol": "ATHERENERG.NS",
-      "action": "BUY",
-      "price": 1450.4,
-      "quantity": 22
-    },
-    {
-      "symbol": "EMAMILTD.NS",
-      "action": "SELL",
-      "price": 391.8,
-      "quantity": 49
-    },
-    {
-      "symbol": "CAMS.NS",
-      "action": "BUY",
-      "price": 809.4,
-      "quantity": 43
-    },
-    {
-      "symbol": "NAM-INDIA.NS",
-      "action": "BUY",
-      "price": 1202.0,
-      "quantity": 17
-    },
-    {
-      "symbol": "AUROPHARMA.NS",
-      "action": "BUY",
-      "price": 1585.9,
-      "quantity": 17
-    },
-    {
-      "symbol": "NESTLEIND.NS",
-      "action": "BUY",
-      "price": 1520.0,
-      "quantity": 23
-    },
-    {
-      "symbol": "MANAPPURAM.NS",
-      "action": "BUY",
-      "price": 356.6,
-      "quantity": 91
-    },
-    {
-      "symbol": "TITAN.NS",
-      "action": "BUY",
-      "price": 4935.0,
+      "price": 1410.0,
       "quantity": 6
     },
     {
-      "symbol": "LICHSGFIN.NS",
+      "symbol": "EICHERMOT.NS",
+      "action": "BUY",
+      "price": 8050.0,
+      "quantity": 1
+    },
+    {
+      "symbol": "VMM.NS",
       "action": "SELL",
-      "price": 512.0,
-      "quantity": 61
+      "price": 111.2,
+      "quantity": 101
+    },
+    {
+      "symbol": "JSWSTEEL.NS",
+      "action": "BUY",
+      "price": 1292.3,
+      "quantity": 9
+    },
+    {
+      "symbol": "BELRISE.NS",
+      "action": "BUY",
+      "price": 241.86,
+      "quantity": 40
+    },
+    {
+      "symbol": "SWANCORP.NS",
+      "action": "SELL",
+      "price": 310.2,
+      "quantity": 24
+    },
+    {
+      "symbol": "GAIL.NS",
+      "action": "BUY",
+      "price": 174.3,
+      "quantity": 62
+    },
+    {
+      "symbol": "CHOLAFIN.NS",
+      "action": "BUY",
+      "price": 1888.2,
+      "quantity": 3
+    },
+    {
+      "symbol": "RKFORGE.NS",
+      "action": "BUY",
+      "price": 681.15,
+      "quantity": 10
+    },
+    {
+      "symbol": "AEGISLOG.NS",
+      "action": "BUY",
+      "price": 1388.3,
+      "quantity": 3
+    },
+    {
+      "symbol": "WOCKPHARMA.NS",
+      "action": "BUY",
+      "price": 2028.4,
+      "quantity": 3
+    },
+    {
+      "symbol": "DIVISLAB.NS",
+      "action": "BUY",
+      "price": 8585.0,
+      "quantity": 1
+    },
+    {
+      "symbol": "BALRAMCHIN.NS",
+      "action": "BUY",
+      "price": 646.8,
+      "quantity": 8
+    },
+    {
+      "symbol": "IIFL.NS",
+      "action": "BUY",
+      "price": 617.85,
+      "quantity": 13
     }
   ],
-  "closed_today": [],
-  "open_positions_now": 15
+  "closed_today": [
+    {
+      "symbol": "ATHERENERG.NS",
+      "pnl": -3909.400000000001
+    },
+    {
+      "symbol": "EMAMILTD.NS",
+      "pnl": -695.7999999999995
+    },
+    {
+      "symbol": "TITAN.NS",
+      "pnl": -499.1999999999989
+    },
+    {
+      "symbol": "AUROPHARMA.NS",
+      "pnl": -530.4000000000008
+    },
+    {
+      "symbol": "NAM-INDIA.NS",
+      "pnl": -629.0
+    }
+  ],
+  "open_positions_now": 27
 }
