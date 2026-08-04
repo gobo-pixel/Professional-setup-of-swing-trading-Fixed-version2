@@ -14,7 +14,7 @@
   "sell_accuracy": 0.0,
   "regime_breakdown": {
     "UNKNOWN": {
-      "days": 187,
+      "days": 188,
       "win_rate": 0.0,
       "avg_daily_return_pct": 0.0
     }
@@ -49,19 +49,26 @@
     },
     {
       "window": 4,
-      "days": 47,
+      "days": 48,
       "return_pct": 0.0,
       "win_rate": 0.0,
       "sharpe": 0.0,
       "start_date": "2026-05-28 00:00:00",
-      "end_date": "2026-07-31 00:00:00"
+      "end_date": "2026-08-03 00:00:00"
     }
   ],
   "false_positives": 0,
   "false_negatives": null,
   "final_equity": 500000.0,
-  "total_scan_attempts": 0,
+  "total_scan_attempts": 2079,
   "error_count": 0,
   "error_breakdown": {},
-  "error_samples": {}
+  "error_samples": {},
+  "no_trade_count": 1454,
+  "blocked_by_portfolio_count": 625,
+  "no_trade_reasons": {
+    "Decision engine rejected trade.": 1454,
+    "signal generated but portfolio blocked: NaN values detected.": 446,
+    "signal generated but portfolio blocked: Insufficient historical candles.": 179
+  }
 }
