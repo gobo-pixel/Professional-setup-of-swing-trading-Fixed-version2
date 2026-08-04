@@ -1,17 +1,17 @@
 {
   "comparisons": {
-    "win_rate": "MetricComparison(name='win_rate', previous=0.0, current=53.84615384615385, delta=53.846, delta_percent=0.0, better=True)",
-    "profit_factor": "MetricComparison(name='profit_factor', previous=0.0, current=0.5684330486058609, delta=0.568, delta_percent=0.0, better=True)",
-    "max_drawdown": "MetricComparison(name='max_drawdown', previous=0.0, current=2.0133656966079383, delta=2.013, delta_percent=0.0, better=False)",
-    "cagr": "MetricComparison(name='cagr', previous=0.0, current=-6.328190980833859, delta=-6.328, delta_percent=0.0, better=False)",
-    "expectancy": "MetricComparison(name='expectancy', previous=0.0, current=-155.86923678682749, delta=-155.869, delta_percent=0.0, better=False)",
-    "sharpe": "MetricComparison(name='sharpe', previous=0.0, current=-2.151093290826734, delta=-2.151, delta_percent=0.0, better=False)",
-    "sortino": "MetricComparison(name='sortino', previous=0.0, current=-2.7934171817632927, delta=-2.793, delta_percent=0.0, better=False)",
-    "avg_rr": "MetricComparison(name='avg_rr', previous=0.0, current=0.03456080697018901, delta=0.035, delta_percent=0.0, better=False)",
-    "total_trades": "MetricComparison(name='total_trades', previous=0.0, current=52.0, delta=52.0, delta_percent=0.0, better=True)"
+    "win_rate": "MetricComparison(name='win_rate', previous=44.89795918367347, current=40.74074074074074, delta=-4.157, delta_percent=-9.26, better=False)",
+    "profit_factor": "MetricComparison(name='profit_factor', previous=0.7732379198394262, current=0.3852858165268793, delta=-0.388, delta_percent=-50.17, better=False)",
+    "max_drawdown": "MetricComparison(name='max_drawdown', previous=1.7210838905577417, current=3.7209391849256868, delta=2.0, delta_percent=116.2, better=False)",
+    "cagr": "MetricComparison(name='cagr', previous=-2.982033993166777, current=-10.444422851716684, delta=-7.462, delta_percent=-250.24, better=False)",
+    "expectancy": "MetricComparison(name='expectancy', previous=-65.33672384357043, current=-251.86020312635645, delta=-186.523, delta_percent=-285.48, better=False)",
+    "sharpe": "MetricComparison(name='sharpe', previous=-0.8970046832477495, current=-3.3970751490230415, delta=-2.5, delta_percent=-278.71, better=False)",
+    "sortino": "MetricComparison(name='sortino', previous=-1.314941437218489, current=-4.154176508452994, delta=-2.839, delta_percent=-215.92, better=False)",
+    "avg_rr": "MetricComparison(name='avg_rr', previous=0.17405517171757098, current=0.21015498726439827, delta=0.036, delta_percent=20.74, better=False)",
+    "total_trades": "MetricComparison(name='total_trades', previous=49.0, current=54.0, delta=5.0, delta_percent=10.2, better=True)"
   },
   "verdict": "ROLLBACK",
-  "verdict_reason": "5 metric(s) got measurably worse vs 2 that improved.",
-  "improved_count": 2,
-  "worsened_count": 5
+  "verdict_reason": "7 metric(s) got measurably worse vs 0 that improved.",
+  "improved_count": 0,
+  "worsened_count": 7
 }
