@@ -75,13 +75,23 @@ def write_daily_report(summary: dict, diary: TradeDiary) -> None:
 
 
 def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Bypass the NSE trading-day check (for manual testing on holidays/weekends). "
+             "Note: market data will still reflect the last actual trading day's prices, "
+             "since no new data exists on a genuine holiday.",
+    )
+    args = parser.parse_args()
+
     symbols = WatchlistManager("storage/watchlist/nifty500.json").load()
     if not symbols:
         logger.warning("Watchlist empty; nothing to scan.")
         symbols = []
 
     engine = PaperTradingEngine()
-    summary = engine.run_cycle(symbols)
+    summary = engine.run_cycle(symbols, force=args.force)
 
     ran_cycle = summary.get("status") != "SKIPPED_NON_TRADING_DAY"
     gh_output = os.environ.get("GITHUB_OUTPUT")
