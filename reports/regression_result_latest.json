@@ -1,17 +1,17 @@
 {
   "comparisons": {
-    "win_rate": "MetricComparison(name='win_rate', previous=0.0, current=49.46236559139785, delta=49.462, delta_percent=0.0, better=True)",
-    "profit_factor": "MetricComparison(name='profit_factor', previous=0.0, current=999.99, delta=999.99, delta_percent=0.0, better=True)",
-    "max_drawdown": "MetricComparison(name='max_drawdown', previous=0.0, current=3.0792319540954907, delta=3.079, delta_percent=0.0, better=False)",
-    "cagr": "MetricComparison(name='cagr', previous=0.0, current=nan, delta=nan, delta_percent=0.0, better=False)",
-    "expectancy": "MetricComparison(name='expectancy', previous=0.0, current=nan, delta=nan, delta_percent=0.0, better=False)",
-    "sharpe": "MetricComparison(name='sharpe', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
-    "sortino": "MetricComparison(name='sortino', previous=0.0, current=nan, delta=nan, delta_percent=0.0, better=False)",
-    "avg_rr": "MetricComparison(name='avg_rr', previous=0.0, current=0.07386058310166524, delta=0.074, delta_percent=0.0, better=False)",
-    "total_trades": "MetricComparison(name='total_trades', previous=0.0, current=93.0, delta=93.0, delta_percent=0.0, better=True)"
+    "win_rate": "MetricComparison(name='win_rate', previous=0.0, current=48.35164835164835, delta=48.352, delta_percent=0.0, better=True)",
+    "profit_factor": "MetricComparison(name='profit_factor', previous=0.0, current=0.6669034339187967, delta=0.667, delta_percent=0.0, better=True)",
+    "max_drawdown": "MetricComparison(name='max_drawdown', previous=0.0, current=3.701574442220327, delta=3.702, delta_percent=0.0, better=False)",
+    "cagr": "MetricComparison(name='cagr', previous=0.0, current=-9.514061452141343, delta=-9.514, delta_percent=0.0, better=False)",
+    "expectancy": "MetricComparison(name='expectancy', previous=0.0, current=-101.33163733151581, delta=-101.332, delta_percent=0.0, better=False)",
+    "sharpe": "MetricComparison(name='sharpe', previous=0.0, current=-2.248718941556068, delta=-2.249, delta_percent=0.0, better=False)",
+    "sortino": "MetricComparison(name='sortino', previous=0.0, current=-2.79848989446736, delta=-2.798, delta_percent=0.0, better=False)",
+    "avg_rr": "MetricComparison(name='avg_rr', previous=0.0, current=0.16515212474026408, delta=0.165, delta_percent=0.0, better=True)",
+    "total_trades": "MetricComparison(name='total_trades', previous=0.0, current=91.0, delta=91.0, delta_percent=0.0, better=True)"
   },
-  "verdict": "KEEP_WITH_TRADEOFFS",
-  "verdict_reason": "2 metric(s) improved vs 1 that got worse \u2014 net positive, but review the regressed metric(s) before fully committing.",
-  "improved_count": 2,
-  "worsened_count": 1
+  "verdict": "ROLLBACK",
+  "verdict_reason": "5 metric(s) got measurably worse vs 3 that improved.",
+  "improved_count": 3,
+  "worsened_count": 5
 }
