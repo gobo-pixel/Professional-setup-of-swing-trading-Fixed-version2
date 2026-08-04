@@ -48,6 +48,7 @@ import yfinance as yf  # noqa: E402
 from core.logger import get_logger  # noqa: E402
 from core.notifications import notify  # noqa: E402
 from analytics.backtest_engine import BacktestEngine  # noqa: E402
+from data.fundamental_data import normalize_fundamentals  # noqa: E402
 
 logger = get_logger(__name__)
 
@@ -163,7 +164,19 @@ def main() -> None:
             continue
         try:
             info = yf.Ticker(symbol).info
-            fundamentals[symbol] = info
+            # CONFIRMED ROOT CAUSE of a backtest producing zero BUY
+            # trades across an entire year: raw yf.Ticker().info uses
+            # camelCase keys (trailingPE, returnOnEquity, debtToEquity,
+            # ...) but buy_fundamental_score()/sell_fundamental_score()
+            # expect snake_case keys (pe, roe, debt_to_equity, ...).
+            # Passed through unmapped, every key silently misses,
+            # falling back to constant defaults — computing the exact
+            # same fundamental score (22.0 BUY-side / 78.0 SELL-side)
+            # for every symbol, every single day, regardless of the
+            # real company data. This mapping is the same one already
+            # used by live scanning (data/fundamental_data.py) — reused
+            # here rather than duplicated.
+            fundamentals[symbol] = normalize_fundamentals(info, symbol)
         except Exception:
             pass
 
