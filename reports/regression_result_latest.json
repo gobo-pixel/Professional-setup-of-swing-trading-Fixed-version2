@@ -1,0 +1,17 @@
+{
+  "comparisons": {
+    "win_rate": "MetricComparison(name='win_rate', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "profit_factor": "MetricComparison(name='profit_factor', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "max_drawdown": "MetricComparison(name='max_drawdown', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "cagr": "MetricComparison(name='cagr', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "expectancy": "MetricComparison(name='expectancy', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "sharpe": "MetricComparison(name='sharpe', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "sortino": "MetricComparison(name='sortino', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "avg_rr": "MetricComparison(name='avg_rr', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=False)",
+    "total_trades": "MetricComparison(name='total_trades', previous=0.0, current=0.0, delta=0.0, delta_percent=0.0, better=True)"
+  },
+  "verdict": "NEEDS_MORE_DATA",
+  "verdict_reason": "Only 0 trades in the current run \u2014 need at least 30 for a statistically meaningful verdict.",
+  "improved_count": 0,
+  "worsened_count": 0
+}
