@@ -70,6 +70,8 @@ class BacktestResult:
             f"Average R:R          : {m.get('avg_rr', 0):.2f}",
             f"BUY Accuracy         : {m.get('buy_accuracy', 0):.2f}%  ({m.get('buy_trades', 0)} trades)",
             f"SELL Accuracy        : {m.get('sell_accuracy', 0):.2f}% ({m.get('sell_trades', 0)} trades)",
+            f"Positions Opened     : {m.get('opened_buy_count', 0)} BUY, {m.get('opened_sell_count', 0)} SELL"
+            f" ({m.get('still_open_at_end', 0)} still open at backtest end)",
             f"False Positives      : {m.get('false_positives', 0)}",
             f"False Negatives      : {m.get('false_negatives', 0)} (see note below)",
             "",
@@ -156,6 +158,7 @@ class BacktestEngine:
         gross_loss = 0.0
         rr_values = []
         buy_wins = buy_total = sell_wins = sell_total = 0
+        opened_buy_count = opened_sell_count = 0
         error_type_counts: Counter = Counter()
         error_sample_messages: dict[str, str] = {}
         no_trade_reasons: Counter = Counter()
@@ -297,6 +300,7 @@ class BacktestEngine:
                             entry_price=order_result.avg_price,
                             direction="BUY",
                         )
+                        opened_buy_count += 1
                 elif candidate.action == "SELL":
                     if candidate.symbol in portfolio.state.open_positions:
                         existing_direction = portfolio.state.open_positions[candidate.symbol].direction
@@ -340,6 +344,7 @@ class BacktestEngine:
                             entry_price=order_result.avg_price,
                             direction="SELL",
                         )
+                        opened_sell_count += 1
 
             # Mark every open position to today's close, then snapshot equity.
             for sym in list(portfolio.state.open_positions.keys()):
@@ -378,6 +383,9 @@ class BacktestEngine:
             result, initial_capital, wins, losses, gross_profit, gross_loss,
             rr_values, buy_wins, buy_total, sell_wins, sell_total,
         )
+        result.metrics["opened_buy_count"] = opened_buy_count
+        result.metrics["opened_sell_count"] = opened_sell_count
+        result.metrics["still_open_at_end"] = len(portfolio.state.open_positions)
         result.metrics["total_scan_attempts"] = total_scan_attempts
         result.metrics["error_count"] = sum(error_type_counts.values())
         result.metrics["error_breakdown"] = dict(error_type_counts.most_common(5))
