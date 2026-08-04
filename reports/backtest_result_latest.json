@@ -1,74 +1,80 @@
 {
-  "total_trades": 0,
-  "win_rate": 0.0,
-  "profit_factor": 0.0,
-  "cagr": 0.0,
-  "max_drawdown": 0.0,
+  "total_trades": 88,
+  "win_rate": 45.45454545454545,
+  "profit_factor": 999.99,
+  "cagr": NaN,
+  "max_drawdown": 1.9406514415672076,
   "sharpe": 0.0,
-  "sortino": 0.0,
-  "expectancy": 0.0,
-  "avg_rr": 0.0,
+  "sortino": NaN,
+  "expectancy": NaN,
+  "avg_rr": 0.36825816654926286,
   "buy_trades": 0,
-  "sell_trades": 0,
+  "sell_trades": 88,
   "buy_accuracy": 0.0,
-  "sell_accuracy": 0.0,
+  "sell_accuracy": 45.45454545454545,
   "regime_breakdown": {
+    "BEAR": {
+      "days": 57,
+      "win_rate": 50.88,
+      "avg_daily_return_pct": 0.0132
+    },
     "UNKNOWN": {
-      "days": 188,
+      "days": 4,
       "win_rate": 0.0,
-      "avg_daily_return_pct": 0.0
+      "avg_daily_return_pct": NaN
     }
   },
   "walk_forward_windows": [
     {
       "window": 1,
-      "days": 47,
-      "return_pct": 0.0,
-      "win_rate": 0.0,
-      "sharpe": 0.0,
-      "start_date": "2025-10-31 00:00:00",
-      "end_date": "2026-01-07 00:00:00"
+      "days": 15,
+      "return_pct": 0.4,
+      "win_rate": 57.14,
+      "sharpe": 2.51,
+      "start_date": "2026-05-08 00:00:00",
+      "end_date": "2026-05-28 00:00:00"
     },
     {
       "window": 2,
-      "days": 47,
-      "return_pct": 0.0,
-      "win_rate": 0.0,
-      "sharpe": 0.0,
-      "start_date": "2026-01-08 00:00:00",
-      "end_date": "2026-03-17 00:00:00"
+      "days": 15,
+      "return_pct": 0.71,
+      "win_rate": 50.0,
+      "sharpe": 3.55,
+      "start_date": "2026-05-29 00:00:00",
+      "end_date": "2026-06-18 00:00:00"
     },
     {
       "window": 3,
-      "days": 47,
-      "return_pct": 0.0,
-      "win_rate": 0.0,
-      "sharpe": 0.0,
-      "start_date": "2026-03-18 00:00:00",
-      "end_date": "2026-05-27 00:00:00"
+      "days": 15,
+      "return_pct": 0.27,
+      "win_rate": 64.29,
+      "sharpe": 2.11,
+      "start_date": "2026-06-19 00:00:00",
+      "end_date": "2026-07-09 00:00:00"
     },
     {
       "window": 4,
-      "days": 48,
-      "return_pct": 0.0,
-      "win_rate": 0.0,
+      "days": 17,
+      "return_pct": NaN,
+      "win_rate": 25.0,
       "sharpe": 0.0,
-      "start_date": "2026-05-28 00:00:00",
+      "start_date": "2026-07-10 00:00:00",
       "end_date": "2026-08-03 00:00:00"
     }
   ],
-  "false_positives": 0,
+  "false_positives": 48,
   "false_negatives": null,
-  "final_equity": 500000.0,
-  "total_scan_attempts": 2079,
+  "final_equity": NaN,
+  "total_scan_attempts": 682,
   "error_count": 0,
   "error_breakdown": {},
   "error_samples": {},
-  "no_trade_count": 1454,
-  "blocked_by_portfolio_count": 625,
+  "no_trade_count": 441,
+  "blocked_by_portfolio_count": 34,
   "no_trade_reasons": {
-    "Decision engine rejected trade.": 1454,
-    "signal generated but portfolio blocked: NaN values detected.": 446,
-    "signal generated but portfolio blocked: Insufficient historical candles.": 179
+    "Decision engine rejected trade.": 441,
+    "signal generated but portfolio blocked: Average trading volume is too low.": 20,
+    "signal generated but portfolio blocked: Single-position exposure exceeds limit.": 8,
+    "signal generated but portfolio blocked: Current volume unavailable.": 6
   }
 }
