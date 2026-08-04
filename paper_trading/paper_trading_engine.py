@@ -1,566 +1,1094 @@
 """
-PHASE 2 — MODULE 4: INSTITUTIONAL BACKTESTING ENGINE
+PAPER TRADING ENGINE
 
-Replays historical OHLCV data day-by-day through the REAL production
-pipeline (MarketScanner -> BrokerEngine -> PortfolioEngine), so the
-backtest exercises the exact same code path as live/paper trading —
-not a separate, parallel simulation that can drift out of sync.
+Runs the existing production scanner exactly as it does today. Whenever
+it produces a valid BUY/SELL signal that passes all production
+validations, a VIRTUAL position is opened (no real broker, no real
+orders — pure simulation). Every open position is then re-evaluated on
+every subsequent cycle using the same scanner intelligence plus a
+separate ExitEngine, which decides HOLD or EXIT.
 
-This replaces analytics/backtester.py's run() method, which had several
-integration bugs (orders built via `type("Order", (), dict)` instead of
-the real OrderRequest dataclass, positions that were opened but never
-closed so realized P&L was never captured, and a mathematically incorrect
-entry-price back-calculation). Rather than patch that in place, this is a
-fresh, tested implementation; analytics/backtester.py is left untouched
-for now.
+This module does not change, wrap, or reinterpret any BUY/SELL decision
+logic — it only reacts to scanner.py's output.
 
-Usage:
-    from analytics.backtest_engine import BacktestEngine
-    engine = BacktestEngine()
-    result = engine.run(historical_data, initial_capital=100000)
-    print(result.report())
+Workflow per cycle (see module docstring in the spec):
+    Entry -> Daily Monitoring -> Exit Engine -> Trade Closed -> Trade Diary
 """
 
 from __future__ import annotations
 
 import math
-from collections import Counter
-from dataclasses import dataclass, field
+import time
+from datetime import date
 from typing import Any
 
-import pandas as pd
-
 from core.logger import get_logger
-from data.data_engine import DataBundle
-from execution.broker import BrokerEngine, OrderRequest
+from core.notifications import notify, severity_from_magnitude
+from core.trading_calendar import is_trading_day, now_ist
 from execution.scanner import MarketScanner
-from portfolio.portfolio import PortfolioEngine, PortfolioState
+from paper_trading.virtual_portfolio import VirtualPortfolio
+from risk.exit_engine import ExitEngine
+from storage.trades.trade_diary import TradeDiary
+from storage.trades.trade_store import TradeStore
 
 logger = get_logger(__name__)
 
 
-@dataclass
-class BacktestResult:
-    equity_curve: list[float] = field(default_factory=list)
-    dates: list[Any] = field(default_factory=list)
-    regimes: list[str] = field(default_factory=list)
-    closed_trades: list[dict[str, Any]] = field(default_factory=list)
-    metrics: dict[str, Any] = field(default_factory=dict)
-    status: str = "OK"
-    reason: str = ""
+class PaperTradingEngine:
 
-    def report(self) -> str:
-        if self.status != "OK":
-            return (
-                "=== INSTITUTIONAL BACKTEST REPORT ===\n"
-                f"Status: {self.status}\n"
-                f"Reason: {self.reason}"
-            )
-        m = self.metrics
-        lines = [
-            "=== INSTITUTIONAL BACKTEST REPORT ===",
-            f"Trades              : {m.get('total_trades', 0)}",
-            f"Win Rate             : {m.get('win_rate', 0):.2f}%",
-            f"Profit Factor        : {m.get('profit_factor', 0):.2f}",
-            f"CAGR                 : {m.get('cagr', 0):.2f}%",
-            f"Max Drawdown         : {m.get('max_drawdown', 0):.2f}%",
-            f"Sharpe Ratio         : {m.get('sharpe', 0):.2f}",
-            f"Sortino Ratio        : {m.get('sortino', 0):.2f}",
-            f"Expectancy           : {m.get('expectancy', 0):.2f}",
-            f"Average R:R          : {m.get('avg_rr', 0):.2f}",
-            f"BUY Accuracy         : {m.get('buy_accuracy', 0):.2f}%  ({m.get('buy_trades', 0)} trades)",
-            f"SELL Accuracy        : {m.get('sell_accuracy', 0):.2f}% ({m.get('sell_trades', 0)} trades)",
-            f"Positions Opened     : {m.get('opened_buy_count', 0)} BUY, {m.get('opened_sell_count', 0)} SELL"
-            f" ({m.get('still_open_at_end', 0)} still open at backtest end)",
-            f"False Positives      : {m.get('false_positives', 0)}",
-            f"False Negatives      : {m.get('false_negatives', 0)} (see note below)",
-            "",
-            "NOTE: 'False Negatives' (good setups the engine incorrectly",
-            "skipped) can't be measured from trade history alone — it",
-            "requires re-scoring every NO_TRADE day against what actually",
-            "happened next, which Module 1 (Analysis Engine) does",
-            "separately using the full_report.csv history.",
-        ]
-        error_count = m.get("error_count", 0)
-        total_attempts = m.get("total_scan_attempts", 0)
-        if error_count:
-            error_rate = round(error_count / total_attempts * 100, 1) if total_attempts else 0.0
-            lines.append("")
-            lines.append(f"⚠️ Scan Errors: {error_count} / {total_attempts} attempts ({error_rate}%)")
-            for err_type, count in m.get("error_breakdown", {}).items():
-                sample = m.get("error_samples", {}).get(err_type, "")
-                lines.append(f"  {err_type}: {count}x — e.g. \"{sample}\"")
-            if error_rate > 50:
-                lines.append("  NOTE: majority of attempts failed with errors — this likely explains a low/zero trade count above, not weak signal quality.")
-
-        no_trade_count = m.get("no_trade_count", 0)
-        blocked_count = m.get("blocked_by_portfolio_count", 0)
-        if total_attempts and m.get("total_trades", 0) == 0:
-            no_trade_rate = round(no_trade_count / total_attempts * 100, 1)
-            lines.append("")
-            lines.append(f"NO_TRADE breakdown: {no_trade_count} / {total_attempts} attempts ({no_trade_rate}%) rejected before signal, {blocked_count} signal(s) blocked by portfolio rules")
-            for reason, count in m.get("no_trade_reasons", {}).items():
-                lines.append(f"  {reason}: {count}x")
-        return "\n".join(lines)
-
-
-class BacktestEngine:
-    """Institutional-grade backtester: replays real history through the
-    real production scanner/broker/portfolio, across bull/bear/sideways
-    and high/low volatility periods (whatever the input data covers)."""
-
-    def __init__(self, scanner: MarketScanner | None = None):
-        self.scanner = scanner or MarketScanner()
-
-    def run(
+    def __init__(
         self,
-        historical_data: dict[str, pd.DataFrame],
-        fundamentals: dict[str, dict] | None = None,
-        initial_capital: float = 100000.0,
-        min_history: int = 250,
-        max_candidates_per_day: int = 10,
-    ) -> BacktestResult:
-        """
-        historical_data: {symbol: dataframe} — each dataframe must have a
-        "timestamp" column plus open/high/low/close/volume, ordered oldest
-        to newest, ideally spanning multiple market regimes.
-        fundamentals: optional {symbol: dict} — static snapshot used for
-        every day (see note in the class docstring — historical
-        point-in-time fundamentals aren't available from this pipeline).
-        """
-        fundamentals = fundamentals or {}
-        symbols = list(historical_data.keys())
+        scanner: MarketScanner | None = None,
+        portfolio: VirtualPortfolio | None = None,
+        diary: TradeDiary | None = None,
+        trade_store: TradeStore | None = None,
+        exit_engine: ExitEngine | None = None,
+    ):
+        self.scanner = scanner or MarketScanner()
+        self.portfolio = portfolio or VirtualPortfolio()
+        self.diary = diary or TradeDiary()
+        self.trade_store = trade_store or TradeStore()
+        self.exit_engine = exit_engine or ExitEngine()
 
-        if not symbols:
-            return BacktestResult(
-                status="NOT_READY",
-                reason=(
-                    "No historical OHLCV dataset available. "
-                    "Required: multi-year historical data."
-                ),
-            )
+    # ==========================================================
+    # MAIN DAILY CYCLE
+    # ==========================================================
 
-        state = PortfolioState(total_capital=initial_capital, available_capital=initial_capital)
-        portfolio = PortfolioEngine(state=state)
-        broker = BrokerEngine()
-        result = BacktestResult()
-
-        total_steps = min(len(df) for df in historical_data.values())
-        if total_steps <= min_history:
-            raise ValueError(
-                f"Not enough history: shortest series has {total_steps} rows, "
-                f"need at least {min_history}."
-            )
-
-        wins = 0
-        losses = 0
-        gross_profit = 0.0
-        gross_loss = 0.0
-        rr_values = []
-        buy_wins = buy_total = sell_wins = sell_total = 0
-        opened_buy_count = opened_sell_count = 0
-        error_type_counts: Counter = Counter()
-        error_sample_messages: dict[str, str] = {}
-        no_trade_reasons: Counter = Counter()
-        no_trade_count = [0]
-        blocked_by_portfolio = [0]
-        total_scan_attempts = 0
-
-        for step in range(min_history, total_steps):
-            broker_status = {
-                "status": "ONLINE",
-                "mode": "BACKTEST",
-                "connected": True,
-                "order_allowed": True,
-                "available_margin": initial_capital,
-            }
-            market_state = {
-                "max_trade_candidates": max_candidates_per_day,
-                "max_watchlist": 50,
-                # Without these, ValidationEngine defaults market_open to
-                # False and rejects every single simulated day with
-                # "Market is closed." — meaning the backtest could never
-                # execute a single trade regardless of signal quality.
-                "market_open": True,
-                "holiday": False,
-            }
-            portfolio_dict = portfolio.snapshot()
-
-            bundles = {
-                sym: DataBundle(
-                    symbol=sym,
-                    market=historical_data[sym].iloc[: step + 1].copy(),
-                    fundamentals=fundamentals.get(sym, {}),
-                    news=[],
-                )
-                for sym in symbols
+    def run_cycle(self, symbols: list[str], force: bool = False) -> dict[str, Any]:
+        today_date = date.today()
+        if not force and not is_trading_day(today_date):
+            logger.info("Not an NSE trading day (%s) — skipping cycle entirely. "
+                        "No new entries, no monitoring (no fresh market data exists anyway).",
+                        today_date.isoformat())
+            return {
+                "date": today_date.isoformat(),
+                "status": "SKIPPED_NON_TRADING_DAY",
+                "opened_today": [], "closed_today": [], "monitored": [],
+                "portfolio_snapshot": self.portfolio.snapshot(),
             }
 
-            scan_results = self.scanner.scan_symbols(
-                symbols=symbols,
+        today = today_date.isoformat()
+        broker_status = {
+            "status": "ONLINE", "mode": "PAPER",
+            "connected": True, "order_allowed": True, "available_margin": 1e12,
+        }
+        market_state = {
+            "max_trade_candidates": 20, "max_watchlist": 50,
+            "market_open": True, "holiday": False,
+        }
+
+        open_symbols = set(self.portfolio.engine.state.open_positions.keys())
+        opened_today: list[dict[str, Any]] = []
+        closed_today: list[dict[str, Any]] = []
+        monitored: list[dict[str, Any]] = []
+        monitoring_errors: list[str] = []
+        # Severity-based exception handling (not blanket continue):
+        # Data Fetch / Evaluation -> recoverable, skip this symbol only.
+        # Exit Logic -> recoverable but flagged for manual review (a
+        #   broken exit-evaluation on a held position is not fatal today,
+        #   but must not be silently treated as routine).
+        # Portfolio Update / State Persistence -> NON-recoverable: a
+        #   partial state mutation (position removed from open_positions
+        #   but diary/trade_store write failed, or the final save()
+        #   itself failing) risks silent data corruption if we just keep
+        #   going. These abort the remaining cycle instead of continuing.
+        cycle_aborted = False
+        cycle_abort_reason: str | None = None
+        holding_status_rows: list[dict[str, Any]] = []
+        closed_details: list[dict[str, Any]] = []
+
+        snap_at_start = self.portfolio.snapshot()
+        return_pct = snap_at_start.get("portfolio_return_percent", 0.0)
+        notify(
+            event_type="paper_trading_started",
+            message=(
+                f"🚀 Paper Trading Started\n"
+                f"Date: {today}\n"
+                f"Time: {now_ist().strftime('%H:%M:%S')} IST\n"
+                f"Portfolio Value: {snap_at_start.get('portfolio_value', 0):.2f}\n"
+                f"Cash Balance: {snap_at_start.get('available_capital', 0):.2f}\n"
+                f"Overall Return: {'+' if return_pct >= 0 else ''}{return_pct:.2f}%\n"
+                f"Open Positions: {len(open_symbols)}\n"
+                f"Maximum Positions: {market_state['max_trade_candidates']}\n"
+                f"Status: Evaluating executable trades..."
+            ),
+            dedup_key=f"paper_trading_started::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+        )
+
+        # --------------------------------------------------
+        # 1. MONITOR EXISTING OPEN POSITIONS FIRST
+        #    (uses the SAME production scanner intelligence via
+        #    evaluate_position() — a MONITORING-ONLY method that never
+        #    runs entry-only checks like duplicate_position/max_positions,
+        #    since this position already legitimately exists.)
+        # --------------------------------------------------
+        for symbol in list(open_symbols):
+            portfolio_dict = self.portfolio.engine.snapshot()
+            pos = self.portfolio.engine.state.open_positions[symbol]
+            result = self.scanner.evaluate_position(
+                symbol=symbol,
+                position={
+                    "symbol": symbol,
+                    "direction": pos.direction,
+                    "current_price": pos.current_price,
+                    "max_drawdown_percent": pos.max_drawdown_percent,
+                },
                 portfolio=portfolio_dict,
-                broker_status=broker_status,
-                market_state=market_state,
-                bundles=bundles,
+                broker_status=broker_status, market_state=market_state,
+            )
+            if result.action == "ERROR":
+                stage = result.diagnostics.get("error_stage", "Data Fetch / Evaluation")
+                err_type = result.diagnostics.get("error_type", "UnknownError")
+                err_msg = result.diagnostics.get("error", "unknown error")
+                logger.warning("Monitoring scan failed for %s [%s]: %s: %s", symbol, stage, err_type, err_msg)
+                monitoring_errors.append(f"{symbol} [{stage}] {err_type}: {err_msg}")
+                continue
+
+            self.portfolio.register_sector(symbol, result.diagnostics.get("sector"))
+
+            current_price = result.diagnostics.get("latest_close", pos.current_price)
+
+            # ROOT-CAUSE GUARD (see CHANGELOG.md): an occasional bad/
+            # incomplete market-data fetch can produce a NaN close price
+            # even when the scan otherwise "succeeds" (action != ERROR).
+            # Using a NaN price here would silently corrupt this
+            # position's P&L today AND, if it reaches close_position(),
+            # PERMANENTLY corrupt the whole portfolio's cumulative
+            # total_pnl (NaN is contagious through +=) for every future
+            # day. Skip this symbol for this cycle instead — same
+            # fail-safe pattern as the existing action=="ERROR" skip
+            # above — and retry next cycle when fresh data is available.
+            if current_price is None or (
+                isinstance(current_price, float) and math.isnan(current_price)
+            ):
+                logger.warning(
+                    "Latest close price is NaN/invalid for %s; skipping this "
+                    "monitoring cycle (will retry next run).", symbol,
+                )
+                monitoring_errors.append(f"{symbol} [Data Fetch] InvalidPriceError: NaN/invalid close price")
+                continue
+
+            try:
+                self.portfolio.engine.update_position(symbol=symbol, current_price=current_price)
+            except Exception as exc:
+                logger.exception("Portfolio Update stage failed for %s — NON-RECOVERABLE, aborting cycle", symbol)
+                err_line = f"{symbol} [Portfolio Update] {type(exc).__name__}: {exc}"
+                monitoring_errors.append(err_line)
+                notify(
+                    event_type="cycle_aborted",
+                    message=(
+                        f"🔴 Paper Trading Cycle ABORTED — Non-Recoverable Failure\n"
+                        f"{err_line}\n\n"
+                        f"Portfolio state mutation failed mid-cycle. Remaining symbols "
+                        f"this cycle were NOT monitored, to avoid risking a partially "
+                        f"corrupted state. Already-completed changes will still be saved."
+                    ),
+                    severity="🔴 CRITICAL",
+                    dedup_key=f"cycle_aborted::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+                )
+                cycle_aborted = True
+                cycle_abort_reason = err_line
+                break
+            pos = self.portfolio.engine.state.open_positions[symbol]  # refreshed
+
+            trade_id = self._find_open_trade_id(symbol)
+            diary_record = self.diary.get_diary(trade_id) if trade_id else None
+            holding_days = len(diary_record["daily_log"]) if diary_record else 0
+
+            dataframe = result.diagnostics.get("_dataframe")
+            fundamentals = result.diagnostics.get("_fundamentals") or {}
+            news_score = result.diagnostics.get("_news_score")
+
+            if dataframe is None:
+                logger.warning("No dataframe available to evaluate exit for %s; holding by default.", symbol)
+                monitoring_errors.append(f"{symbol} [Data Fetch] MissingDataError: no market data available")
+                continue
+
+            position_input = {
+                "symbol": symbol,
+                "direction": pos.direction,
+                "entry_price": pos.entry_price,
+                "current_price": current_price,
+                "stop_loss": result.diagnostics.get("stop_loss"),
+                "target1": result.diagnostics.get("target1"),
+                "target2": result.diagnostics.get("target2"),
+                "day_high": result.diagnostics.get("latest_high"),
+                "day_low": result.diagnostics.get("latest_low"),
+                "max_drawdown_percent": pos.max_drawdown_percent,
+            }
+            try:
+                exit_eval = self.exit_engine.evaluate(
+                    dataframe=dataframe, fundamentals=fundamentals, news_score=news_score,
+                    position=position_input, risk_safe=result.diagnostics.get("risk_safe", True),
+                    holding_days=holding_days,
+                )
+            except Exception as exc:
+                logger.exception("Exit Logic stage failed for %s — REVIEW REQUIRED", symbol)
+                err_line = f"{symbol} [Exit Logic] {type(exc).__name__}: {exc}"
+                monitoring_errors.append(err_line)
+                notify(
+                    event_type="exit_logic_review_required",
+                    message=(
+                        f"🟠 REVIEW REQUIRED — Exit Evaluation Failed\n"
+                        f"{err_line}\n\n"
+                        f"This position's exit decision could NOT be computed today. "
+                        f"It remains open and unmonitored for exit conditions until "
+                        f"the next successful cycle — please review manually if this "
+                        f"repeats."
+                    ),
+                    severity="🟠 HIGH",
+                    dedup_key=f"exit_logic_review::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+                )
+                continue
+
+            if trade_id is None:
+                logger.warning("No open diary entry found for %s; skipping diary update.", symbol)
+                monitoring_errors.append(f"{symbol} [Portfolio Update] MissingDiaryEntryError: no matching diary entry found")
+                continue
+            try:
+                self.diary.add_daily_log(
+                    trade_id=trade_id, date=today, current_price=current_price,
+                    current_pnl=pos.unrealized_pnl,
+                    current_buy_confidence=result.diagnostics.get("buy_decision_confidence", 0.0),
+                    current_sell_confidence=result.diagnostics.get("sell_decision_confidence", 0.0),
+                    exit_score=exit_eval.exit_score, recommendation=exit_eval.action,
+                    notes=exit_eval.reasons,
+                )
+            except Exception as exc:
+                logger.exception("Portfolio Update stage (diary) failed for %s — NON-RECOVERABLE, aborting cycle", symbol)
+                err_line = f"{symbol} [Portfolio Update] {type(exc).__name__}: {exc}"
+                monitoring_errors.append(err_line)
+                notify(
+                    event_type="cycle_aborted",
+                    message=(
+                        f"🔴 Paper Trading Cycle ABORTED — Non-Recoverable Failure\n"
+                        f"{err_line}\n\n"
+                        f"Portfolio and diary are now out of sync for this symbol. "
+                        f"Remaining symbols this cycle were NOT monitored, to avoid "
+                        f"risking further state corruption. Already-completed changes "
+                        f"will still be saved."
+                    ),
+                    severity="🔴 CRITICAL",
+                    dedup_key=f"cycle_aborted::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+                )
+                cycle_aborted = True
+                cycle_abort_reason = err_line
+                break
+            monitored.append({"symbol": symbol, "action": exit_eval.action, "exit_score": exit_eval.exit_score})
+
+            # Holding Status row (item 3) — built entirely from values
+            # already computed above (pos, exit_eval, result.diagnostics).
+            stop_loss_v = result.diagnostics.get("stop_loss", 0.0) or 0.0
+            target1_v = result.diagnostics.get("target1", 0.0) or 0.0
+            target2_v = result.diagnostics.get("target2", 0.0) or 0.0
+            # Direction-aware: for BUY, target is ABOVE entry (positive
+            # distance = still need to rise) and stop is BELOW (positive
+            # distance = still safely above stop). For SELL this is
+            # REVERSED — target is below entry, stop is above — so the
+            # sign of each comparison must flip, or SELL positions would
+            # always show a false REACHED/HIT regardless of actual price
+            # movement (this was the confirmed bug).
+            if pos.direction == "SELL":
+                dist_target1 = round((current_price - target1_v) / current_price * 100, 2) if target1_v and current_price else None
+                dist_target2 = round((current_price - target2_v) / current_price * 100, 2) if target2_v and current_price else None
+                dist_stop = round((stop_loss_v - current_price) / current_price * 100, 2) if stop_loss_v and current_price else None
+            else:
+                dist_target1 = round((target1_v - current_price) / current_price * 100, 2) if target1_v and current_price else None
+                dist_target2 = round((target2_v - current_price) / current_price * 100, 2) if target2_v and current_price else None
+                dist_stop = round((current_price - stop_loss_v) / current_price * 100, 2) if stop_loss_v and current_price else None
+
+            if exit_eval.action == "EXIT":
+                status_label = "EXIT CANDIDATE"
+            elif dist_target2 is not None and dist_target2 <= 0:
+                status_label = "TARGET 2 REACHED"
+            elif dist_target1 is not None and dist_target1 <= 0:
+                status_label = "TARGET 1 REACHED"
+            elif dist_stop is not None and dist_stop <= 2.0:
+                status_label = "STOP LOSS WARNING"
+            else:
+                status_label = "HOLD"
+
+            if pos.direction == "SELL":
+                target1_pct = round((pos.entry_price - target1_v) / pos.entry_price * 100, 2) if target1_v and pos.entry_price else None
+                target2_pct = round((pos.entry_price - target2_v) / pos.entry_price * 100, 2) if target2_v and pos.entry_price else None
+            else:
+                target1_pct = round((target1_v - pos.entry_price) / pos.entry_price * 100, 2) if target1_v and pos.entry_price else None
+                target2_pct = round((target2_v - pos.entry_price) / pos.entry_price * 100, 2) if target2_v and pos.entry_price else None
+
+            holding_status_rows.append({
+                "trade_id": trade_id, "symbol": symbol, "direction": pos.direction,
+                "holding_days": holding_days,
+                "entry_date": diary_record.get("entry_date") if diary_record else "N/A",
+                "entry_price": pos.entry_price, "current_price": current_price,
+                "pnl_pct": pos.unrealized_pnl_percent, "pnl_rupees": pos.unrealized_pnl,
+                "highest_pnl": pos.max_profit_percent, "lowest_pnl": -pos.max_drawdown_percent,
+                "dist_target1": dist_target1, "dist_target2": dist_target2, "dist_stop": dist_stop,
+                "target1_pct": target1_pct, "target2_pct": target2_pct,
+                "probability": result.probability,
+                "buy_confidence": result.diagnostics.get("buy_decision_confidence", 0.0),
+                "sell_confidence": result.diagnostics.get("sell_decision_confidence", 0.0),
+                "status": status_label,
+            })
+
+            # "Existing Position Updated" — only notify on a MEANINGFUL
+            # change vs the last logged values (prevents spamming every
+            # trivial fluctuation), and dedup by (symbol, today's date)
+            # so this fires at most once per position per day.
+            prev_log = diary_record["daily_log"][-1] if diary_record and diary_record["daily_log"] else None
+            new_buy_conf = result.diagnostics.get("buy_decision_confidence", 0.0)
+            new_sell_conf = result.diagnostics.get("sell_decision_confidence", 0.0)
+            CHANGE_THRESHOLD = 10.0
+            meaningfully_changed = prev_log is None or (
+                abs(new_buy_conf - prev_log.get("current_buy_confidence", 0.0)) >= CHANGE_THRESHOLD
+                or abs(new_sell_conf - prev_log.get("current_sell_confidence", 0.0)) >= CHANGE_THRESHOLD
+                or abs(exit_eval.exit_score - prev_log.get("current_exit_score", 0.0)) >= CHANGE_THRESHOLD
+                or exit_eval.action != prev_log.get("recommendation")
+            )
+            if meaningfully_changed:
+                position_status = "EXIT" if exit_eval.action == "EXIT" else (
+                    "REVIEW" if exit_eval.exit_score >= exit_eval.threshold * 0.7 else "HOLD"
+                )
+                # NOTE: no longer sent as an individual Telegram message
+                # (was causing 1 message per position per day — see the
+                # consolidated "Paper Trading Summary" at the end of this
+                # cycle instead, which reflects every meaningful change).
+
+            if exit_eval.action == "EXIT":
+                closed = None
+                # A stop-loss/target breach detected via day_low/day_high
+                # means a real order would have executed AT that touch
+                # price, not whatever price is current by the time this
+                # periodic check runs (which can be significantly
+                # different if price has since moved further) — use
+                # that price when it's available, so P&L reflects what
+                # actually would have happened.
+                actual_exit_price = (
+                    exit_eval.suggested_exit_price
+                    if exit_eval.suggested_exit_price is not None
+                    else current_price
+                )
+                try:
+                    closed = self.portfolio.engine.close_position(symbol=symbol, exit_price=actual_exit_price)
+                    if closed is not None:
+                        self.trade_store.save_trade({
+                            "symbol": closed.symbol, "direction": closed.direction, "action": "CLOSE",
+                            "quantity": closed.quantity, "entry_price": closed.entry_price,
+                            "exit_price": actual_exit_price, "status": "CLOSED",
+                            "realized_pnl": closed.realized_pnl,
+                            "realized_pnl_percent": closed.realized_pnl_percent,
+                            "max_profit_percent": closed.max_profit_percent,
+                            "max_drawdown_percent": closed.max_drawdown_percent,
+                            "regime": result.diagnostics.get("market_regime", ""),
+                            "confidence": result.confidence,
+                            "reasons": "; ".join(exit_eval.reasons),
+                        })
+                        target1_status = (
+                            "REACHED" if dist_target1 is not None and dist_target1 <= 0
+                            else "NOT REACHED" if dist_target1 is not None else "N/A"
+                        )
+                        target2_status = (
+                            "REACHED" if dist_target2 is not None and dist_target2 <= 0
+                            else "NOT REACHED" if dist_target2 is not None else "N/A"
+                        )
+                        stop_loss_status = (
+                            "HIT" if dist_stop is not None and dist_stop <= 0
+                            else "NOT HIT" if dist_stop is not None else "N/A"
+                        )
+                        # dist_stop only compares the LATEST current_price
+                        # against the stop level — it can show "NOT HIT"
+                        # even when the exit was genuinely triggered by an
+                        # INTRADAY dip/spike (day_low/day_high) that
+                        # recovered by the time this runs, contradicting
+                        # the Exit Reason shown right above it (the exact
+                        # bug reported). exit_eval.hard_risk_reason is the
+                        # actual source of truth for why the exit
+                        # happened, so it overrides here when it
+                        # specifically says the stop was breached.
+                        if exit_eval.hard_risk_reason and "stop-loss breached" in exit_eval.hard_risk_reason.lower():
+                            stop_loss_status = "HIT"
+                        self.diary.close_trade(
+                            trade_id=trade_id, exit_date=today, exit_price=current_price,
+                            exit_reason=exit_eval.hard_risk_reason or "; ".join(exit_eval.reasons[-1:]),
+                            final_pnl=closed.realized_pnl,
+                            final_pnl_percent=closed.realized_pnl_percent,
+                            max_profit_percent=closed.max_profit_percent,
+                            max_drawdown_percent=closed.max_drawdown_percent,
+                            exit_score=exit_eval.exit_score,
+                            target1_status=target1_status,
+                            target2_status=target2_status,
+                            stop_loss_status=stop_loss_status,
+                        )
+                        closed_today.append({"symbol": symbol, "pnl": closed.realized_pnl})
+                        open_symbols.discard(symbol)
+                except Exception as exc:
+                    logger.exception("Portfolio Update stage (close) failed for %s — NON-RECOVERABLE, aborting cycle", symbol)
+                    err_line = f"{symbol} [Portfolio Update] {type(exc).__name__}: {exc}"
+                    monitoring_errors.append(err_line)
+                    notify(
+                        event_type="cycle_aborted",
+                        message=(
+                            f"🔴 Paper Trading Cycle ABORTED — Non-Recoverable Failure\n"
+                            f"{err_line}\n\n"
+                            f"A position close operation failed partway through — the "
+                            f"portfolio/diary/trade journal may now be inconsistent for "
+                            f"this symbol. Remaining symbols this cycle were NOT "
+                            f"monitored, to avoid risking further corruption. "
+                            f"Already-completed changes will still be saved."
+                        ),
+                        severity="🔴 CRITICAL",
+                        dedup_key=f"cycle_aborted::{symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+                    )
+                    cycle_aborted = True
+                    cycle_abort_reason = err_line
+                    break
+
+                if closed is not None:
+                    closed_at = time.time()
+                    pnl_pct = closed.realized_pnl_percent
+                    trigger = self._classify_exit_trigger(exit_eval)
+                    closed_details.append({
+                        "symbol": symbol, "direction": closed.direction,
+                        "entry_price": closed.entry_price, "exit_price": actual_exit_price,
+                        "pnl_pct": pnl_pct, "pnl_rupees": closed.realized_pnl,
+                        "trigger": trigger, "holding_days": holding_days,
+                        "trade_id": trade_id, "exit_score": exit_eval.exit_score,
+                        "exit_threshold": exit_eval.threshold,
+                        "exit_reasons": [
+                            r for r in (exit_eval.reasons or [])
+                            if not r.lower().startswith("exit score")
+                        ][:3],
+                        "risk_factor_detail": self._top_risk_factors(result.diagnostics),
+                        "target1_status": target1_status, "target2_status": target2_status,
+                        "stop_loss_status": stop_loss_status,
+                    })
+
+        total_positions = len(open_symbols) + len(closed_today)
+        if total_positions > 0:
+            successful_count = len(monitored)
+            failed_count = len(monitoring_errors)
+
+            # Group failures by exception type for the breakdown.
+            groups: dict[str, dict[str, Any]] = {}
+            for err in monitoring_errors:
+                if "[" in err and "]" in err:
+                    symbol_part, rest = err.split("[", 1)
+                    stage_part, detail_part = rest.split("]", 1)
+                    detail_part = detail_part.strip()
+                    if ":" in detail_part:
+                        exc_type, exc_msg = detail_part.split(":", 1)
+                    else:
+                        exc_type, exc_msg = "UnknownError", detail_part
+                    exc_type = exc_type.strip()
+                    exc_msg = exc_msg.strip()
+                else:
+                    symbol_part, exc_type, exc_msg = err, "UnknownError", err
+
+                key = f"{exc_type}::{stage_part.strip() if '[' in err else ''}"
+                g = groups.setdefault(key, {"type": exc_type, "stage": stage_part.strip() if "[" in err else "N/A", "symbols": [], "reason": exc_msg})
+                g["symbols"].append(symbol_part.strip().split(".")[0])
+
+            holding_count = successful_count - len(closed_details)
+            summary_lines = [
+                "📊 Paper Trading Summary",
+                f"{total_positions} Positions Evaluated",
+                f"{len(closed_details)} Closed",
+                f"{max(holding_count, 0)} Holding",
+            ]
+            if failed_count:
+                summary_lines.append(f"{failed_count} Failed")
+
+            if closed_details:
+                short_trigger = {
+                    "Stop Loss Hit": "Stop Loss", "Target Achieved": "Target Hit",
+                    "Risk Management Exit": "Risk Exit",
+                    "Time-Based Exit": "Time Exit",
+                    "Momentum Weakened": "Momentum Exit",
+                    "Fundamentals Weakened": "Fundamentals Exit",
+                    "Negative News": "News Exit",
+                    "Trend Reversal": "Trend Exit",
+                }
+                summary_lines.append("-" * 16)
+                summary_lines.append("Closed")
+                for c in closed_details:
+                    summary_lines.append("-" * 14)
+                    summary_lines.extend(self._render_closed_trade_block(c, short_trigger))
+
+            if groups:
+                summary_lines.append("")
+                summary_lines.append("Failure Breakdown")
+                for g in groups.values():
+                    summary_lines.append(f"{g['type']} ({g['stage']})")
+                    summary_lines.append(f"{len(g['symbols'])}")
+                    summary_lines.append("Affected Symbols")
+                    summary_lines.extend(g["symbols"])
+                    summary_lines.append("Reason")
+                    summary_lines.append(g["reason"])
+                    summary_lines.append("")
+
+            notify(
+                event_type="monitoring_summary",
+                message="\n".join(summary_lines).strip(),
+                severity="🔴 CRITICAL" if failed_count == total_positions and total_positions > 0 else "🟢 LOW",
+                dedup_key=f"monitoring_summary::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+            )
+        else:
+            recent_closed = self.diary.get_closed_trades()
+            # Most-recently-closed first, capped to a reasonable count
+            # so this doesn't grow unbounded over the life of the portfolio.
+            recent_closed = sorted(
+                recent_closed, key=lambda r: r.get("updated_at", 0), reverse=True
+            )[:20]
+
+            lines = [
+                "📊 Paper Trading Summary",
+                "0 Positions Evaluated",
+                "",
+                "No open positions to monitor.",
+            ]
+            if recent_closed:
+                short_trigger = {
+                    "Stop Loss Hit": "Stop Loss", "Target Achieved": "Target Hit", "Risk Management Exit": "Risk Exit",
+                    "Time-Based Exit": "Time Exit", "Momentum Weakened": "Momentum Exit",
+                    "Fundamentals Weakened": "Fundamentals Exit", "Negative News": "News Exit",
+                    "Trend Reversal": "Trend Exit",
+                }
+                lines.append("")
+                lines.append(f"Last {len(recent_closed)} Exit(s)")
+                for rec in recent_closed:
+                    lines.append("-" * 14)
+                    c = {
+                        "symbol": rec.get("symbol", "N/A"), "direction": rec.get("direction", ""),
+                        "entry_price": rec.get("entry_price"), "exit_price": rec.get("exit_price"),
+                        "pnl_pct": rec.get("final_pnl_percent", 0.0), "pnl_rupees": rec.get("final_pnl", 0.0),
+                        "trigger": rec.get("exit_reason", "N/A"), "holding_days": rec.get("holding_days", "N/A"),
+                        "exit_score": rec.get("exit_score"), "target1_status": rec.get("target1_status"),
+                        "target2_status": rec.get("target2_status"), "stop_loss_status": rec.get("stop_loss_status"),
+                    }
+                    lines.extend(self._render_closed_trade_block(c, short_trigger))
+
+            notify(
+                event_type="monitoring_summary",
+                message="\n".join(lines).strip(),
+                dedup_key=f"monitoring_summary_empty::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
 
-            # scan_symbols() returns ONLY the already-filtered
-            # executable_results (BUY/SELL + portfolio_allowed) — by
-            # construction it can NEVER contain ERROR or NO_TRADE
-            # entries, so diagnosing "why zero trades" from THAT list
-            # is structurally blind (confirmed: an earlier version of
-            # this diagnostic always showed "0 errors" regardless of
-            # what was actually happening). The FULL per-symbol list,
-            # including NO_TRADE/ERROR and their rejection reasons, is
-            # stashed separately for exactly this purpose.
-            full_scan_results = getattr(self.scanner, "_last_full_scan_results", scan_results)
-            for r in full_scan_results:
-                total_scan_attempts += 1
-                if r.action == "ERROR":
-                    err_type = r.diagnostics.get("error_type", "UnknownError")
-                    error_type_counts[err_type] += 1
-                    if err_type not in error_sample_messages:
-                        error_sample_messages[err_type] = str(r.diagnostics.get("error", ""))[:200]
-                elif r.action == "NO_TRADE":
-                    no_trade_count[0] += 1
-                    reason = r.diagnostics.get("validation_rejection_reason") or r.diagnostics.get("portfolio_rule_reason") or "score below threshold"
-                    no_trade_reasons[str(reason)[:100]] += 1
-                elif r.action in ("BUY", "SELL") and not r.portfolio_allowed:
-                    blocked_by_portfolio[0] += 1
-                    reason = r.diagnostics.get("portfolio_rule_reason") or "unknown"
-                    no_trade_reasons[f"signal generated but portfolio blocked: {str(reason)[:80]}"] += 1
+        self.portfolio.engine.mark_to_market()
 
-            candidates = sorted(
-                (r for r in scan_results if r.action in ("BUY", "SELL") and r.portfolio_allowed),
-                key=lambda r: r.ranking,
-                reverse=True,
-            )[:max_candidates_per_day]
+        if holding_status_rows:
+            status_lines = ["📋 Holding Status", ""]
+            for r in holding_status_rows:
+                status_lines.append(f"{r['symbol']} ({r['direction']}) — {r['status']}")
+                status_lines.append(f"Trade ID: {r['trade_id']}")
+                status_lines.append(f"Holding Days: {r['holding_days']} | Entry Date: {r['entry_date']}")
+                status_lines.append(f"Entry: {r['entry_price']} | Current: {r['current_price']}")
+                status_lines.append(f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})")
+                status_lines.append(f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%")
+                t1_label = f" ({r['target1_pct']}%)" if r.get("target1_pct") is not None else ""
+                t2_label = f" ({r['target2_pct']}%)" if r.get("target2_pct") is not None else ""
+                if r["dist_target1"] is not None:
+                    if r["dist_target1"] > 0:
+                        status_lines.append(f"Target 1{t1_label} progress:- {-r['dist_target1']:.2f}% remaining")
+                    else:
+                        status_lines.append(f"Target 1{t1_label}: REACHED ({abs(r['dist_target1']):.2f}% Beyond)")
+                if r["dist_target2"] is not None:
+                    if r["dist_target2"] > 0:
+                        status_lines.append(f"Target 2{t2_label} progress:- {-r['dist_target2']:.2f}% remaining")
+                    else:
+                        status_lines.append(f"Target 2{t2_label}: REACHED ({abs(r['dist_target2']):.2f}% Beyond)")
+                if r["dist_stop"] is not None:
+                    status_lines.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
+                status_lines.append(f"Probability: {r['probability']:.1f}%")
+                status_lines.append(f"BUY Confidence: {r['buy_confidence']:.1f}% | SELL Confidence: {r['sell_confidence']:.1f}%")
+                status_lines.append("")
+
+            # Portfolio-level aggregate — added specifically so the
+            # overall picture (is the portfolio net up or down right
+            # now, across ALL open positions) is visible in the same
+            # notification, without needing to manually total each
+            # position's P&L. Uses the SAME pnl_rupees/pnl_pct fields
+            # already computed per-position above (no new calculation
+            # logic, just a sum).
+            total_unrealized_rupees = sum(r["pnl_rupees"] for r in holding_status_rows)
+            winning = sum(1 for r in holding_status_rows if r["pnl_rupees"] > 0)
+            losing = sum(1 for r in holding_status_rows if r["pnl_rupees"] <= 0)
+
+            status_lines.append("━━━━━━━━━━━━━━━━━━")
+            status_lines.append("📊 Portfolio Summary (all open positions)")
+            status_lines.append(f"Positions Held: {len(holding_status_rows)} ({winning} winning, {losing} losing)")
+            sign = "+" if total_unrealized_rupees >= 0 else ""
+            status_lines.append(f"Total Unrealized P&L: {sign}₹{total_unrealized_rupees:.2f}")
+            status_lines.append(
+                "(This is separate from Realized PnL in the Daily Portfolio Summary — "
+                "this reflects only currently-open positions, mark-to-market at today's prices.)"
+            )
+
+            notify(
+                event_type="holding_status",
+                message="\n".join(status_lines).strip(),
+                dedup_key=f"holding_status::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+            )
+
+        # --------------------------------------------------
+        # 2. SCAN FOR NEW ENTRIES (skip symbols already open)
+        #    Skipped entirely if a non-recoverable failure aborted the
+        #    monitoring phase above — adding MORE state changes on top
+        #    of a potentially inconsistent portfolio would compound risk.
+        # --------------------------------------------------
+        candidate_symbols = [s for s in symbols if s not in open_symbols] if not cycle_aborted else []
+        if candidate_symbols:
+            portfolio_dict = self.portfolio.engine.snapshot()
+            candidates = self.scanner.scan_symbols(
+                symbols=candidate_symbols, portfolio=portfolio_dict,
+                broker_status=broker_status, market_state=market_state,
+            )
+
+            # Item 2: every BUY/SELL candidate gets a visible outcome —
+            # including ones that did NOT make it into `candidates`
+            # (already-computed, previously-discarded diagnostics).
+            executed_symbols = {c.symbol for c in candidates}
+            available_cash = portfolio_dict.get("available_capital", 0.0)
+            not_executed_lines = []
+            for r in self.scanner._last_full_scan_results:
+                if r.action not in ("BUY", "SELL") or r.symbol in executed_symbols:
+                    continue
+                reason = (
+                    r.diagnostics.get("validation_rejection_reason")
+                    or r.diagnostics.get("portfolio_rule_reason")
+                    or ("Risk grade: " + str(r.diagnostics.get("risk_grade")) if not r.diagnostics.get("risk_safe", True) else None)
+                    or "Did not clear final execution checks."
+                )
+                price = r.diagnostics.get("latest_close", 0.0) or 0.0
+                required_capital = (r.position_size or 0) * price
+                line = f"{r.symbol} ({r.action}) — NOT EXECUTED\nReason: {reason}"
+                if required_capital > 0:
+                    line += f"\nRequired: ₹{required_capital:,.2f}\nAvailable: ₹{available_cash:,.2f}"
+                not_executed_lines.append(line)
+            if not_executed_lines:
+                notify(
+                    event_type="candidates_not_executed",
+                    message="📌 Candidates Not Executed\n\n" + "\n\n".join(not_executed_lines),
+                    dedup_key=f"candidates_not_executed::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+                )
 
             for candidate in candidates:
+                if not candidate.portfolio_allowed or candidate.position_size <= 0:
+                    continue
+
                 price = candidate.diagnostics.get("latest_close")
-                # "if not price" alone does NOT catch NaN — NaN is
-                # truthy in Python (bool(float('nan')) is True) — so a
-                # NaN price would silently pass through into trade
-                # execution, producing NaN PnL that cascades into NaN
-                # CAGR/Sortino/Expectancy in the final report (confirmed
-                # via a real backtest run). Explicit isnan check
-                # required, matching the same fix already applied in
-                # paper_trading_engine.py.
+                # NOTE: "if not price" alone would NOT catch NaN — NaN is
+                # truthy in Python (bool(float('nan')) is True) — so this
+                # explicit isnan check is required to actually guard
+                # against a bad/incomplete data fetch (see the matching
+                # guard + explanation in the monitoring loop above).
                 if not price or (isinstance(price, float) and math.isnan(price)):
                     continue
 
-                order = OrderRequest(
-                    symbol=candidate.symbol,
-                    action=candidate.action,
-                    quantity=candidate.position_size,
+                added = self.portfolio.engine.add_position(
+                    symbol=candidate.symbol, quantity=candidate.position_size,
+                    entry_price=price, direction=candidate.action,
                 )
-                order_result = broker.place_order(order=order, market_price=price, market_state=market_state)
-                if order_result.status not in ("FILLED", "PARTIAL"):
+                if not added:
+                    # Rejected — symbol already held, or insufficient
+                    # capital (add_position() already logged why).
+                    # Previously this was NOT checked, so a rejected
+                    # attempt still got recorded as if it succeeded
+                    # (counted in "Opened", written to the diary/CSV,
+                    # and notified on Telegram) — the confirmed cause
+                    # of the Position Count Check mismatch.
                     continue
+                self.portfolio.register_sector(candidate.symbol, candidate.diagnostics.get("sector"))
 
-                if candidate.action == "BUY":
-                    if candidate.symbol in portfolio.state.open_positions:
-                        # Existing position is a SHORT (SELL direction) —
-                        # a BUY signal here means "cover the short",
-                        # mirroring how the SELL branch closes an
-                        # existing BUY. Without this, short positions
-                        # could only ever be closed by the final forced
-                        # close-everything-at-the-end step.
-                        existing = portfolio.state.open_positions[candidate.symbol]
-                        if existing.direction == "SELL":
-                            closed = portfolio.close_position(
-                                symbol=candidate.symbol, exit_price=order_result.avg_price
-                            )
-                            if closed is not None:
-                                self._record_closed_trade(result, closed, candidate, wins, losses)
-                                if closed.realized_pnl > 0:
-                                    wins += 1
-                                    gross_profit += closed.realized_pnl
-                                else:
-                                    losses += 1
-                                    gross_loss += abs(closed.realized_pnl)
-                                if closed.max_drawdown_percent > 0:
-                                    rr_values.append(
-                                        closed.max_profit_percent / max(closed.max_drawdown_percent, 1e-9)
-                                    )
-                                # Count by the CLOSED POSITION's actual
-                                # direction (it was a SELL position being
-                                # covered here), not by candidate.action
-                                # (BUY) — this is what was previously
-                                # inverted, causing "BUY Accuracy" to
-                                # only ever reflect short-covers instead
-                                # of genuine BUY-entry trades.
-                                sell_total += 1
-                                if closed.realized_pnl > 0:
-                                    sell_wins += 1
-                    else:
-                        portfolio.add_position(
-                            symbol=candidate.symbol,
-                            quantity=order_result.filled_quantity,
-                            entry_price=order_result.avg_price,
-                            direction="BUY",
-                        )
-                        opened_buy_count += 1
-                elif candidate.action == "SELL":
-                    if candidate.symbol in portfolio.state.open_positions:
-                        existing_direction = portfolio.state.open_positions[candidate.symbol].direction
-                        closed = portfolio.close_position(symbol=candidate.symbol, exit_price=order_result.avg_price)
-                        if closed is not None:
-                            self._record_closed_trade(
-                                result, closed, candidate, wins, losses,
-                            )
-                            if closed.realized_pnl > 0:
-                                wins += 1
-                                gross_profit += closed.realized_pnl
-                            else:
-                                losses += 1
-                                gross_loss += abs(closed.realized_pnl)
-                            if closed.max_drawdown_percent > 0:
-                                rr_values.append(
-                                    closed.max_profit_percent / max(closed.max_drawdown_percent, 1e-9)
-                                )
-                            # FIXED: previously always counted here as
-                            # "sell_total" regardless of what direction
-                            # the closed position actually was. Since
-                            # the overwhelmingly common lifecycle is
-                            # BUY-entry -> SELL-signal-closes-it, this
-                            # silently mislabeled nearly every genuine
-                            # BUY trade's outcome as a SELL trade,
-                            # making "BUY Accuracy" reflect only the
-                            # rare short-cover case (confirmed via a
-                            # real backtest: 1 BUY trade vs 314 SELL).
-                            if existing_direction == "BUY":
-                                buy_total += 1
-                                if closed.realized_pnl > 0:
-                                    buy_wins += 1
-                            else:
-                                sell_total += 1
-                                if closed.realized_pnl > 0:
-                                    sell_wins += 1
-                    else:
-                        portfolio.add_position(
-                            symbol=candidate.symbol,
-                            quantity=order_result.filled_quantity,
-                            entry_price=order_result.avg_price,
-                            direction="SELL",
-                        )
-                        opened_sell_count += 1
+                trade_id = self._new_trade_id(candidate.symbol)
+                reasons_list = [
+                    r for r in candidate.diagnostics.get("decision_reasons", "").split(" | ") if r
+                ]
 
-            # Mark every open position to today's close, then snapshot equity.
-            for sym in list(portfolio.state.open_positions.keys()):
-                if sym in historical_data and step < len(historical_data[sym]):
-                    price = float(historical_data[sym].iloc[step]["close"])
-                    portfolio.update_position(symbol=sym, current_price=price)
-            portfolio.mark_to_market()
+                self.diary.open_trade(
+                    trade_id=trade_id, symbol=candidate.symbol, direction=candidate.action,
+                    entry_price=price, entry_date=today,
+                    buy_probability=candidate.probability, buy_confidence=candidate.confidence,
+                    entry_reasons=reasons_list,
+                )
+                self.trade_store.save_trade({
+                    "symbol": candidate.symbol, "direction": candidate.action, "action": "OPEN",
+                    "quantity": candidate.position_size, "entry_price": price, "exit_price": "",
+                    "status": "OPEN", "realized_pnl": "", "realized_pnl_percent": "",
+                    "regime": candidate.diagnostics.get("market_regime", ""),
+                    "confidence": candidate.confidence, "reasons": "",
+                })
+                opened_today.append({
+                    "symbol": candidate.symbol, "action": candidate.action, "price": price,
+                    "quantity": candidate.position_size,
+                })
 
-            equity = portfolio.state.total_capital + portfolio.state.total_pnl
-            result.equity_curve.append(equity)
-            ts_col = historical_data[symbols[0]].iloc[step].get("timestamp", step)
-            result.dates.append(ts_col)
-            # Reuses the market_regime the scanner already computed for
-            # this day (same regime-detection used live) — no separate
-            # computation needed. Falls back to "UNKNOWN" if no scan
-            # result was available (e.g. all symbols rejected pre-regime).
-            day_regime = scan_results[0].diagnostics.get("market_regime", "UNKNOWN") if scan_results else "UNKNOWN"
-            result.regimes.append(day_regime)
+                notify(
+                    event_type="trade_opened",
+                    message=self._format_buy_report(candidate, price, reasons_list, trade_id),
+                    severity=severity_from_magnitude(candidate.confidence / 100.0),
+                    dedup_key=f"trade_opened::{candidate.symbol}::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
+                )
 
-        # Close anything still open at the end, so realized P&L covers the
-        # whole run (otherwise long-held winners/losers would be invisible
-        # to win-rate / profit-factor).
-        for sym in list(portfolio.state.open_positions.keys()):
-            last_price = float(historical_data[sym].iloc[-1]["close"])
-            closed = portfolio.close_position(symbol=sym, exit_price=last_price)
-            if closed is not None:
-                self._record_closed_trade(result, closed, None, wins, losses)
-                if closed.realized_pnl > 0:
-                    wins += 1
-                    gross_profit += closed.realized_pnl
-                else:
-                    losses += 1
-                    gross_loss += abs(closed.realized_pnl)
-
-        result.metrics = self._compute_metrics(
-            result, initial_capital, wins, losses, gross_profit, gross_loss,
-            rr_values, buy_wins, buy_total, sell_wins, sell_total,
-        )
-        result.metrics["opened_buy_count"] = opened_buy_count
-        result.metrics["opened_sell_count"] = opened_sell_count
-        result.metrics["still_open_at_end"] = len(portfolio.state.open_positions)
-        result.metrics["total_scan_attempts"] = total_scan_attempts
-        result.metrics["error_count"] = sum(error_type_counts.values())
-        result.metrics["error_breakdown"] = dict(error_type_counts.most_common(5))
-        result.metrics["error_samples"] = error_sample_messages
-        result.metrics["no_trade_count"] = no_trade_count[0]
-        result.metrics["blocked_by_portfolio_count"] = blocked_by_portfolio[0]
-        result.metrics["no_trade_reasons"] = dict(no_trade_reasons.most_common(5))
-        return result
-
-    def _record_closed_trade(self, result, closed, candidate, wins, losses):
-        result.closed_trades.append({
-            "symbol": closed.symbol,
-            "direction": closed.direction,
-            "entry_price": closed.entry_price,
-            "realized_pnl": closed.realized_pnl,
-            "max_profit_percent": closed.max_profit_percent,
-            "max_drawdown_percent": closed.max_drawdown_percent,
-        })
-
-    @staticmethod
-    def _compute_walk_forward_windows(
-        result: "BacktestResult", initial_capital: float, n_windows: int = 4,
-    ) -> list[dict[str, Any]]:
-        """Splits the backtest into N sequential, non-overlapping
-        windows and computes metrics for EACH window independently —
-        the core spirit of walk-forward (rolling, out-of-sample-style
-        evaluation) adapted for a rule-based strategy with no fittable
-        parameters to literally retrain window-over-window. A strategy
-        whose win-rate/CAGR swings wildly between windows is more
-        likely overfit to one historical stretch than one with
-        consistent numbers across all windows."""
-        curve = result.equity_curve
-        if len(curve) < n_windows * 10:  # need a reasonable minimum per window
-            return []
-
-        window_size = len(curve) // n_windows
-        windows = []
-        for w in range(n_windows):
-            start = w * window_size
-            end = start + window_size if w < n_windows - 1 else len(curve)
-            window_curve = curve[start:end]
-            if len(window_curve) < 2:
-                continue
-
-            window_returns = [
-                (window_curve[i] / window_curve[i - 1] - 1)
-                for i in range(1, len(window_curve)) if window_curve[i - 1] > 0
-            ]
-            win_days = sum(1 for r in window_returns if r > 0)
-            window_start_equity = window_curve[0]
-            window_end_equity = window_curve[-1]
-            window_return_pct = (
-                (window_end_equity / window_start_equity - 1) * 100
-                if window_start_equity > 0 else 0.0
+        try:
+            self.portfolio.save()
+        except Exception as exc:
+            logger.exception("State Persistence stage failed — NON-RECOVERABLE, this cycle's changes may be lost")
+            notify(
+                event_type="cycle_aborted",
+                message=(
+                    f"🔴 STATE PERSISTENCE FAILED — Non-Recoverable\n"
+                    f"Stage: State Persistence\n"
+                    f"Exception Type: {type(exc).__name__}\n"
+                    f"Exception Message: {exc}\n\n"
+                    f"Today's Opened/Closed/Monitored changes may NOT have been "
+                    f"saved to disk. Do not trust this cycle's summary until "
+                    f"verified manually."
+                ),
+                severity="🔴 CRITICAL",
+                dedup_key=f"state_persistence_failed::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
             )
-            mean_r = sum(window_returns) / len(window_returns) if window_returns else 0.0
-            std_r = (
-                (sum((r - mean_r) ** 2 for r in window_returns) / len(window_returns)) ** 0.5
-                if window_returns else 0.0
-            )
-            sharpe = (mean_r / std_r * (252 ** 0.5)) if std_r > 0 else 0.0
+            raise  # do not swallow — let the workflow run itself fail loudly
 
-            windows.append({
-                "window": w + 1,
-                "days": len(window_curve),
-                "return_pct": round(window_return_pct, 2),
-                "win_rate": round(win_days / len(window_returns) * 100, 2) if window_returns else None,
-                "sharpe": round(sharpe, 2),
-                "start_date": str(result.dates[start]) if start < len(result.dates) else None,
-                "end_date": str(result.dates[end - 1]) if end - 1 < len(result.dates) else None,
-            })
-        return windows
-
-    @staticmethod
-    def _compute_regime_breakdown(result: "BacktestResult", returns: list[float]) -> dict[str, Any]:
-        """Segments the day-over-day equity return series by the
-        market regime active on each day (reusing the SAME
-        MarketRegimeEngine used live — see the regimes list populated
-        during run()), so performance can be judged per-regime instead
-        of only as one blended number across the whole period. `returns`
-        has one fewer entry than `regimes` (return[i] is between day
-        i-1 and day i), so it's paired with regimes[1:]."""
-        if not returns or len(result.regimes) < 2:
-            return {}
-
-        by_regime: dict[str, list[float]] = {}
-        for regime, ret in zip(result.regimes[1:], returns):
-            by_regime.setdefault(regime, []).append(ret)
-
-        breakdown = {}
-        for regime, rets in by_regime.items():
-            wins = sum(1 for r in rets if r > 0)
-            breakdown[regime] = {
-                "days": len(rets),
-                "win_rate": round(wins / len(rets) * 100, 2) if rets else None,
-                "avg_daily_return_pct": round(sum(rets) / len(rets) * 100, 4) if rets else None,
-            }
-        return breakdown
-
-    def _compute_metrics(
-        self, result, initial_capital, wins, losses, gross_profit, gross_loss,
-        rr_values, buy_wins, buy_total, sell_wins, sell_total,
-    ) -> dict[str, Any]:
-        curve = result.equity_curve
-        total_trades = wins + losses
-
-        win_rate = (wins / total_trades * 100) if total_trades else 0.0
-        profit_factor = (
-            (gross_profit / gross_loss) if gross_loss > 0
-            else (999.99 if gross_profit > 0 else 0.0)  # "no losses" sentinel — inf isn't valid JSON
-        )
-        expectancy = ((gross_profit - gross_loss) / total_trades) if total_trades else 0.0
-        avg_rr = (sum(rr_values) / len(rr_values)) if rr_values else 0.0
-
-        # CAGR
-        years = max(len(curve) / 252.0, 1e-9)
-        final_equity = curve[-1] if curve else initial_capital
-        cagr = ((final_equity / initial_capital) ** (1 / years) - 1) * 100 if initial_capital > 0 else 0.0
-
-        # Max drawdown
-        peak = -math.inf
-        max_dd = 0.0
-        for e in curve:
-            peak = max(peak, e)
-            if peak > 0:
-                max_dd = max(max_dd, (peak - e) / peak)
-        max_dd *= 100
-
-        # Daily returns -> Sharpe / Sortino (assume 252 trading days/year, 0% risk-free)
-        returns = [
-            (curve[i] / curve[i - 1] - 1) for i in range(1, len(curve)) if curve[i - 1] > 0
-        ]
-        sharpe = 0.0
-        sortino = 0.0
-        if returns:
-            mean_r = sum(returns) / len(returns)
-            std_r = (sum((r - mean_r) ** 2 for r in returns) / len(returns)) ** 0.5
-            sharpe = (mean_r / std_r * (252 ** 0.5)) if std_r > 0 else 0.0
-
-            downside = [r for r in returns if r < 0]
-            down_std = (sum(r ** 2 for r in downside) / len(returns)) ** 0.5 if downside else 0.0
-            sortino = (mean_r / down_std * (252 ** 0.5)) if down_std > 0 else 0.0
-
-        buy_trades = [t for t in result.closed_trades if t["direction"] == "BUY"]
-        sell_trades = [t for t in result.closed_trades if t["direction"] == "SELL"]
-        buy_accuracy = (
-            sum(1 for t in buy_trades if t["realized_pnl"] > 0) / len(buy_trades) * 100
-            if buy_trades else 0.0
-        )
-        sell_accuracy = (
-            sum(1 for t in sell_trades if t["realized_pnl"] > 0) / len(sell_trades) * 100
-            if sell_trades else 0.0
-        )
-
-        return {
-            "total_trades": total_trades,
-            "win_rate": win_rate,
-            "profit_factor": profit_factor,
-            "cagr": cagr,
-            "max_drawdown": max_dd,
-            "sharpe": sharpe,
-            "sortino": sortino,
-            "expectancy": expectancy,
-            "avg_rr": avg_rr,
-            "buy_trades": len(buy_trades),
-            "sell_trades": len(sell_trades),
-            "buy_accuracy": buy_accuracy,
-            "sell_accuracy": sell_accuracy,
-            "regime_breakdown": self._compute_regime_breakdown(result, returns),
-            "walk_forward_windows": self._compute_walk_forward_windows(result, initial_capital),
-            # "False positives" here = losing trades (the engine said
-            # trade, it lost). True false-positive/negative classification
-            # against a ground truth needs labeled data this pipeline
-            # doesn't have yet.
-            "false_positives": losses,
-            "false_negatives": None,
-            "final_equity": result.equity_curve[-1] if result.equity_curve else initial_capital,
+        summary = {
+            "date": today,
+            "opened_today": opened_today,
+            "closed_today": closed_today,
+            "monitored": monitored,
+            "monitoring_errors": monitoring_errors,
+            "cycle_aborted": cycle_aborted,
+            "cycle_abort_reason": cycle_abort_reason,
+            "open_positions_at_start": len(open_symbols) + len(closed_today),
+            "opening_balance": snap_at_start.get("available_capital", 0.0),
+            "portfolio_snapshot": self.portfolio.snapshot(),
         }
+        logger.info(
+            "Paper trading cycle complete: %d opened, %d closed, %d monitored.",
+            len(opened_today), len(closed_today), len(monitored),
+        )
+        return summary
+
+    def _find_open_trade_id(self, symbol: str) -> str | None:
+        prefix = f"paper_{symbol.replace('.', '_')}_"
+        for tid in self.diary.list_open_trade_ids():
+            if tid.startswith(prefix):
+                return tid
+        return None
+
+    @staticmethod
+    def _new_trade_id(symbol: str) -> str:
+        # Unique per position lifetime (symbol + open timestamp) — if the
+        # same symbol trades again later after a prior position closed,
+        # this avoids overwriting the earlier CLOSED diary record.
+        return f"paper_{symbol.replace('.', '_')}_{int(time.time() * 1000)}"
+
+    # ==========================================================
+    # TELEGRAM REPORT FORMATTING (presentation only — every value
+    # used below was already computed elsewhere; nothing new here.
+    # Market Intelligence stays fully decoupled — see
+    # market_intelligence/market_intelligence_engine.py, which runs on
+    # its own separate schedule and sends its own summary.)
+    # ==========================================================
+
+    @staticmethod
+    def _fmt_ts(epoch: float | None) -> str:
+        if not epoch:
+            return "N/A"
+        from datetime import datetime, timezone
+        from core.trading_calendar import IST_OFFSET
+        dt = datetime.fromtimestamp(epoch, tz=timezone.utc) + IST_OFFSET
+        return dt.strftime("%Y-%m-%d %H:%M")
+
+    @staticmethod
+    def _extract_reason_line(reasons_list: list[str], prefix: str) -> str | None:
+        """Find an already-existing reason line by its prefix (e.g.
+        "BUY Strength", "SELL engine validation") — these are produced
+        by decision_engine.py's own reasons list, not recomputed here."""
+        for r in reasons_list:
+            if r.strip().lower().startswith(prefix.lower()):
+                return r.strip()
+        return None
+
+    def _format_buy_report(
+        self, candidate: Any, price: float, reasons_list: list[str], trade_id: str,
+    ) -> str:
+        d = candidate.diagnostics
+        action = candidate.action
+        other_side = "SELL" if action == "BUY" else "BUY"
+
+        strength_prefixes = ("buy strength", "sell strength", "decision quality",
+                             "buy engine validation", "sell engine validation")
+        filtered_reasons = [
+            r for r in reasons_list
+            if not r.strip().lower().startswith(strength_prefixes)
+        ]
+        top_reasons = "\n".join(f"• {r}" for r in filtered_reasons[:5]) or "• N/A"
+
+        buy_strength = self._extract_reason_line(reasons_list, "BUY Strength")
+        sell_strength = self._extract_reason_line(reasons_list, "SELL Strength")
+        decision_quality = self._extract_reason_line(reasons_list, "Decision Quality")
+        other_side_rejection = self._extract_reason_line(
+            reasons_list, f"{other_side} engine validation"
+        )
+
+        stop_loss = d.get("stop_loss", 0.0) or 0.0
+        target1 = d.get("target1", 0.0) or 0.0
+        target2 = d.get("target2", 0.0) or 0.0
+        expected_hold_days = d.get("expected_hold_days", 0) or 0
+
+        stop_pct = round(abs(price - stop_loss) / price * 100, 2) if stop_loss and price else 0.0
+        stop_dist = abs(price - stop_loss)
+
+        def target_block(label: str, target_price: float) -> list[str]:
+            if not target_price or not price:
+                return [f"{label}: N/A"]
+            pct = round((target_price - price) / price * 100, 2)
+            rr = round(abs(target_price - price) / stop_dist, 2) if stop_dist else 0.0
+            sign = "+" if pct >= 0 else ""
+            return [f"{label}: {sign}{pct:.1f}%  (Risk:Reward 1:{rr:.2f})"]
+
+        # Decision Margin — overall score vs the qualifying threshold that
+        # actually decided this trade (already computed by the strategy).
+        score_key, threshold_key = (
+            ("buy_overall_score", "buy_qualify_threshold") if action == "BUY"
+            else ("sell_overall_score", "sell_qualify_threshold")
+        )
+        score = d.get(score_key)
+        threshold = d.get(threshold_key)
+        margin_lines = []
+        if score is not None and threshold is not None:
+            margin = round(score - threshold, 2)
+            margin_lines = [
+                "",
+                "Decision Margin",
+                f"{action} Score: {score:.1f}",
+                f"Threshold: {threshold:.1f}",
+                f"Margin: {'+' if margin >= 0 else ''}{margin:.1f}",
+            ]
+
+        opened_ts = self._fmt_ts(time.time())
+
+        lines = [
+            "🟢 New Virtual Trade Opened",
+            f"Trade ID: {trade_id}",
+            f"Symbol: {candidate.symbol}",
+            f"Signal: {action}",
+            f"Entry Price: {price}",
+            f"Quantity: {candidate.position_size}",
+            f"Probability: {candidate.probability:.1f}%",
+            f"Confidence: {candidate.confidence:.1f}%",
+            "",
+            f"📅 Expected Holding: ~{expected_hold_days} days",
+            "🎯 " + target_block("Target 1 (Partial)", target1)[0],
+            "🎯 " + target_block("Target 2 (Final)", target2)[0],
+            f"🛑 Expected Stop Loss: -{stop_pct:.1f}%",
+        ]
+        lines += margin_lines
+        if buy_strength or sell_strength or decision_quality:
+            lines.append("")
+            if buy_strength:
+                lines.append(buy_strength)
+            if sell_strength:
+                lines.append(sell_strength)
+            if decision_quality:
+                lines.append(decision_quality)
+        lines.append("")
+        lines.append("Top Reasons")
+        lines.append(top_reasons)
+        if other_side_rejection:
+            lines.append("")
+            lines.append(f"Why {other_side} was rejected:")
+            lines.append(f"• {other_side_rejection}")
+        lines += [
+            "",
+            "Lifecycle",
+            f"Opened: {opened_ts}",
+            "Holding: 0 Days",
+            "Status: ACTIVE",
+        ]
+
+        return "\n".join(lines)
+
+    def _format_position_update(
+        self, symbol: str, pos: Any, holding_days: int, buy_conf: float, sell_conf: float,
+        exit_eval: Any, position_status: str, result_diagnostics: dict,
+        trade_id: str, created_at: float | None,
+    ) -> str:
+        current_price = pos.current_price
+        stop_loss = result_diagnostics.get("stop_loss", 0.0) or 0.0
+        target1 = result_diagnostics.get("target1", 0.0) or 0.0
+        target2 = result_diagnostics.get("target2", 0.0) or 0.0
+        if pos.direction == "SELL":
+            dist_to_target1 = (
+                round((current_price - target1) / current_price * 100, 2)
+                if target1 and current_price else None
+            )
+            dist_to_target2 = (
+                round((current_price - target2) / current_price * 100, 2)
+                if target2 and current_price else None
+            )
+            dist_to_stop = (
+                round((stop_loss - current_price) / current_price * 100, 2)
+                if stop_loss and current_price else None
+            )
+        else:
+            dist_to_target1 = (
+                round((target1 - current_price) / current_price * 100, 2)
+                if target1 and current_price else None
+            )
+            dist_to_target2 = (
+                round((target2 - current_price) / current_price * 100, 2)
+                if target2 and current_price else None
+            )
+            dist_to_stop = (
+                round((current_price - stop_loss) / current_price * 100, 2)
+                if stop_loss and current_price else None
+            )
+        current_pnl_rupees = pos.unrealized_pnl
+
+        lines = [
+            f"🔄 Position Update: {symbol} ({pos.direction})",
+            f"Trade ID: {trade_id}",
+            f"Holding Days: {holding_days}",
+            f"Current Price: {current_price}",
+            f"Entry Price: {pos.entry_price}",
+            f"Current PnL: {pos.unrealized_pnl_percent:.2f}% (₹{current_pnl_rupees:.2f})",
+            f"Highest PnL achieved: {pos.max_profit_percent:.2f}%",
+            f"Lowest PnL achieved: -{pos.max_drawdown_percent:.2f}%",
+        ]
+        if dist_to_target1 is not None:
+            lines.append(f"Remaining Distance to Target 1: {dist_to_target1:.2f}%")
+        if dist_to_target2 is not None:
+            lines.append(f"Remaining Distance to Target 2: {dist_to_target2:.2f}%")
+        if dist_to_stop is not None:
+            lines.append(f"Remaining Distance to Stop Loss: {dist_to_stop:.2f}%")
+        lines += [
+            f"BUY Confidence: {buy_conf:.1f}%",
+            f"SELL Confidence: {sell_conf:.1f}%",
+            f"Exit Score: {exit_eval.exit_score:.1f}/100",
+            f"Recommendation: {position_status}",
+            "",
+            "Lifecycle",
+            f"Opened: {self._fmt_ts(created_at)}",
+            f"Holding: {holding_days} Days",
+            "Status: ACTIVE",
+        ]
+        return "\n".join(lines)
+
+    @staticmethod
+    def _top_risk_factors(diagnostics: dict, top_n: int = 2) -> list[str]:
+        """RiskManager already computes individual risk-dimension
+        scores (volatility_risk, liquidity_risk, news_risk, market_risk,
+        portfolio_risk, sector_risk, atr_risk, gap_risk, overnight_risk)
+        — this surfaces the highest-scoring ones so "Risk engine flagged
+        this symbol as unsafe" can say WHICH risk, not just that one exists."""
+        labels = {
+            "volatility_risk": "Volatility", "liquidity_risk": "Liquidity",
+            "news_risk": "News", "market_risk": "Market", "portfolio_risk": "Portfolio",
+            "sector_risk": "Sector", "atr_risk": "ATR (volatility)", "gap_risk": "Overnight Gap",
+            "overnight_risk": "Overnight Hold",
+        }
+        scored = []
+        for key, label in labels.items():
+            val = diagnostics.get(key)
+            if val is not None:
+                try:
+                    scored.append((label, float(val)))
+                except (TypeError, ValueError):
+                    continue
+        scored.sort(key=lambda kv: kv[1], reverse=True)
+        return [f"{label}: {val:.0f}/100" for label, val in scored[:top_n] if val >= 40]
+
+    @staticmethod
+    def _render_closed_trade_block(c: dict, short_trigger: dict) -> list[str]:
+        """Full detail lines for one closed trade — Symbol/Direction/
+        Entry/Exit/Return%/PnL/Holding Days/Exit Score/Target1/Target2/
+        StopLoss/Reason. Shared by both the "closed this cycle" section
+        and the "last known exits" (0 open positions) recap."""
+        lines = []
+        tag = f"{c['symbol'].split('.')[0]}" + (" SELL" if c["direction"] == "SELL" else "")
+        lines.append(tag)
+        if c.get("entry_price") is not None:
+            lines.append(f"Entry: {c['entry_price']} -> Exit: {c.get('exit_price', 'N/A')}")
+        sign = "+" if c["pnl_pct"] >= 0 else ""
+        lines.append(f"Return: {sign}{c['pnl_pct']:.2f}%  |  P&L: ₹{c['pnl_rupees']:.2f}")
+        lines.append(f"Holding Days: {c.get('holding_days', 'N/A')}")
+        lines.append(f"Exit Reason: {short_trigger.get(c['trigger'], c['trigger'])}")
+        exit_reasons = c.get("exit_reasons") or []
+        if exit_reasons:
+            lines.append("Reason:")
+            for r in exit_reasons:
+                lines.append(f"  • {r}")
+                if "flagged this symbol as unsafe" in r.lower():
+                    for factor in c.get("risk_factor_detail") or []:
+                        lines.append(f"      - {factor}")
+        if c.get("exit_score") is not None:
+            threshold = c.get("exit_threshold")
+            if threshold is not None:
+                lines.append(f"Exit Score: {c['exit_score']:.1f} / 100")
+                lines.append(f"Threshold : {threshold:.0f}")
+            else:
+                lines.append(f"Exit Score: {c['exit_score']:.1f}/100")
+        t1 = c.get("target1_status")
+        t2 = c.get("target2_status")
+        sl = c.get("stop_loss_status")
+        if t1 and t1 != "N/A":
+            lines.append(f"Target 1: {t1}")
+        if t2 and t2 != "N/A":
+            lines.append(f"Target 2: {t2}")
+        if sl and sl != "N/A":
+            lines.append(f"Stop Loss: {sl}")
+        return lines
+
+    @staticmethod
+    def _classify_exit_trigger(exit_eval: Any) -> str:
+        """Classifies the ALREADY-COMPUTED exit reason into a short
+        label. Purely a text categorization of exit_eval's existing
+        output (hard_risk_reason / reasons) — does not change when or
+        why ExitEngine decides to exit, only how it's labeled here."""
+        reason_text = (exit_eval.hard_risk_reason or "").lower()
+        if "stop-loss" in reason_text:
+            return "Stop Loss Hit"
+        if "target" in reason_text and "reached" in reason_text:
+            return "Target Achieved"
+        if "risk engine" in reason_text or "unsafe" in reason_text:
+            return "Risk Management Exit"
+        if "maximum holding" in reason_text:
+            return "Time-Based Exit"
+        # Weighted-score exit (no hard-risk override) — look at which
+        # sub-score(s) were the biggest drivers, from exit_eval's own
+        # already-computed breakdown.
+        subscores = {
+            "Momentum Weakened": exit_eval.technical_exit,
+            "Fundamentals Weakened": exit_eval.fundamental_exit,
+            "Negative News": exit_eval.news_exit,
+            "Risk Management Exit": exit_eval.risk_exit,
+        }
+        top = max(subscores, key=subscores.get)
+        return "Trend Reversal" if top == "Momentum Weakened" and exit_eval.technical_exit >= 80 else top
+
+    def _format_trade_closed(
+        self, symbol: str, closed: Any, exit_price: float, pnl_pct: float,
+        holding_days: int, exit_eval: Any, trade_id: str,
+        created_at: float | None, closed_at: float | None,
+    ) -> str:
+        trigger = self._classify_exit_trigger(exit_eval)
+        explanation = exit_eval.hard_risk_reason or (
+            exit_eval.reasons[-1] if exit_eval.reasons else "N/A"
+        )
+        top_reasons = "\n".join(f"• {r}" for r in exit_eval.reasons[:5]) or "• N/A"
+        pnl_rupees = closed.realized_pnl
+        return (
+            f"🔴 Virtual Trade Closed: {symbol} ({closed.direction})\n"
+            f"Trade ID: {trade_id}\n"
+            f"Holding Days: {holding_days}\n"
+            f"Entry: {closed.entry_price}\n"
+            f"Exit: {exit_price}\n"
+            f"Total Return: {pnl_pct:.2f}%\n"
+            f"Total P&L: ₹{pnl_rupees:.2f}\n"
+            f"Exit Reason: {trigger}\n"
+            f"Why: {explanation}\n\n"
+            f"Top Reasons\n{top_reasons}\n\n"
+            f"Lifecycle\n"
+            f"Opened: {self._fmt_ts(created_at)}\n"
+            f"Closed: {self._fmt_ts(closed_at)}\n"
+            f"Holding: {holding_days} Days"
+        )
