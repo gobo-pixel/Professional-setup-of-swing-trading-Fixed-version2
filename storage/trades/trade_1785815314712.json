@@ -1,0 +1,16 @@
+{
+  "symbol": "BELRISE.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 62,
+  "entry_price": 236.73,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 73.53,
+  "reasons": "",
+  "id": "trade_1785815314712",
+  "timestamp": 1785815314.712463
+}

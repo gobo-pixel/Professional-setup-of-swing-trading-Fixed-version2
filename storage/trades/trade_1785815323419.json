@@ -1,0 +1,16 @@
+{
+  "symbol": "TITAN.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 2,
+  "entry_price": 4895.6,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 71.82,
+  "reasons": "",
+  "id": "trade_1785815323419",
+  "timestamp": 1785815323.419667
+}

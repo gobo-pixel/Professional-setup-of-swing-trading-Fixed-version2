@@ -1,0 +1,16 @@
+{
+  "symbol": "ABCAPITAL.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 35,
+  "entry_price": 404.3,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 73.62,
+  "reasons": "",
+  "id": "trade_1785815316586",
+  "timestamp": 1785815316.5863385
+}

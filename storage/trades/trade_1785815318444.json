@@ -1,0 +1,16 @@
+{
+  "symbol": "DABUR.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 35,
+  "entry_price": 421.45,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 72.28,
+  "reasons": "",
+  "id": "trade_1785815318444",
+  "timestamp": 1785815318.4448044
+}
