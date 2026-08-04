@@ -1,27 +1,27 @@
 {
   "total_trades": 52,
-  "win_rate": 53.84615384615385,
-  "profit_factor": 0.5684330486058609,
-  "cagr": -6.328190980833859,
-  "max_drawdown": 2.0133656966079383,
-  "sharpe": -2.151093290826734,
-  "sortino": -2.7934171817632927,
-  "expectancy": -155.86923678682749,
-  "avg_rr": 0.03456080697018901,
+  "win_rate": 50.0,
+  "profit_factor": 0.5225596915155295,
+  "cagr": -6.843900172165029,
+  "max_drawdown": 2.321154963601228,
+  "sharpe": -2.9925397144080077,
+  "sortino": -3.748750746946491,
+  "expectancy": -168.91602003032992,
+  "avg_rr": 0.14574437817019065,
   "buy_trades": 4,
   "sell_trades": 48,
   "buy_accuracy": 25.0,
-  "sell_accuracy": 56.25,
+  "sell_accuracy": 52.083333333333336,
   "regime_breakdown": {
     "BEAR": {
       "days": 36,
-      "win_rate": 41.67,
-      "avg_daily_return_pct": -0.0193
+      "win_rate": 38.89,
+      "avg_daily_return_pct": -0.029
     },
     "BULL": {
       "days": 24,
-      "win_rate": 41.67,
-      "avg_daily_return_pct": -0.0338
+      "win_rate": 37.5,
+      "avg_daily_return_pct": -0.0264
     },
     "UNKNOWN": {
       "days": 2,
@@ -33,43 +33,43 @@
     {
       "window": 1,
       "days": 15,
-      "return_pct": -0.09,
-      "win_rate": 35.71,
-      "sharpe": -0.47,
+      "return_pct": -0.18,
+      "win_rate": 50.0,
+      "sharpe": -1.31,
       "start_date": "2026-05-08 00:00:00",
       "end_date": "2026-05-28 00:00:00"
     },
     {
       "window": 2,
       "days": 15,
-      "return_pct": 0.03,
-      "win_rate": 42.86,
-      "sharpe": 0.25,
+      "return_pct": -1.11,
+      "win_rate": 21.43,
+      "sharpe": -10.06,
       "start_date": "2026-05-29 00:00:00",
       "end_date": "2026-06-18 00:00:00"
     },
     {
       "window": 3,
       "days": 15,
-      "return_pct": -0.53,
-      "win_rate": 42.86,
-      "sharpe": -4.03,
+      "return_pct": -1.09,
+      "win_rate": 21.43,
+      "sharpe": -8.79,
       "start_date": "2026-06-19 00:00:00",
       "end_date": "2026-07-09 00:00:00"
     },
     {
       "window": 4,
       "days": 18,
-      "return_pct": -0.89,
+      "return_pct": 0.46,
       "win_rate": 41.18,
-      "sharpe": -4.03,
+      "sharpe": 3.25,
       "start_date": "2026-07-10 00:00:00",
       "end_date": "2026-08-04 00:00:00"
     }
   ],
-  "false_positives": 24,
+  "false_positives": 26,
   "false_negatives": null,
-  "final_equity": 491894.799687085,
+  "final_equity": 491216.3669584228,
   "opened_buy_count": 4,
   "opened_sell_count": 48,
   "still_open_at_end": 0,

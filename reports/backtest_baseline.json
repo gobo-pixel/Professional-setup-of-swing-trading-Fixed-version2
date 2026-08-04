@@ -1,26 +1,87 @@
 {
-  "total_trades": 0,
-  "win_rate": 0.0,
-  "profit_factor": 0.0,
-  "cagr": 0.0,
-  "max_drawdown": 0.0,
-  "sharpe": 0.0,
-  "sortino": 0.0,
-  "expectancy": 0.0,
-  "avg_rr": 0.0,
-  "buy_trades": 0,
-  "sell_trades": 0,
-  "buy_accuracy": 0.0,
-  "sell_accuracy": 0.0,
+  "total_trades": 52,
+  "win_rate": 50.0,
+  "profit_factor": 0.5225596915155295,
+  "cagr": -6.843900172165029,
+  "max_drawdown": 2.321154963601228,
+  "sharpe": -2.9925397144080077,
+  "sortino": -3.748750746946491,
+  "expectancy": -168.91602003032992,
+  "avg_rr": 0.14574437817019065,
+  "buy_trades": 4,
+  "sell_trades": 48,
+  "buy_accuracy": 25.0,
+  "sell_accuracy": 52.083333333333336,
   "regime_breakdown": {
+    "BEAR": {
+      "days": 36,
+      "win_rate": 38.89,
+      "avg_daily_return_pct": -0.029
+    },
+    "BULL": {
+      "days": 24,
+      "win_rate": 37.5,
+      "avg_daily_return_pct": -0.0264
+    },
     "UNKNOWN": {
-      "days": 5,
+      "days": 2,
       "win_rate": 0.0,
       "avg_daily_return_pct": 0.0
     }
   },
-  "walk_forward_windows": [],
-  "false_positives": 0,
+  "walk_forward_windows": [
+    {
+      "window": 1,
+      "days": 15,
+      "return_pct": -0.18,
+      "win_rate": 50.0,
+      "sharpe": -1.31,
+      "start_date": "2026-05-08 00:00:00",
+      "end_date": "2026-05-28 00:00:00"
+    },
+    {
+      "window": 2,
+      "days": 15,
+      "return_pct": -1.11,
+      "win_rate": 21.43,
+      "sharpe": -10.06,
+      "start_date": "2026-05-29 00:00:00",
+      "end_date": "2026-06-18 00:00:00"
+    },
+    {
+      "window": 3,
+      "days": 15,
+      "return_pct": -1.09,
+      "win_rate": 21.43,
+      "sharpe": -8.79,
+      "start_date": "2026-06-19 00:00:00",
+      "end_date": "2026-07-09 00:00:00"
+    },
+    {
+      "window": 4,
+      "days": 18,
+      "return_pct": 0.46,
+      "win_rate": 41.18,
+      "sharpe": 3.25,
+      "start_date": "2026-07-10 00:00:00",
+      "end_date": "2026-08-04 00:00:00"
+    }
+  ],
+  "false_positives": 26,
   "false_negatives": null,
-  "final_equity": 500000.0
+  "final_equity": 491216.3669584228,
+  "opened_buy_count": 4,
+  "opened_sell_count": 48,
+  "still_open_at_end": 0,
+  "total_scan_attempts": 693,
+  "error_count": 0,
+  "error_breakdown": {},
+  "error_samples": {},
+  "no_trade_count": 512,
+  "blocked_by_portfolio_count": 8,
+  "no_trade_reasons": {
+    "Decision engine rejected trade.": 512,
+    "signal generated but portfolio blocked: Current volume unavailable.": 5,
+    "signal generated but portfolio blocked: Average trading volume is too low.": 3
+  }
 }
