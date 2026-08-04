@@ -66,7 +66,7 @@ class WiredOrchestrator:
         self.scanner = MarketScanner()  # Fixed reference to standard interface
         self.broker = BrokerEngine()
         self.portfolio = PortfolioEngine(
-            state=PortfolioState(total_capital=100000.0, available_capital=100000.0)
+            state=PortfolioState(total_capital=500000.0, available_capital=500000.0)
         )
         self.tracker = PositionTracker()
         self.trade_store = TradeStore()
