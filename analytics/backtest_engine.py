@@ -90,6 +90,15 @@ class BacktestResult:
                 lines.append(f"  {err_type}: {count}x — e.g. \"{sample}\"")
             if error_rate > 50:
                 lines.append("  NOTE: majority of attempts failed with errors — this likely explains a low/zero trade count above, not weak signal quality.")
+
+        no_trade_count = m.get("no_trade_count", 0)
+        blocked_count = m.get("blocked_by_portfolio_count", 0)
+        if total_attempts and m.get("total_trades", 0) == 0:
+            no_trade_rate = round(no_trade_count / total_attempts * 100, 1)
+            lines.append("")
+            lines.append(f"NO_TRADE breakdown: {no_trade_count} / {total_attempts} attempts ({no_trade_rate}%) rejected before signal, {blocked_count} signal(s) blocked by portfolio rules")
+            for reason, count in m.get("no_trade_reasons", {}).items():
+                lines.append(f"  {reason}: {count}x")
         return "\n".join(lines)
 
 
@@ -149,6 +158,9 @@ class BacktestEngine:
         buy_wins = buy_total = sell_wins = sell_total = 0
         error_type_counts: Counter = Counter()
         error_sample_messages: dict[str, str] = {}
+        no_trade_reasons: Counter = Counter()
+        no_trade_count = [0]
+        blocked_by_portfolio = [0]
         total_scan_attempts = 0
 
         for step in range(min_history, total_steps):
@@ -189,13 +201,31 @@ class BacktestEngine:
                 bundles=bundles,
             )
 
-            for r in scan_results:
+            # scan_symbols() returns ONLY the already-filtered
+            # executable_results (BUY/SELL + portfolio_allowed) — by
+            # construction it can NEVER contain ERROR or NO_TRADE
+            # entries, so diagnosing "why zero trades" from THAT list
+            # is structurally blind (confirmed: an earlier version of
+            # this diagnostic always showed "0 errors" regardless of
+            # what was actually happening). The FULL per-symbol list,
+            # including NO_TRADE/ERROR and their rejection reasons, is
+            # stashed separately for exactly this purpose.
+            full_scan_results = getattr(self.scanner, "_last_full_scan_results", scan_results)
+            for r in full_scan_results:
                 total_scan_attempts += 1
                 if r.action == "ERROR":
                     err_type = r.diagnostics.get("error_type", "UnknownError")
                     error_type_counts[err_type] += 1
                     if err_type not in error_sample_messages:
                         error_sample_messages[err_type] = str(r.diagnostics.get("error", ""))[:200]
+                elif r.action == "NO_TRADE":
+                    no_trade_count[0] += 1
+                    reason = r.diagnostics.get("validation_rejection_reason") or r.diagnostics.get("portfolio_rule_reason") or "score below threshold"
+                    no_trade_reasons[str(reason)[:100]] += 1
+                elif r.action in ("BUY", "SELL") and not r.portfolio_allowed:
+                    blocked_by_portfolio[0] += 1
+                    reason = r.diagnostics.get("portfolio_rule_reason") or "unknown"
+                    no_trade_reasons[f"signal generated but portfolio blocked: {str(reason)[:80]}"] += 1
 
             candidates = sorted(
                 (r for r in scan_results if r.action in ("BUY", "SELL") and r.portfolio_allowed),
@@ -352,6 +382,9 @@ class BacktestEngine:
         result.metrics["error_count"] = sum(error_type_counts.values())
         result.metrics["error_breakdown"] = dict(error_type_counts.most_common(5))
         result.metrics["error_samples"] = error_sample_messages
+        result.metrics["no_trade_count"] = no_trade_count[0]
+        result.metrics["blocked_by_portfolio_count"] = blocked_by_portfolio[0]
+        result.metrics["no_trade_reasons"] = dict(no_trade_reasons.most_common(5))
         return result
 
     def _record_closed_trade(self, result, closed, candidate, wins, losses):
