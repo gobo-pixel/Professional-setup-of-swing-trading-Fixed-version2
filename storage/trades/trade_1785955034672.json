@@ -1,0 +1,16 @@
+{
+  "symbol": "MARICO.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 40,
+  "entry_price": 875.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.14,
+  "reasons": "",
+  "id": "trade_1785955034672",
+  "timestamp": 1785955034.6729155
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "HDFCLIFE.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 72,
+  "entry_price": 535.95,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 78.02,
+  "reasons": "",
+  "id": "trade_1785955034122",
+  "timestamp": 1785955034.1226604
+}

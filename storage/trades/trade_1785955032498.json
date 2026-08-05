@@ -1,0 +1,16 @@
+{
+  "symbol": "SAREGAMA.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 42,
+  "entry_price": 542.55,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.66,
+  "reasons": "",
+  "id": "trade_1785955032498",
+  "timestamp": 1785955032.4985878
+}

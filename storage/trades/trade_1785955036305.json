@@ -1,0 +1,16 @@
+{
+  "symbol": "360ONE.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 27,
+  "entry_price": 1192.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 75.72,
+  "reasons": "",
+  "id": "trade_1785955036305",
+  "timestamp": 1785955036.305723
+}

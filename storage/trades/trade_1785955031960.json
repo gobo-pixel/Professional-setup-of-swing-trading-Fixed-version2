@@ -1,0 +1,16 @@
+{
+  "symbol": "ASTERDM.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 36,
+  "entry_price": 842.1,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 79.98,
+  "reasons": "",
+  "id": "trade_1785955031960",
+  "timestamp": 1785955031.9609697
+}

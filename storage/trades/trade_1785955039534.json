@@ -1,0 +1,16 @@
+{
+  "symbol": "GAIL.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 216,
+  "entry_price": 175.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 72.61,
+  "reasons": "",
+  "id": "trade_1785955039534",
+  "timestamp": 1785955039.5342371
+}

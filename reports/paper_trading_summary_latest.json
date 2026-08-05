@@ -1,0 +1,109 @@
+{
+  "date": "2026-08-05",
+  "opening_balance": 500000.0,
+  "total_capital_in_positions": 496121.1,
+  "remaining_balance": 3878.9000000000524,
+  "portfolio_value": 500000.0,
+  "realized_pnl": 0.0,
+  "portfolio_return_percent": 0.0,
+  "opened_today": [
+    {
+      "symbol": "AUROPHARMA.NS",
+      "action": "BUY",
+      "price": 1613.4,
+      "quantity": 19
+    },
+    {
+      "symbol": "ASTERDM.NS",
+      "action": "BUY",
+      "price": 842.1,
+      "quantity": 36
+    },
+    {
+      "symbol": "SAREGAMA.NS",
+      "action": "BUY",
+      "price": 542.55,
+      "quantity": 42
+    },
+    {
+      "symbol": "EMAMILTD.NS",
+      "action": "SELL",
+      "price": 391.8,
+      "quantity": 56
+    },
+    {
+      "symbol": "MOTHERSON.NS",
+      "action": "BUY",
+      "price": 151.0,
+      "quantity": 305
+    },
+    {
+      "symbol": "HDFCLIFE.NS",
+      "action": "SELL",
+      "price": 535.95,
+      "quantity": 72
+    },
+    {
+      "symbol": "MARICO.NS",
+      "action": "BUY",
+      "price": 875.0,
+      "quantity": 40
+    },
+    {
+      "symbol": "BDL.NS",
+      "action": "SELL",
+      "price": 1240.0,
+      "quantity": 23
+    },
+    {
+      "symbol": "PIDILITIND.NS",
+      "action": "BUY",
+      "price": 1620.0,
+      "quantity": 21
+    },
+    {
+      "symbol": "360ONE.NS",
+      "action": "BUY",
+      "price": 1192.0,
+      "quantity": 27
+    },
+    {
+      "symbol": "NAM-INDIA.NS",
+      "action": "BUY",
+      "price": 1202.0,
+      "quantity": 17
+    },
+    {
+      "symbol": "NESTLEIND.NS",
+      "action": "BUY",
+      "price": 1520.0,
+      "quantity": 23
+    },
+    {
+      "symbol": "MANAPPURAM.NS",
+      "action": "BUY",
+      "price": 356.6,
+      "quantity": 91
+    },
+    {
+      "symbol": "NETWEB.NS",
+      "action": "BUY",
+      "price": 4762.2,
+      "quantity": 5
+    },
+    {
+      "symbol": "PAYTM.NS",
+      "action": "BUY",
+      "price": 1400.0,
+      "quantity": 19
+    },
+    {
+      "symbol": "GAIL.NS",
+      "action": "BUY",
+      "price": 175.0,
+      "quantity": 216
+    }
+  ],
+  "closed_today": [],
+  "open_positions_now": 16
+}
