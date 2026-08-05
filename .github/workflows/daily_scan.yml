@@ -2,7 +2,7 @@ name: Daily Scan
 
 on:
   schedule:
-    - cron: "0 18 * * *"
+    - cron: "0 17 * * *"  # 10:30 PM IST (17:00 UTC)
   workflow_dispatch:
     inputs:
       force:
