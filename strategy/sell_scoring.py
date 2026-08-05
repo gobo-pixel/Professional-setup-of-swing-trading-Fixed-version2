@@ -164,7 +164,15 @@ class SellScoringEngine:
 
         score = 0.0
 
-        max_points = 20
+        max_points = 22  # CONFIRMED BUG FIX: this method awards up to 22
+        # raw points (14 checks totaling 22, including the Ichimoku
+        # cloud_trend check below) but was dividing by 20 — proven via
+        # direct test to let the final score reach 110.0 (all-bearish
+        # inputs), uncapped, since result.technical = self._technical_score(...)
+        # is assigned directly without going through _normalize(). The
+        # BUY-side equivalent has no Ichimoku check in its technical
+        # score (14 checks totaling 20 points) so its max_points=20 is
+        # correctly calibrated and does not need this fix.
         # --------------------------------------------------
         # EMA Trend
         # --------------------------------------------------
@@ -543,4 +551,4 @@ class SellScoringEngine:
 
 # ==========================================================
 # END OF FILE
-# ==========================================================
+# ==================================================
