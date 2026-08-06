@@ -847,6 +847,15 @@ class PaperTradingEngine:
 
         # Decision Margin — overall score vs the qualifying threshold that
         # actually decided this trade (already computed by the strategy).
+        # Labeled "(Screening)" because this is buy_decision.overall_score
+        # / sell_decision.overall_score (Tier2*0.45 + Tier3*0.55 from
+        # buy_strategy.py/sell_strategy.py) — a DIFFERENT number from the
+        # full 8-component weighted-blend score (buy_score.overall /
+        # sell_score.overall from buy_scoring.py/sell_scoring.py) that
+        # feeds into BUY/SELL Strength further below. Both are legitimate
+        # but answer different questions; showing them both as unqualified
+        # "{action} Score" was confirmed confusing (numbers don't match
+        # because they're genuinely different calculations).
         score_key, threshold_key = (
             ("buy_overall_score", "buy_qualify_threshold") if action == "BUY"
             else ("sell_overall_score", "sell_qualify_threshold")
@@ -859,7 +868,7 @@ class PaperTradingEngine:
             margin_lines = [
                 "",
                 "Decision Margin",
-                f"{action} Score: {score:.1f}",
+                f"{action} Score (Screening): {score:.1f}",
                 f"Threshold: {threshold:.1f}",
                 f"Margin: {'+' if margin >= 0 else ''}{margin:.1f}",
             ]
@@ -884,6 +893,7 @@ class PaperTradingEngine:
         lines += margin_lines
         if buy_strength or sell_strength or decision_quality:
             lines.append("")
+            lines.append("Conflict Resolution (full-blend score + probability, 50/50 — different basis than Decision Margin above)")
             if buy_strength:
                 lines.append(buy_strength)
             if sell_strength:
@@ -974,20 +984,61 @@ class PaperTradingEngine:
         return "\n".join(lines)
 
     @staticmethod
-    def _top_risk_factors(diagnostics: dict, top_n: int = 2) -> list[str]:
-        """RiskManager already computes individual risk-dimension
-        scores (volatility_risk, liquidity_risk, news_risk, market_risk,
-        portfolio_risk, sector_risk, atr_risk, gap_risk, overnight_risk)
-        — this surfaces the highest-scoring ones so "Risk engine flagged
-        this symbol as unsafe" can say WHICH risk, not just that one exists."""
+    def _top_risk_factors(diagnostics: dict) -> list[str]:
+        """Shows WHICH risk dimension actually drove total_risk, sorted
+        by genuine CONTRIBUTION (value x weight from RiskManager's own
+        weights) rather than raw value — a high raw score on a
+        low-weight dimension (e.g. Sector, weight 0.05) can contribute
+        LESS than a moderate score on a high-weight one (e.g. Market/
+        Portfolio, weight 0.12 each). Confirmed via risk_manager.py:
+        total_risk = sum(value * weight), NOT max(value). Also flags
+        the 6 instant-unsafe overrides (circuit breaker, emergency
+        stop, daily loss lock, VIX spike, event day, news shock) which
+        bypass the weighted-sum entirely and force unsafe=True on
+        their own — these were previously invisible in this notification."""
+        OVERRIDE_FLAGS = {
+            "circuit_override": "🔴 Circuit breaker active (INSTANT unsafe, bypasses all other scoring)",
+            "emergency_stop": "🔴 Portfolio emergency stop enabled (INSTANT unsafe)",
+            "daily_loss_lock": "🔴 Daily loss limit reached (INSTANT unsafe)",
+            "vix_override": "🟠 Extreme VIX spike (+10 to total_risk)",
+            "event_override": "🟠 High-impact market event today (+15 to total_risk)",
+            "news_override": "🟠 Extreme news shock (+15 to total_risk)",
+        }
+        lines = [msg for key, msg in OVERRIDE_FLAGS.items() if diagnostics.get(key)]
+
+        components = diagnostics.get("risk_components")
+        weights = diagnostics.get("risk_weights")
         labels = {
+            "atr": "ATR (volatility)", "gap": "Overnight Gap", "overnight": "Overnight Hold",
+            "news": "News", "liquidity": "Liquidity", "volatility": "Volatility",
+            "market": "Market", "portfolio": "Portfolio", "sector": "Sector",
+            "correlation": "Correlation", "capital": "Capital",
+        }
+        if components and weights:
+            scored = []
+            for key, label in labels.items():
+                val = components.get(key)
+                w = weights.get(key)
+                if val is not None and w is not None:
+                    scored.append((label, float(val), float(w), float(val) * float(w)))
+            scored.sort(key=lambda t: t[3], reverse=True)
+            total = sum(t[3] for t in scored) or 1.0
+            for label, val, w, contribution in scored:
+                pct_of_total = round(contribution / total * 100, 0)
+                lines.append(f"{label}: {val:.0f}/100 (weight {w:.0%}) -> contributes {contribution:.1f} = {pct_of_total:.0f}% of total_risk")
+            return lines
+
+        # Fallback: nested dicts not present in this diagnostics dict —
+        # show raw values only, clearly labeled as such so it isn't
+        # mistaken for contribution-ranking.
+        fallback_labels = {
             "volatility_risk": "Volatility", "liquidity_risk": "Liquidity",
             "news_risk": "News", "market_risk": "Market", "portfolio_risk": "Portfolio",
             "sector_risk": "Sector", "atr_risk": "ATR (volatility)", "gap_risk": "Overnight Gap",
             "overnight_risk": "Overnight Hold",
         }
         scored = []
-        for key, label in labels.items():
+        for key, label in fallback_labels.items():
             val = diagnostics.get(key)
             if val is not None:
                 try:
@@ -995,7 +1046,10 @@ class PaperTradingEngine:
                 except (TypeError, ValueError):
                     continue
         scored.sort(key=lambda kv: kv[1], reverse=True)
-        return [f"{label}: {val:.0f}/100" for label, val in scored[:top_n] if val >= 40]
+        if scored:
+            lines.append("(weights unavailable — raw values only, NOT contribution-ranked)")
+            lines += [f"{label}: {val:.0f}/100" for label, val in scored]
+        return lines
 
     @staticmethod
     def _render_closed_trade_block(c: dict, short_trigger: dict) -> list[str]:
