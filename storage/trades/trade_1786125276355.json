@@ -1,0 +1,18 @@
+{
+  "symbol": "MANAPPURAM.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 91,
+  "entry_price": 356.6,
+  "exit_price": 366.75,
+  "status": "CLOSED",
+  "realized_pnl": 923.6499999999979,
+  "realized_pnl_percent": 2.8463264161525457,
+  "max_profit_percent": 2.8463264161525457,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 58.01,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; Fundamentals have deteriorated for this BUY position (60/100).",
+  "id": "trade_1786125276355",
+  "timestamp": 1786125276.3559692
+}

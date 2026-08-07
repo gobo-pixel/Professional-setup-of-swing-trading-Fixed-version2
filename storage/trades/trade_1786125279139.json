@@ -1,0 +1,18 @@
+{
+  "symbol": "GAIL.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 216,
+  "entry_price": 175.0,
+  "exit_price": 173.63,
+  "status": "CLOSED",
+  "realized_pnl": -295.920000000001,
+  "realized_pnl_percent": -0.7828571428571454,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 0.7828571428571454,
+  "regime": "BULL",
+  "confidence": 51.88,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1786125279139",
+  "timestamp": 1786125279.1399603
+}

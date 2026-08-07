@@ -1,0 +1,16 @@
+{
+  "symbol": "PNBHOUSING.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 12,
+  "entry_price": 1143.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 78.07,
+  "reasons": "",
+  "id": "trade_1786125996446",
+  "timestamp": 1786125996.4464808
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "BHARATFORG.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 7,
+  "entry_price": 2265.2,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 74.82,
+  "reasons": "",
+  "id": "trade_1786125995918",
+  "timestamp": 1786125995.9188404
+}

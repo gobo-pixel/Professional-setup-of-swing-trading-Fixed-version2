@@ -1,0 +1,16 @@
+{
+  "symbol": "LLOYDSME.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 5,
+  "entry_price": 2101.2,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 77.9,
+  "reasons": "",
+  "id": "trade_1786125998152",
+  "timestamp": 1786125998.1522906
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "INDIANB.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 21,
+  "entry_price": 889.5,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 80.93,
+  "reasons": "",
+  "id": "trade_1786125993157",
+  "timestamp": 1786125993.1575086
+}

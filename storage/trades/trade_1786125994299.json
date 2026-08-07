@@ -1,0 +1,16 @@
+{
+  "symbol": "UNIONBANK.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 122,
+  "entry_price": 183.6,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.44,
+  "reasons": "",
+  "id": "trade_1786125994299",
+  "timestamp": 1786125994.2990365
+}

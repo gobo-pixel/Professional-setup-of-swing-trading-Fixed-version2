@@ -1,0 +1,18 @@
+{
+  "symbol": "MOTHERSON.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 305,
+  "entry_price": 151.0,
+  "exit_price": 155.17,
+  "status": "CLOSED",
+  "realized_pnl": 1271.8499999999963,
+  "realized_pnl_percent": 2.7615894039735016,
+  "max_profit_percent": 11.589403973509933,
+  "max_drawdown_percent": 0.0,
+  "regime": "BULL",
+  "confidence": 78.08,
+  "reasons": "HARD RISK EXIT: Stop-loss breached (intraday low=155.17, stop=157.66).",
+  "id": "trade_1786125262368",
+  "timestamp": 1786125262.3686976
+}

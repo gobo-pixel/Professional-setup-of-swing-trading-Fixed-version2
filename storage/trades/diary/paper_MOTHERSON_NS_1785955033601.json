@@ -73,15 +73,33 @@
     "Expected Hold : 15 days",
     "Trade Grade : B+"
   ],
-  "daily_log": [],
-  "status": "OPEN",
-  "exit_date": null,
-  "exit_price": null,
-  "exit_reason": null,
-  "holding_days": 0,
-  "max_profit_percent": 0.0,
+  "daily_log": [
+    {
+      "date": "2026-08-07",
+      "current_price": 168.5,
+      "current_pnl": 5337.5,
+      "current_buy_confidence": 69.68,
+      "current_sell_confidence": 31.68,
+      "current_exit_score": 14.5,
+      "recommendation": "EXIT",
+      "notes": [
+        "HARD RISK EXIT: Stop-loss breached (intraday low=155.17, stop=157.66)."
+      ]
+    }
+  ],
+  "status": "CLOSED",
+  "exit_date": "2026-08-07",
+  "exit_price": 168.5,
+  "exit_reason": "Stop-loss breached (intraday low=155.17, stop=157.66).",
+  "holding_days": 1,
+  "max_profit_percent": 11.589403973509933,
   "max_drawdown_percent": 0.0,
-  "final_pnl": null,
+  "final_pnl": 1271.8499999999963,
   "created_at": 1785955033.6012723,
-  "updated_at": 1785955033.6012723
+  "updated_at": 1786125262.3690665,
+  "final_pnl_percent": 2.7615894039735016,
+  "exit_score": 14.5,
+  "target1_status": "NOT REACHED",
+  "target2_status": "NOT REACHED",
+  "stop_loss_status": "HIT"
 }

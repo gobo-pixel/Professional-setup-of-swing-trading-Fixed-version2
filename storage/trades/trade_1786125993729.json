@@ -1,0 +1,16 @@
+{
+  "symbol": "GRASIM.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 4,
+  "entry_price": 3323.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 79.64,
+  "reasons": "",
+  "id": "trade_1786125993729",
+  "timestamp": 1786125993.7295427
+}

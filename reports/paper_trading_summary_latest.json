@@ -1,109 +1,136 @@
 {
-  "date": "2026-08-05",
-  "opening_balance": 500000.0,
-  "total_capital_in_positions": 496121.1,
-  "remaining_balance": 3878.9000000000524,
-  "portfolio_value": 500000.0,
-  "realized_pnl": 0.0,
-  "portfolio_return_percent": 0.0,
+  "date": "2026-08-07",
+  "opening_balance": 3878.9000000000524,
+  "total_capital_in_positions": 497980.22000000003,
+  "remaining_balance": 4035.359999999944,
+  "portfolio_value": 502015.57999999996,
+  "realized_pnl": 1432.379999999995,
+  "portfolio_return_percent": 0.40311599999999165,
   "opened_today": [
     {
-      "symbol": "AUROPHARMA.NS",
+      "symbol": "BELRISE.NS",
       "action": "BUY",
-      "price": 1613.4,
-      "quantity": 19
+      "price": 248.21,
+      "quantity": 82
     },
     {
-      "symbol": "ASTERDM.NS",
+      "symbol": "SBIN.NS",
       "action": "BUY",
-      "price": 842.1,
-      "quantity": 36
+      "price": 1097.2,
+      "quantity": 26
     },
     {
-      "symbol": "SAREGAMA.NS",
+      "symbol": "INDIANB.NS",
       "action": "BUY",
-      "price": 542.55,
-      "quantity": 42
+      "price": 889.5,
+      "quantity": 21
     },
     {
-      "symbol": "EMAMILTD.NS",
+      "symbol": "GRASIM.NS",
+      "action": "BUY",
+      "price": 3323.0,
+      "quantity": 4
+    },
+    {
+      "symbol": "UNIONBANK.NS",
+      "action": "BUY",
+      "price": 183.6,
+      "quantity": 122
+    },
+    {
+      "symbol": "ASIANPAINT.NS",
+      "action": "BUY",
+      "price": 2735.0,
+      "quantity": 6
+    },
+    {
+      "symbol": "TECHM.NS",
+      "action": "BUY",
+      "price": 1635.0,
+      "quantity": 12
+    },
+    {
+      "symbol": "BHARATFORG.NS",
+      "action": "BUY",
+      "price": 2265.2,
+      "quantity": 7
+    },
+    {
+      "symbol": "PNBHOUSING.NS",
+      "action": "BUY",
+      "price": 1143.0,
+      "quantity": 12
+    },
+    {
+      "symbol": "ABCAPITAL.NS",
+      "action": "BUY",
+      "price": 408.05,
+      "quantity": 48
+    },
+    {
+      "symbol": "BLUESTARCO.NS",
       "action": "SELL",
-      "price": 391.8,
-      "quantity": 56
+      "price": 1514.0,
+      "quantity": 6
+    },
+    {
+      "symbol": "LLOYDSME.NS",
+      "action": "BUY",
+      "price": 2101.2,
+      "quantity": 5
     },
     {
       "symbol": "MOTHERSON.NS",
       "action": "BUY",
-      "price": 151.0,
-      "quantity": 305
+      "price": 168.5,
+      "quantity": 96
     },
     {
-      "symbol": "HDFCLIFE.NS",
-      "action": "SELL",
-      "price": 535.95,
-      "quantity": 72
-    },
-    {
-      "symbol": "MARICO.NS",
+      "symbol": "TATATECH.NS",
       "action": "BUY",
-      "price": 875.0,
-      "quantity": 40
-    },
-    {
-      "symbol": "BDL.NS",
-      "action": "SELL",
-      "price": 1240.0,
-      "quantity": 23
-    },
-    {
-      "symbol": "PIDILITIND.NS",
-      "action": "BUY",
-      "price": 1620.0,
-      "quantity": 21
-    },
-    {
-      "symbol": "360ONE.NS",
-      "action": "BUY",
-      "price": 1192.0,
-      "quantity": 27
-    },
-    {
-      "symbol": "NAM-INDIA.NS",
-      "action": "BUY",
-      "price": 1202.0,
+      "price": 872.8,
       "quantity": 17
     },
     {
-      "symbol": "NESTLEIND.NS",
+      "symbol": "AIIL.NS",
       "action": "BUY",
-      "price": 1520.0,
-      "quantity": 23
+      "price": 596.6,
+      "quantity": 18
+    }
+  ],
+  "closed_today": [
+    {
+      "symbol": "EMAMILTD.NS",
+      "pnl": -1162.0
     },
     {
-      "symbol": "MANAPPURAM.NS",
-      "action": "BUY",
-      "price": 356.6,
-      "quantity": 91
+      "symbol": "MOTHERSON.NS",
+      "pnl": 1271.8499999999963
     },
     {
-      "symbol": "NETWEB.NS",
-      "action": "BUY",
-      "price": 4762.2,
-      "quantity": 5
+      "symbol": "MARICO.NS",
+      "pnl": -520.0
     },
     {
       "symbol": "PAYTM.NS",
-      "action": "BUY",
-      "price": 1400.0,
-      "quantity": 19
+      "pnl": 790.3999999999983
+    },
+    {
+      "symbol": "BDL.NS",
+      "pnl": -1242.0
+    },
+    {
+      "symbol": "MANAPPURAM.NS",
+      "pnl": 923.6499999999979
     },
     {
       "symbol": "GAIL.NS",
-      "action": "BUY",
-      "price": 175.0,
-      "quantity": 216
+      "pnl": -295.920000000001
+    },
+    {
+      "symbol": "SAREGAMA.NS",
+      "pnl": -980.6999999999962
     }
   ],
-  "closed_today": [],
-  "open_positions_now": 16
+  "open_positions_now": 23
 }

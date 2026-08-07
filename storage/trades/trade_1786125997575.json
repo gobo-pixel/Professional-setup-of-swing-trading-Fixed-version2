@@ -1,0 +1,16 @@
+{
+  "symbol": "BLUESTARCO.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 6,
+  "entry_price": 1514.0,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 77.16,
+  "reasons": "",
+  "id": "trade_1786125997575",
+  "timestamp": 1786125997.5751114
+}
