@@ -575,58 +575,93 @@ class PaperTradingEngine:
         self.portfolio.engine.mark_to_market()
 
         if holding_status_rows:
-            status_lines = ["📋 Holding Status", ""]
+            # Build each position's block SEPARATELY (not one giant
+            # joined string) so they can be grouped into Telegram-safe
+            # chunks below — CONFIRMED root cause of this notification
+            # silently not arriving: Telegram has a hard 4096-character
+            # limit per message, and output/telegram_alert.py does not
+            # check the API response, so an oversized single message
+            # (e.g. ~9980 chars for 22 positions) gets silently
+            # rejected while the code logs "sent" regardless.
+            position_blocks = []
             for r in holding_status_rows:
-                status_lines.append(f"{r['symbol']} ({r['direction']}) — {r['status']}")
-                status_lines.append(f"Trade ID: {r['trade_id']}")
-                status_lines.append(f"Holding Days: {r['holding_days']} | Entry Date: {r['entry_date']}")
-                status_lines.append(f"Entry: {r['entry_price']} | Current: {r['current_price']}")
-                status_lines.append(f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})")
-                status_lines.append(f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%")
+                block = [
+                    f"{r['symbol']} ({r['direction']}) — {r['status']}",
+                    f"Trade ID: {r['trade_id']}",
+                    f"Holding Days: {r['holding_days']} | Entry Date: {r['entry_date']}",
+                    f"Entry: {r['entry_price']} | Current: {r['current_price']}",
+                    f"PnL: {r['pnl_pct']:.2f}% (₹{r['pnl_rupees']:.2f})",
+                    f"Highest: {r['highest_pnl']:.2f}% | Lowest: {r['lowest_pnl']:.2f}%",
+                ]
                 t1_label = f" ({r['target1_pct']}%)" if r.get("target1_pct") is not None else ""
                 t2_label = f" ({r['target2_pct']}%)" if r.get("target2_pct") is not None else ""
                 if r["dist_target1"] is not None:
                     if r["dist_target1"] > 0:
-                        status_lines.append(f"Target 1{t1_label} progress:- {-r['dist_target1']:.2f}% remaining")
+                        block.append(f"Target 1{t1_label} progress:- {-r['dist_target1']:.2f}% remaining")
                     else:
-                        status_lines.append(f"Target 1{t1_label}: REACHED ({abs(r['dist_target1']):.2f}% Beyond)")
+                        block.append(f"Target 1{t1_label}: REACHED ({abs(r['dist_target1']):.2f}% Beyond)")
                 if r["dist_target2"] is not None:
                     if r["dist_target2"] > 0:
-                        status_lines.append(f"Target 2{t2_label} progress:- {-r['dist_target2']:.2f}% remaining")
+                        block.append(f"Target 2{t2_label} progress:- {-r['dist_target2']:.2f}% remaining")
                     else:
-                        status_lines.append(f"Target 2{t2_label}: REACHED ({abs(r['dist_target2']):.2f}% Beyond)")
+                        block.append(f"Target 2{t2_label}: REACHED ({abs(r['dist_target2']):.2f}% Beyond)")
                 if r["dist_stop"] is not None:
-                    status_lines.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
-                status_lines.append(f"Probability: {r['probability']:.1f}%")
-                status_lines.append(f"BUY Confidence: {r['buy_confidence']:.1f}% | SELL Confidence: {r['sell_confidence']:.1f}%")
-                status_lines.append("")
+                    block.append(f"Stop Loss Distance: {r['dist_stop']:.2f}%")
+                block.append(f"Probability: {r['probability']:.1f}%")
+                block.append(f"BUY Confidence: {r['buy_confidence']:.1f}% | SELL Confidence: {r['sell_confidence']:.1f}%")
+                position_blocks.append("\n".join(block))
 
-            # Portfolio-level aggregate — added specifically so the
-            # overall picture (is the portfolio net up or down right
-            # now, across ALL open positions) is visible in the same
-            # notification, without needing to manually total each
-            # position's P&L. Uses the SAME pnl_rupees/pnl_pct fields
-            # already computed per-position above (no new calculation
-            # logic, just a sum).
+            # Portfolio-level aggregate — same computation as before,
+            # appended to the LAST part only.
             total_unrealized_rupees = sum(r["pnl_rupees"] for r in holding_status_rows)
             winning = sum(1 for r in holding_status_rows if r["pnl_rupees"] > 0)
             losing = sum(1 for r in holding_status_rows if r["pnl_rupees"] <= 0)
-
-            status_lines.append("━━━━━━━━━━━━━━━━━━")
-            status_lines.append("📊 Portfolio Summary (all open positions)")
-            status_lines.append(f"Positions Held: {len(holding_status_rows)} ({winning} winning, {losing} losing)")
             sign = "+" if total_unrealized_rupees >= 0 else ""
-            status_lines.append(f"Total Unrealized P&L: {sign}₹{total_unrealized_rupees:.2f}")
-            status_lines.append(
+            summary_block = "\n".join([
+                "━━━━━━━━━━━━━━━━━━",
+                "📊 Portfolio Summary (all open positions)",
+                f"Positions Held: {len(holding_status_rows)} ({winning} winning, {losing} losing)",
+                f"Total Unrealized P&L: {sign}₹{total_unrealized_rupees:.2f}",
                 "(This is separate from Realized PnL in the Daily Portfolio Summary — "
-                "this reflects only currently-open positions, mark-to-market at today's prices.)"
-            )
+                "this reflects only currently-open positions, mark-to-market at today's prices.)",
+            ])
 
-            notify(
-                event_type="holding_status",
-                message="\n".join(status_lines).strip(),
-                dedup_key=f"holding_status::{today}::{now_ist().strftime('%H:%M:%S.%f')}",
-            )
+            # Group into chunks of 7 positions each (safe margin under
+            # Telegram's 4096-char limit for typical block sizes), with
+            # a defense-in-depth check: if a chunk of 7 still happens to
+            # exceed ~4000 chars (unusually long values), it's split
+            # further rather than risk another silent rejection.
+            POSITIONS_PER_CHUNK = 7
+            SAFE_CHAR_LIMIT = 4000
+            chunks: list[list[str]] = []
+            current_chunk: list[str] = []
+            current_len = 0
+            for block in position_blocks:
+                block_len = len(block) + 2
+                if current_chunk and (
+                    len(current_chunk) >= POSITIONS_PER_CHUNK
+                    or current_len + block_len > SAFE_CHAR_LIMIT
+                ):
+                    chunks.append(current_chunk)
+                    current_chunk = []
+                    current_len = 0
+                current_chunk.append(block)
+                current_len += block_len
+            if current_chunk:
+                chunks.append(current_chunk)
+
+            total_parts = len(chunks)
+            for part_num, chunk in enumerate(chunks, start=1):
+                part_lines = [f"📋 Holding Status (Part {part_num}/{total_parts})", ""]
+                part_lines.append("\n\n".join(chunk))
+                if part_num == total_parts:
+                    part_lines.append("")
+                    part_lines.append(summary_block)
+                notify(
+                    event_type="holding_status",
+                    message="\n".join(part_lines).strip(),
+                    dedup_key=f"holding_status::{today}::part{part_num}::{now_ist().strftime('%H:%M:%S.%f')}",
+                )
 
         # --------------------------------------------------
         # 2. SCAN FOR NEW ENTRIES (skip symbols already open)
