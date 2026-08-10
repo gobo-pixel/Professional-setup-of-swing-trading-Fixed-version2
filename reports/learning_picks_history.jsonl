@@ -26,3 +26,5 @@
 {"date": "2026-08-05", "symbol": "BDL.NS", "direction": "SELL", "entry_price": 1240.0}
 {"date": "2026-08-07", "symbol": "AUROPHARMA.NS", "direction": "BUY", "entry_price": 1658.0}
 {"date": "2026-08-07", "symbol": "BLUESTARCO.NS", "direction": "SELL", "entry_price": 1514.0}
+{"date": "2026-08-10", "symbol": "GLAND.NS", "direction": "BUY", "entry_price": 2667.3}
+{"date": "2026-08-10", "symbol": "ABLBL.NS", "direction": "SELL", "entry_price": 91.55}
