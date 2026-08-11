@@ -1,25 +1,12 @@
 {
-  "date": "2026-08-10",
-  "opening_balance": 4035.359999999944,
+  "date": "2026-08-11",
+  "opening_balance": 78479.85999999993,
   "total_capital_in_positions": 425675.16,
   "remaining_balance": 78479.85999999993,
   "portfolio_value": 504155.0199999999,
   "realized_pnl": 996.7199999999926,
   "portfolio_return_percent": 0.8310039999999805,
   "opened_today": [],
-  "closed_today": [
-    {
-      "symbol": "ASTERDM.NS",
-      "pnl": 901.7999999999984
-    },
-    {
-      "symbol": "NETWEB.NS",
-      "pnl": 704.0000000000009
-    },
-    {
-      "symbol": "BHARATFORG.NS",
-      "pnl": 208.60000000000127
-    }
-  ],
+  "closed_today": [],
   "open_positions_now": 20
 }
