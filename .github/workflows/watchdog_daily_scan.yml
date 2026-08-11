@@ -4,11 +4,21 @@ on:
   schedule:
     - cron: "45 17 * * *"  # 11:15 PM IST — 45 min after Daily Scan's 10:30 PM IST expected start
   workflow_dispatch:
-
+    inputs:
+      target:
+        description: "Which workflow to check (for manual runs)"
+        type: choice
+        options: ["daily_scan"]
+        default: "daily_scan"
+ 
+concurrency:
+  group: repo-write-lock
+  cancel-in-progress: false
+ 
 permissions:
   contents: read
   actions: read
-
+ 
 jobs:
   watchdog:
     runs-on: ubuntu-latest
@@ -20,9 +30,15 @@ jobs:
           python-version: "3.10"
       - name: Install dependencies
         run: pip install requests
+ 
       - name: Check Daily Scan status
+        if: github.event.schedule == '20 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.target == 'daily_scan')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python scripts/watchdog_daily_scan.py
+        run: >
+          python scripts/watchdog_workflow.py
+          --workflow-file daily_scan.yml
+          --scheduled-hour-utc 15 --scheduled-minute-utc 0
+          --max-delay-minutes 20 --label "Daily Scan"
