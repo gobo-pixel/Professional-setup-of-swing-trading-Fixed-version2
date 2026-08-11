@@ -8,6 +8,10 @@ on:
         required: true
         default: "dry-run"
 
+concurrency:
+  group: repo-write-lock
+  cancel-in-progress: false
+
 jobs:
   clean_slate:
     runs-on: ubuntu-latest
@@ -21,7 +25,13 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
       - name: Run Clean Slate
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ "${{ inputs.confirm }}" = "CONFIRM" ]; then
             python scripts/clean_slate.py --confirm
@@ -36,5 +46,19 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A -- reports/ storage/trades/ storage/reports/
           git diff --staged --quiet || git commit -m "Clean slate: reset trading/analysis data $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
-          
+          PUSH_OK=false
+          for i in $(seq 1 12); do
+            if git push; then
+              PUSH_OK=true
+              break
+            fi
+            echo "Push rejected (likely a concurrent workflow pushed first) — pulling and retrying ($i/12)..."
+            git stash --include-untracked
+            git pull --rebase origin main
+            git stash pop || true
+            sleep 300
+          done
+          if [ "$PUSH_OK" = false ]; then
+            echo "::error::Push failed after 5 attempts — commit exists locally but was NOT pushed to remote. Data may be lost unless a future run recovers it."
+            exit 1
+          fi
