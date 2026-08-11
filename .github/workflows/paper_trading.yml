@@ -50,43 +50,47 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: PYTHONPATH=. python scripts/run_paper_trading.py ${{ (github.event_name == 'workflow_dispatch' && inputs.force) && '--force' || '' }}
-
+ 
       - name: Run Analysis Engine (only after a successful trading-day cycle)
         if: steps.paper_trading.outputs.ran_cycle == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: PYTHONPATH=. python scripts/analysis_engine.py
-
+ 
       - name: Run Learning Engine (observe closed trades — never changes strategy)
         if: steps.paper_trading.outputs.ran_cycle == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: PYTHONPATH=. python scripts/learning_engine.py
-
+ 
       - name: Run Optimizer (recommendations only — never auto-applied)
         if: steps.paper_trading.outputs.ran_cycle == 'true'
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: PYTHONPATH=. python scripts/optimizer.py
-
+ 
       - name: Commit updated paper-trading state back to repo
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A -- reports/ storage/trades/ storage/reports/
-
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-            exit 0
+          git diff --staged --quiet || git commit -m "Paper trading + analysis + learning update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          PUSH_OK=false
+          for i in 1 2 3 4 5; do
+            if git push; then
+              PUSH_OK=true
+              break
+            fi
+            echo "Push rejected (likely a concurrent workflow pushed first) — pulling and retrying ($i/5)..."
+            git stash --include-untracked
+            git pull --rebase origin main
+            git stash pop || true
+            sleep 60
+          done
+          if [ "$PUSH_OK" = false ]; then
+            echo "::error::Push failed after 5 attempts — commit exists locally but was NOT pushed to remote. Data may be lost unless a future run recovers it."
+            exit 1
           fi
-
-          git commit -m "Paper trading + analysis + learning update: $(date -u +'%Y-%m-%d %H:%M UTC')"
-
-          git fetch origin main
-          git rebase origin/main
-
-          git push origin HEAD:main
