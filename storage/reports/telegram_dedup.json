@@ -6,6 +6,16 @@
     "mi_summary::2026-08-12 20:06:29.877947",
     "mi_summary::2026-08-12 21:54:52.884552",
     "scan_started::2026-08-12::23:24:34.393652",
-    "scan_completed::2026-08-12::23:34:09.475376"
+    "scan_completed::2026-08-12::23:34:09.475376",
+    "paper_trading_started::2026-08-12::23:34:48.491525",
+    "monitoring_summary::2026-08-12::23:35:10.728945",
+    "holding_status::2026-08-12::part1::23:35:11.205390",
+    "holding_status::2026-08-12::part2::23:35:11.699038",
+    "holding_status::2026-08-12::part3::23:35:12.195539",
+    "candidates_not_executed::2026-08-12::23:44:13.855259",
+    "portfolio_summary::2026-08-12::23:44:14.229467",
+    "analysis_summary::2026-08-12::23:44:15.170940",
+    "learning_summary::2026-08-12::23:44:16.999053",
+    "optimizer_recommendation::2026-08-12::23:44:17.781079"
   ]
 }

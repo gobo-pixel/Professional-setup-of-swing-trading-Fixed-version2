@@ -1,0 +1,18 @@
+{
+  "symbol": "AIIL.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 18,
+  "entry_price": 596.6,
+  "exit_price": 554.8,
+  "status": "CLOSED",
+  "realized_pnl": -752.4000000000012,
+  "realized_pnl_percent": -7.006369426751603,
+  "max_profit_percent": 0.0,
+  "max_drawdown_percent": 7.006369426751603,
+  "regime": "BULL",
+  "confidence": 52.13,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; Drawdown from peak is significant (7.0%).",
+  "id": "trade_1786557899496",
+  "timestamp": 1786557899.4963284
+}
