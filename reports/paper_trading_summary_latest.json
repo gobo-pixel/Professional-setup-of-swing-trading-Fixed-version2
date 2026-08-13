@@ -1,25 +1,17 @@
 {
-  "date": "2026-08-12",
-  "opening_balance": 78479.85999999993,
-  "total_capital_in_positions": 371044.0,
-  "remaining_balance": 130345.20000000001,
-  "portfolio_value": 501389.2,
-  "realized_pnl": 1128.9599999999962,
-  "portfolio_return_percent": 0.2778400000000023,
+  "date": "2026-08-13",
+  "opening_balance": 130345.20000000001,
+  "total_capital_in_positions": 332476.54,
+  "remaining_balance": 171004.03999999998,
+  "portfolio_value": 503480.57999999996,
+  "realized_pnl": 861.8999999999967,
+  "portfolio_return_percent": 0.6961159999999916,
   "opened_today": [],
   "closed_today": [
     {
-      "symbol": "LLOYDSME.NS",
-      "pnl": -1037.9999999999995
-    },
-    {
-      "symbol": "AIIL.NS",
-      "pnl": -752.4000000000012
-    },
-    {
-      "symbol": "NESTLEIND.NS",
-      "pnl": -299.0
+      "symbol": "HDFCLIFE.NS",
+      "pnl": -151.19999999999345
     }
   ],
-  "open_positions_now": 17
+  "open_positions_now": 16
 }
