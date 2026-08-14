@@ -1,0 +1,16 @@
+{
+  "symbol": "SWANCORP.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 38,
+  "entry_price": 304.6,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 78.64,
+  "reasons": "",
+  "id": "trade_1786730856689",
+  "timestamp": 1786730856.6892917
+}

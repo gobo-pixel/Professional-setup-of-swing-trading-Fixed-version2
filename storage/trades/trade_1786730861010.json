@@ -1,0 +1,16 @@
+{
+  "symbol": "HUDCO.NS",
+  "direction": "SELL",
+  "action": "OPEN",
+  "quantity": 80,
+  "entry_price": 189.99,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BEAR",
+  "confidence": 73.13,
+  "reasons": "",
+  "id": "trade_1786730861010",
+  "timestamp": 1786730861.0109801
+}

@@ -1,0 +1,16 @@
+{
+  "symbol": "NSLNISP.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 351,
+  "entry_price": 44.5,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 71.61,
+  "reasons": "",
+  "id": "trade_1786730860063",
+  "timestamp": 1786730860.0632374
+}

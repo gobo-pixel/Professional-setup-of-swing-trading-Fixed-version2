@@ -1,0 +1,16 @@
+{
+  "symbol": "ELGIEQUIP.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 20,
+  "entry_price": 609.5,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 76.88,
+  "reasons": "",
+  "id": "trade_1786730855242",
+  "timestamp": 1786730855.2420044
+}

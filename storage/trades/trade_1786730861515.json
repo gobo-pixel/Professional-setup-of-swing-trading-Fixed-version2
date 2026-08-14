@@ -1,0 +1,16 @@
+{
+  "symbol": "BHEL.NS",
+  "direction": "BUY",
+  "action": "OPEN",
+  "quantity": 40,
+  "entry_price": 421.7,
+  "exit_price": "",
+  "status": "OPEN",
+  "realized_pnl": "",
+  "realized_pnl_percent": "",
+  "regime": "BULL",
+  "confidence": 69.6,
+  "reasons": "",
+  "id": "trade_1786730861515",
+  "timestamp": 1786730861.5151148
+}

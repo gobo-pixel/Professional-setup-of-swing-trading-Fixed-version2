@@ -1,0 +1,18 @@
+{
+  "symbol": "ASIANPAINT.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 6,
+  "entry_price": 2735.0,
+  "exit_price": 2696.3,
+  "status": "CLOSED",
+  "realized_pnl": -232.1999999999989,
+  "realized_pnl_percent": -1.414990859232169,
+  "max_profit_percent": 0.7495429616087752,
+  "max_drawdown_percent": 1.414990859232169,
+  "regime": "BULL",
+  "confidence": 47.36,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+  "id": "trade_1786730295411",
+  "timestamp": 1786730295.4116669
+}
