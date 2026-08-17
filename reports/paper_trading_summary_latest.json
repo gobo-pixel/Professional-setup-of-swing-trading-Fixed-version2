@@ -1,128 +1,33 @@
 {
-  "date": "2026-08-14",
-  "opening_balance": 171004.03999999998,
-  "total_capital_in_positions": 498178.81999999995,
-  "remaining_balance": 2929.0699999999742,
-  "portfolio_value": 501107.8899999999,
-  "realized_pnl": -1322.9299999999994,
-  "portfolio_return_percent": 0.22157799999997949,
-  "opened_today": [
+  "date": "2026-08-17",
+  "opening_balance": 2929.0699999999742,
+  "total_capital_in_positions": 421252.87,
+  "remaining_balance": 75157.58000000002,
+  "portfolio_value": 496410.45,
+  "realized_pnl": -5172.239999999991,
+  "portfolio_return_percent": -0.7179099999999976,
+  "opened_today": [],
+  "closed_today": [
     {
-      "symbol": "ELGIEQUIP.NS",
-      "action": "BUY",
-      "price": 609.5,
-      "quantity": 20
-    },
-    {
-      "symbol": "POONAWALLA.NS",
-      "action": "BUY",
-      "price": 497.9,
-      "quantity": 24
-    },
-    {
-      "symbol": "HEG.NS",
-      "action": "BUY",
-      "price": 701.0,
-      "quantity": 20
-    },
-    {
-      "symbol": "SWANCORP.NS",
-      "action": "SELL",
-      "price": 304.6,
-      "quantity": 38
-    },
-    {
-      "symbol": "HONASA.NS",
-      "action": "BUY",
-      "price": 502.8,
-      "quantity": 21
-    },
-    {
-      "symbol": "GLENMARK.NS",
-      "action": "BUY",
-      "price": 2318.4,
-      "quantity": 5
-    },
-    {
-      "symbol": "NATIONALUM.NS",
-      "action": "BUY",
-      "price": 376.0,
-      "quantity": 32
-    },
-    {
-      "symbol": "ENGINERSIN.NS",
-      "action": "BUY",
-      "price": 243.68,
-      "quantity": 47
-    },
-    {
-      "symbol": "NBCC.NS",
-      "action": "SELL",
-      "price": 89.15,
-      "quantity": 247
-    },
-    {
-      "symbol": "AARTIIND.NS",
-      "action": "BUY",
-      "price": 534.1,
-      "quantity": 21
-    },
-    {
-      "symbol": "NSLNISP.NS",
-      "action": "BUY",
-      "price": 44.5,
-      "quantity": 351
+      "symbol": "BERGEPAINT.NS",
+      "pnl": 59.5
     },
     {
       "symbol": "HDFCAMC.NS",
-      "action": "SELL",
-      "price": 2485.0,
-      "quantity": 5
+      "pnl": -190.0
     },
     {
-      "symbol": "HUDCO.NS",
-      "action": "SELL",
-      "price": 189.99,
-      "quantity": 80
+      "symbol": "NSLNISP.NS",
+      "pnl": -961.7400000000007
     },
     {
-      "symbol": "BHEL.NS",
-      "action": "BUY",
-      "price": 421.7,
-      "quantity": 40
+      "symbol": "TECHM.NS",
+      "pnl": -300.0
     },
     {
-      "symbol": "BERGEPAINT.NS",
-      "action": "BUY",
-      "price": 545.1,
-      "quantity": 14
-    },
-    {
-      "symbol": "SHRIRAMFIN.NS",
-      "action": "BUY",
-      "price": 1122.0,
-      "quantity": 15
-    },
-    {
-      "symbol": "HAL.NS",
-      "action": "BUY",
-      "price": 5029.9,
-      "quantity": 2
+      "symbol": "BELRISE.NS",
+      "pnl": -993.8400000000004
     }
   ],
-  "closed_today": [
-    {
-      "symbol": "ABCAPITAL.NS",
-      "pnl": -338.40000000000055
-    },
-    {
-      "symbol": "ASIANPAINT.NS",
-      "pnl": -232.1999999999989
-    },
-    {
-      "symbol": "NAM-INDIA.NS",
-      "pnl": -579.6999999999985
-    }
-  ],
-  "open_positions_now": 30
+  "open_positions_now": 25
 }

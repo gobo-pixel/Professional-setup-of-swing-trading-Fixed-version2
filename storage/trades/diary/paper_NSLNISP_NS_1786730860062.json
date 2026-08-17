@@ -68,15 +68,35 @@
     "Expected Hold : 10 days",
     "Trade Grade : B"
   ],
-  "daily_log": [],
-  "status": "OPEN",
-  "exit_date": null,
-  "exit_price": null,
-  "exit_reason": null,
-  "holding_days": 0,
+  "daily_log": [
+    {
+      "date": "2026-08-17",
+      "current_price": 41.76,
+      "current_pnl": -961.7400000000007,
+      "current_buy_confidence": 37.33,
+      "current_sell_confidence": 54.49,
+      "current_exit_score": 42.97,
+      "recommendation": "EXIT",
+      "notes": [
+        "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.",
+        "No fresh news \u2014 news component does not contribute to the exit score.",
+        "Drawdown from peak is significant (6.2%)."
+      ]
+    }
+  ],
+  "status": "CLOSED",
+  "exit_date": "2026-08-17",
+  "exit_price": 41.76,
+  "exit_reason": "Risk engine flagged this symbol as unsafe.",
+  "holding_days": 1,
   "max_profit_percent": 0.0,
-  "max_drawdown_percent": 0.0,
-  "final_pnl": null,
+  "max_drawdown_percent": 6.157303370786521,
+  "final_pnl": -961.7400000000007,
   "created_at": 1786730860.0627387,
-  "updated_at": 1786730860.0627387
+  "updated_at": 1786988062.1019492,
+  "final_pnl_percent": -6.157303370786521,
+  "exit_score": 42.97,
+  "target1_status": "NOT REACHED",
+  "target2_status": "NOT REACHED",
+  "stop_loss_status": "NOT HIT"
 }

@@ -1,0 +1,18 @@
+{
+  "symbol": "BELRISE.NS",
+  "direction": "BUY",
+  "action": "CLOSE",
+  "quantity": 82,
+  "entry_price": 248.21,
+  "exit_price": 236.09,
+  "status": "CLOSED",
+  "realized_pnl": -993.8400000000004,
+  "realized_pnl_percent": -4.882962007977118,
+  "max_profit_percent": 5.293904355183117,
+  "max_drawdown_percent": 4.882962007977118,
+  "regime": "BULL",
+  "confidence": 48.51,
+  "reasons": "HARD RISK EXIT: Risk engine flagged this symbol as unsafe.; No fresh news \u2014 news component does not contribute to the exit score.",
+  "id": "trade_1786988069638",
+  "timestamp": 1786988069.6380308
+}
