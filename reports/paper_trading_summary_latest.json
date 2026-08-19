@@ -1,29 +1,12 @@
 {
   "date": "2026-08-19",
-  "opening_balance": 101335.95000000007,
-  "total_capital_in_positions": 294417.82,
-  "remaining_balance": 197369.94,
-  "portfolio_value": 491787.76,
-  "realized_pnl": -6979.149999999998,
-  "portfolio_return_percent": -1.6424479999999981,
+  "opening_balance": 500000.0,
+  "total_capital_in_positions": 0.0,
+  "remaining_balance": 500000.0,
+  "portfolio_value": 500000.0,
+  "realized_pnl": 0.0,
+  "portfolio_return_percent": 0.0,
   "opened_today": [],
-  "closed_today": [
-    {
-      "symbol": "GLENMARK.NS",
-      "pnl": -359.50000000000045
-    },
-    {
-      "symbol": "UNIONBANK.NS",
-      "pnl": 402.6000000000014
-    },
-    {
-      "symbol": "SBIN.NS",
-      "pnl": -1263.6000000000035
-    },
-    {
-      "symbol": "PIDILITIND.NS",
-      "pnl": 630.0
-    }
-  ],
-  "open_positions_now": 19
+  "closed_today": [],
+  "open_positions_now": 0
 }
