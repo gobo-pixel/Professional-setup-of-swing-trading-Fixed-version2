@@ -481,6 +481,19 @@ class MarketScanner:
             diagnostics["risk_safe"] = risk_result.safe
             diagnostics["risk_grade"] = risk_result.risk_grade
             diagnostics["total_risk"] = round(risk_result.total_risk, 2)
+            # CONFIRMED-BUG FIX: risk_manager.py computes the detailed
+            # per-component breakdown (risk_components/risk_weights)
+            # internally, but it was never threaded up into scanner's
+            # own diagnostics dict — meaning paper_trading_engine.py's
+            # _top_risk_factors() always fell through to its empty
+            # fallback, and HARD RISK EXIT notifications showed only
+            # the generic message with zero breakdown. Copy them here
+            # so the detailed "which risk-dimension actually drove
+            # this exit" explanation genuinely reaches the notification.
+            diagnostics["risk_components"] = risk_result.diagnostics.get("risk_components")
+            diagnostics["risk_weights"] = risk_result.diagnostics.get("risk_weights")
+            for override_key in ("circuit_override", "emergency_stop", "daily_loss_lock", "vix_override", "event_override", "news_override"):
+                diagnostics[override_key] = risk_result.diagnostics.get(override_key, False)
 
             # 9. POSITION SIZING
             position_result = self.sizer.calculate(
@@ -670,6 +683,19 @@ class MarketScanner:
             diagnostics["risk_safe"] = risk_result.safe
             diagnostics["risk_grade"] = risk_result.risk_grade
             diagnostics["total_risk"] = round(risk_result.total_risk, 2)
+            # CONFIRMED-BUG FIX: risk_manager.py computes the detailed
+            # per-component breakdown (risk_components/risk_weights)
+            # internally, but it was never threaded up into scanner's
+            # own diagnostics dict — meaning paper_trading_engine.py's
+            # _top_risk_factors() always fell through to its empty
+            # fallback, and HARD RISK EXIT notifications showed only
+            # the generic message with zero breakdown. Copy them here
+            # so the detailed "which risk-dimension actually drove
+            # this exit" explanation genuinely reaches the notification.
+            diagnostics["risk_components"] = risk_result.diagnostics.get("risk_components")
+            diagnostics["risk_weights"] = risk_result.diagnostics.get("risk_weights")
+            for override_key in ("circuit_override", "emergency_stop", "daily_loss_lock", "vix_override", "event_override", "news_override"):
+                diagnostics[override_key] = risk_result.diagnostics.get(override_key, False)
 
             # Stop-loss uses the POSITION'S HELD direction (not today's
             # fresh signal) — monitoring cares about "given I am long
