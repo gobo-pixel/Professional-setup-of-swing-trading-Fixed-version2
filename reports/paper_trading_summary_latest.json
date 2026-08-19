@@ -1,21 +1,29 @@
 {
-  "date": "2026-08-18",
-  "opening_balance": 75157.58000000002,
-  "total_capital_in_positions": 393011.45999999996,
-  "remaining_balance": 101335.95000000007,
-  "portfolio_value": 494347.41000000003,
-  "realized_pnl": -4833.749999999996,
-  "portfolio_return_percent": -1.1305179999999935,
+  "date": "2026-08-19",
+  "opening_balance": 101335.95000000007,
+  "total_capital_in_positions": 294417.82,
+  "remaining_balance": 197369.94,
+  "portfolio_value": 491787.76,
+  "realized_pnl": -6979.149999999998,
+  "portfolio_return_percent": -1.6424479999999981,
   "opened_today": [],
   "closed_today": [
     {
-      "symbol": "HUDCO.NS",
-      "pnl": 158.40000000000146
+      "symbol": "GLENMARK.NS",
+      "pnl": -359.50000000000045
     },
     {
-      "symbol": "ELGIEQUIP.NS",
-      "pnl": 94.00000000000091
+      "symbol": "UNIONBANK.NS",
+      "pnl": 402.6000000000014
+    },
+    {
+      "symbol": "SBIN.NS",
+      "pnl": -1263.6000000000035
+    },
+    {
+      "symbol": "PIDILITIND.NS",
+      "pnl": 630.0
     }
   ],
-  "open_positions_now": 23
+  "open_positions_now": 19
 }

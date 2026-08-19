@@ -40,3 +40,5 @@
 {"date": "2026-08-17", "symbol": "FACT.NS", "direction": "SELL", "entry_price": 793.25}
 {"date": "2026-08-18", "symbol": "HEG.NS", "direction": "BUY", "entry_price": 739.25}
 {"date": "2026-08-18", "symbol": "SWANCORP.NS", "direction": "SELL", "entry_price": 304.55}
+{"date": "2026-08-19", "symbol": "WELCORP.NS", "direction": "BUY", "entry_price": 1973.9}
+{"date": "2026-08-19", "symbol": "SWANCORP.NS", "direction": "SELL", "entry_price": 303.2}
