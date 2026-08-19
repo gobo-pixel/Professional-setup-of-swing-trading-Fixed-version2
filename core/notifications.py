@@ -114,7 +114,33 @@ def notify(
     full_message = f"{severity}\n{message}"
     telegram = _get_telegram()
     if telegram is not None:
-        telegram.send(full_message, level=event_type.upper())
+        # Telegram hard-limits messages to 4096 characters. Confirmed
+        # via production logs that this can be hit by more than one
+        # notification type (Holding Status, Monitoring Summary with a
+        # long failure list, ...) — splitting HERE, once, at the
+        # central choke-point protects every current and future
+        # notify() call instead of fixing each oversized message
+        # individually as it's discovered.
+        TELEGRAM_SAFE_LIMIT = 4000
+        if len(full_message) <= TELEGRAM_SAFE_LIMIT:
+            telegram.send(full_message, level=event_type.upper())
+        else:
+            lines = full_message.split("\n")
+            parts: list[str] = []
+            current: list[str] = []
+            current_len = 0
+            for line in lines:
+                line_len = len(line) + 1
+                if current and current_len + line_len > TELEGRAM_SAFE_LIMIT:
+                    parts.append("\n".join(current))
+                    current, current_len = [], 0
+                current.append(line)
+                current_len += line_len
+            if current:
+                parts.append("\n".join(current))
+            total = len(parts)
+            for i, part in enumerate(parts, start=1):
+                telegram.send(f"(Part {i}/{total})\n{part}", level=event_type.upper())
     else:
         logger.info("[Notification — no Telegram configured] %s", full_message)
 

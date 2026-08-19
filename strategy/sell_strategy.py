@@ -44,7 +44,8 @@ from core.constants import NO_TRADE
 
 from core.logger import get_logger
 from core.exceptions import StrategyError
-from strategy.fundamental_scoring import sell_fundamental_score
+from decision.state_rules import evaluate_entry_state
+from strategy.fundamental_scoring import sell_fundamental_evaluation
 from news.news_bias import news_component
 
 logger = get_logger(__name__)
@@ -74,10 +75,31 @@ class SellDecision:
     tier1_passed: bool = False
     tier2_score: float = 0.0
     tier3_score: float = 0.0
+    # Tier 2 factor-score breakdown (see the restructuring NOTE at the
+    # Tier 2 computation site) — kept on the decision object so live
+    # production logs/diagnostics can show *why* tier2_score landed
+    # where it did, not just the final blended number.
+    trend_factor_score: float = 0.0
+    momentum_factor_score: float = 0.0
+    volume_factor_score: float = 0.0
+    volatility_factor_score: float = 0.0
+    adx_regime: str = ""
     fundamental_weakness: float = 0.0
+    fundamental_coverage: float = 0.0
     news_negativity: float | None = None
     overall_score: float = 0.0
     qualify_threshold: float = 0.0
+    # FIX #15 (architecture review — state-based structure), Point 15
+    # (PHASE29_NOTES.md): mirrors buy_strategy.py's identical fix — see
+    # BuyDecision.state_narrative's NOTE and decision/state_rules.py's
+    # module docstring for the full rationale (entry_state now comes
+    # from the same rule table that decides `qualified`/`action`, not a
+    # separate after-the-fact narration of it).
+    state_narrative: str = ""
+    # FIX #10/#16 (architecture review — volume-pressure model): mirrors
+    # BuyDecision's identical field — see buy_strategy.py's
+    # volume_factor_score computation site for the full rationale.
+    volume_pressure_uses_delivery: bool = False
 
 
 # ==========================================================
@@ -92,6 +114,8 @@ class SellStrategyEngine:
 
     REQUIRED_COLUMNS = {
         "close",
+        "open",
+        "high",
         "ema_20",
         "ema_50",
         "ema_200",
@@ -104,7 +128,6 @@ class SellStrategyEngine:
         "macd_histogram",
         "adx_14",
         "supertrend",
-        "cloud_trend",
         "vwap",
         "volume",
         "volume_sma_20",
@@ -129,6 +152,7 @@ class SellStrategyEngine:
         "gap_day",
         "is_breakdown",
         "is_pullback",
+        "bb_lower",
     }
 
     def evaluate(
@@ -209,15 +233,15 @@ class SellStrategyEngine:
             reasons.append("Supertrend is bearish.")
 
         # --------------------------------------------------
-        # ICHIMOKU CLOUD
-        # --------------------------------------------------
-
-        checks["ichimoku"] = row["cloud_trend"] == "BEAR"
-
-        if checks["ichimoku"]:
-
-            reasons.append("Price below Ichimoku Cloud.")
-
+        # ICHIMOKU CLOUD — REMOVED (user review, mirrors
+        # strategy/buy_strategy.py). cloud_trend's underlying
+        # senkou_span_a/b are built via .shift(26) — today's cloud
+        # level reflects price data up to ~52-78 bars old, a poor fit
+        # for a fast-moving swing stock. features/indicators/
+        # ichimoku.py itself is untouched — cloud_trend still computes
+        # and still shows up in reports/diagnostics for reference — it
+        # simply no longer feeds tier2_score, result.overall, or
+        # result.risk anywhere.
         # --------------------------------------------------
         # LONG TERM MARKET TREND
         # --------------------------------------------------
@@ -253,15 +277,10 @@ class SellStrategyEngine:
 
             reasons.append("Bearish MACD crossover.")
 
-        # --------------------------------------------------
-        # MACD HISTOGRAM
-        # --------------------------------------------------
-
-        checks["macd_histogram"] = row["macd_histogram"] < 0
-
-        if checks["macd_histogram"]:
-
-            reasons.append("Negative MACD histogram.")
+        # NOTE: a "macd_histogram < 0" check used to live here — removed
+        # for the same reason as the BUY-side mirror (see
+        # strategy/buy_strategy.py): macd_histogram = macd - macd_signal,
+        # so "< 0" is mathematically identical to "macd_cross" above.
 
         # --------------------------------------------------
         # ADX
@@ -371,15 +390,10 @@ class SellStrategyEngine:
 
             reasons.append("Money Flow Index indicates distribution.")
 
-        # --------------------------------------------------
-        # VWAP CONFIRMATION
-        # --------------------------------------------------
-
-        checks["vwap_confirmation"] = row["close"] < row["vwap"]
-
-        if checks["vwap_confirmation"]:
-
-            reasons.append("VWAP confirms bearish pressure.")
+        # NOTE: a "VWAP confirmation" check used to live here, but it was
+        # `row["close"] < row["vwap"]` — byte-identical to
+        # "price_below_vwap" above. Removed for the same reason as the
+        # BUY-side mirror (see strategy/buy_strategy.py).
 
         # --------------------------------------------------
         # DISTRIBUTION
@@ -420,15 +434,12 @@ class SellStrategyEngine:
             reasons.append("Failed breakout confirmed.")
 
         # --------------------------------------------------
-        # GAP FILTER
-        # --------------------------------------------------
-
-        checks["gap_filter"] = not bool(row["gap_up"])
-
-        if checks["gap_filter"]:
-
-            reasons.append("No bullish opening gap.")
-
+        # GAP FILTER — REMOVED (user review, mirrors
+        # strategy/buy_strategy.py). checks["gap_filter"] was dead
+        # weight (never reached tier2_score), while row["gap_up"] was
+        # separately, live, the single biggest penalty in
+        # strategy/sell_scoring.py's _risk_score() (-25, now rescaled).
+        # _risk_score() remains gap's one live vote.
         # --------------------------------------------------
         # PIVOT
         # --------------------------------------------------
@@ -449,15 +460,10 @@ class SellStrategyEngine:
 
             reasons.append("Below Bollinger middle band.")
 
-        # --------------------------------------------------
-        # KELTNER
-        # --------------------------------------------------
-
-        checks["keltner"] = row["close"] < row["kc_middle"]
-
-        if checks["keltner"]:
-
-            reasons.append("Below Keltner middle channel.")
+        # NOTE: a "keltner" check used to live here (close < kc_middle) —
+        # removed for the same reason as the BUY-side mirror (see
+        # strategy/buy_strategy.py): kc_middle = ema_20, byte-identical
+        # to "price_below_ema20" above.
 
         # --------------------------------------------------
         # DONCHIAN
@@ -492,19 +498,204 @@ class SellStrategyEngine:
         if checks["confirmed_breakdown"]:
 
             reasons.append("High conviction breakdown confirmed by volume.")
+
+        # ==========================================================
+        # EARLY-ENTRY ENGINE (mirror of strategy/buy_strategy.py's —
+        # same reasoning, bearish direction: catch a breakdown near its
+        # START instead of after price has already fallen a long way)
+        # ==========================================================
+
+        # --------------------------------------------------
+        # FRESH EMA CROSS (crossed bearish within the last few bars,
+        # not "has been stacked bearish for weeks")
+        # --------------------------------------------------
+
+        EMA_CROSS_LOOKBACK = 3
+
+        lookback_n = min(len(dataframe), EMA_CROSS_LOOKBACK + 1)
+        recent = dataframe.iloc[-lookback_n:]
+
+        ema_fresh_cross = False
+
+        for i in range(1, len(recent)):
+
+            prev_above = recent["ema_20"].iloc[i - 1] >= recent["ema_50"].iloc[i - 1]
+
+            now_below = recent["ema_20"].iloc[i] < recent["ema_50"].iloc[i]
+
+            if prev_above and now_below:
+
+                ema_fresh_cross = True
+
+                break
+
+        checks["ema_fresh_cross"] = ema_fresh_cross
+
+        if checks["ema_fresh_cross"]:
+
+            reasons.append("Fresh bearish EMA20/EMA50 cross (early breakdown, not chasing).")
+
+        # --------------------------------------------------
+        # RSI FRESH MIDLINE CROSS (just crossed below 50, not
+        # "already sitting" deeply oversold in 30-45 for a while)
+        # --------------------------------------------------
+
+        RSI_CROSS_LOOKBACK = 2
+
+        recent_rsi = dataframe["rsi_14"].iloc[-min(len(dataframe), RSI_CROSS_LOOKBACK):]
+
+        rsi_fresh_cross = (
+            len(recent_rsi) >= 2
+            and recent_rsi.iloc[-2] >= 50 > recent_rsi.iloc[-1]
+            and recent_rsi.iloc[-1] >= 35
+        )
+
+        checks["rsi_fresh_cross"] = bool(rsi_fresh_cross)
+
+        if checks["rsi_fresh_cross"]:
+
+            reasons.append("RSI freshly crossed below the 50 momentum midline.")
+
+        # --------------------------------------------------
+        # SQUEEZE BREAKDOWN (breakdown FROM a prior low-volatility
+        # consolidation, not a decline that's already run far)
+        # --------------------------------------------------
+
+        SQUEEZE_LOOKBACK = 5
+
+        SQUEEZE_BB_WIDTH_THRESHOLD = 0.04
+
+        squeeze_n = min(len(dataframe), SQUEEZE_LOOKBACK + 1)
+
+        prior_bb_width = dataframe["bb_width"].iloc[-squeeze_n:-1] if squeeze_n > 1 else dataframe["bb_width"].iloc[0:0]
+
+        was_squeezed = bool((prior_bb_width < SQUEEZE_BB_WIDTH_THRESHOLD).all()) if len(prior_bb_width) > 0 else False
+
+        # Breakdown trigger is the actual Bollinger lower band (close <
+        # bb_lower), not the existing is_breakdown flag (a 20-day-low
+        # Donchian breakdown — a different, unrelated definition). Mirror
+        # of the BUY side's same fix (see strategy/buy_strategy.py).
+        checks["squeeze_breakout"] = (
+            was_squeezed and row["close"] < row["bb_lower"] and checks["volume_spike"]
+        )
+
+        if checks["squeeze_breakout"]:
+
+            reasons.append("Breakdown below the Bollinger lower band from a prior low-volatility squeeze.")
+
+        # --------------------------------------------------
+        # RELIEF-RALLY REJECTION (shorted a failed bounce within an
+        # established downtrend, instead of a fresh low) — price was
+        # WITHIN 1.5% of EMA20 yesterday (relief-rallied up to
+        # resistance) and today closes back below EMA20 on a bearish
+        # rejection candle (close < open), mirroring the BUY side's
+        # pullback_entry exactly (see strategy/buy_strategy.py).
+        # --------------------------------------------------
+
+        PULLBACK_PROXIMITY_PERCENT = 1.5
+
+        prev_row = dataframe.iloc[-2] if len(dataframe) >= 2 else row
+        prev_ema20 = float(prev_row["ema_20"])
+        prev_proximity_percent = (
+            abs(float(prev_row["close"]) - prev_ema20) / prev_ema20 * 100 if prev_ema20 else 100.0
+        )
+
+        checks["pullback_entry"] = bool(
+            row["close"] < row["ema_200"]
+            and prev_proximity_percent <= PULLBACK_PROXIMITY_PERCENT
+            and row["close"] < row["ema_20"]
+            and row["close"] < row["open"]
+        )
+
+        if checks["pullback_entry"]:
+
+            reasons.append("Relief-rally to EMA20 resistance (within 1.5%) followed by a bearish rejection candle.")
+
+        # --------------------------------------------------
+        # OVEREXTENSION CAP (HARD REJECT below, not just a vote) —
+        # price already too far below EMA20 means the easy part of
+        # the decline is over, and snap-back/short-squeeze risk is
+        # elevated; treat it as a chase-risk filter.
+        #
+        # FIX #12 (architecture review — crude % distance): mirrors
+        # buy_strategy.py's identical fix — see that file's NOTE for the
+        # full rationale, the explicit scope boundary (ATR-normalization
+        # only; breakout-age/volume-decay tracking need new persisted
+        # per-symbol state and are out of scope here, same class of work
+        # as fix #5), and the calibration reasoning (multiplier chosen
+        # so a typical ~2% ATR stock lands close to the old flat 8% cap
+        # — genuine normalization, not a blanket tightening).
+        # --------------------------------------------------
+
+        OVEREXTENSION_ATR_MULTIPLE = 4.0
+        OVEREXTENSION_CAP_FLOOR_PERCENT = 5.0
+        OVEREXTENSION_CAP_CEILING_PERCENT = 20.0
+
+        ema20_value = float(row["ema_20"])
+        close_value = float(row["close"])
+        atr_value = float(row.get("atr_14", 0) or 0)
+
+        extension_percent = (
+            ((ema20_value - close_value) / ema20_value) * 100
+            if ema20_value
+            else 0.0
+        )
+
+        atr_percent = (atr_value / close_value) * 100 if close_value else 0.0
+        overextension_cap_percent = min(
+            max(atr_percent * OVEREXTENSION_ATR_MULTIPLE, OVEREXTENSION_CAP_FLOOR_PERCENT),
+            OVEREXTENSION_CAP_CEILING_PERCENT,
+        )
+
+        checks["not_overextended"] = extension_percent <= overextension_cap_percent
+
+        if not checks["not_overextended"]:
+
+            reasons.append(
+                f"Price {extension_percent:.1f}% below EMA20 (ATR-normalized cap "
+                f"{overextension_cap_percent:.1f}%, {atr_percent:.1f}% ATR x "
+                f"{OVEREXTENSION_ATR_MULTIPLE:.1f}) — too extended, short-squeeze risk."
+            )
+
+        # --------------------------------------------------
+        # STALE-ENTRY CAP (HARD REJECT, not just a vote) — FIX #5
+        # (architecture review — late-entry architecture). Mirrors
+        # buy_strategy.py's identical fix — see that file's NOTE for the
+        # full rationale and scope boundary. is_breakdown (close below
+        # the prior 20-day low) can stay True for many consecutive days
+        # once a decline is underway, long after the actual breakdown
+        # day; this rejects when that's running but nothing today
+        # specifically re-confirms a fresh bearish trigger.
+        # --------------------------------------------------
+
+        FRESH_TRIGGER_CHECKS = (
+            "ema_fresh_cross", "rsi_fresh_cross",
+            "squeeze_breakout", "pullback_entry", "confirmed_breakdown",
+        )
+
+        has_fresh_trigger = any(checks.get(key, False) for key in FRESH_TRIGGER_CHECKS)
+        is_running_move = bool(row.get("is_breakdown", False))
+        setup_is_stale = is_running_move and not has_fresh_trigger
+
+        checks["not_stale_entry"] = not setup_is_stale
+
+        if not checks["not_stale_entry"]:
+
+            reasons.append(
+                "Rejected: breakdown is running but no fresh trigger today "
+                "(no EMA/RSI cross, squeeze, pullback, or fresh-volume "
+                "confirmation) — chasing an already-established decline, "
+                "regardless of score."
+            )
+
         # ==========================================================
         # MARKET FILTER
         # ==========================================================
 
-        # --------------------------------------------------
-        # MARKET REGIME
-        # --------------------------------------------------
-
-        checks["bear_market"] = row["market_regime"] == "BEAR"
-
-        if checks["bear_market"]:
-
-            reasons.append("Bear market confirmed.")
+        # NOTE: a "bear_market" tier2 check used to live here, but it was
+        # `row["market_regime"] == "BEAR"` — byte-identical to the
+        # "market_trend" Tier 1 check below. Removed for the same reason
+        # as the BUY-side mirror (see strategy/buy_strategy.py).
 
         # --------------------------------------------------
         # VOLATILITY
@@ -551,7 +742,21 @@ class SellStrategyEngine:
         # SECTOR FILTER
         # ==========================================================
 
-        checks["sector"] = sector_score >= 70
+        # FIX #8: sector_score is now None (not a fabricated 50.0) when
+        # unavailable — guard against `None >= 70` raising TypeError.
+        #
+        # SEPARATE, NOT FIXED HERE: same `>= 70` threshold as
+        # buy_strategy.py's checks["sector"], reasons text below implies
+        # sector_score should be SELL-direction (high = weak sector) the
+        # way market_score needed inverting for fix #2 — but
+        # execution/scanner.py passes the identical sector_score to both
+        # buy_strat and sell_strat with no inversion. Not fixed now:
+        # sector_score is unavailable (None) in every real scan today
+        # (see execution/scanner.py's NOTE), so this has zero real
+        # impact until sector data is actually wired in — flagging so
+        # it isn't silently reintroduced as a live bug once that
+        # happens, the same way fix #2's market_score issue was found.
+        checks["sector"] = sector_score is not None and sector_score >= 70
 
         if checks["sector"]:
 
@@ -561,13 +766,22 @@ class SellStrategyEngine:
         # FUNDAMENTAL FILTER (weighted, never all-or-nothing)
         # ==========================================================
 
-        fundamental_weakness = sell_fundamental_score(fundamentals)
+        fundamental_evidence = sell_fundamental_evaluation(fundamentals)
+        fundamental_weakness = fundamental_evidence.score
+        fundamental_coverage = fundamental_evidence.coverage
 
         checks["fundamental"] = fundamental_weakness >= 55
 
         if checks["fundamental"]:
 
             reasons.append(f"Fundamentals weak ({fundamental_weakness:.0f}/100 weakness).")
+
+        # Coverage exposed for visibility/audit — see the mirrored NOTE
+        # in strategy/buy_strategy.py. Not used to gate here.
+        reasons.append(
+            f"Fundamental data coverage: {fundamental_evidence.available_metrics}"
+            f"/{fundamental_evidence.total_metrics} metrics ({fundamental_coverage:.0%})."
+        )
 
         # ==========================================================
         # NEWS FILTER (bidirectional — NO news is neutral, never a fail)
@@ -596,7 +810,17 @@ class SellStrategyEngine:
         # MARKET SCORE FILTER
         # ==========================================================
 
-        checks["market_score"] = market_score >= 60
+        # market_score is BUY-oriented (BULL regime=75, BEAR regime=25).
+        # For a SELL setup a BEAR (LOW) market_score should pass this
+        # check, not a high one — this was found NOT inverted (checking
+        # market_score >= 60, same threshold/direction as the BUY side)
+        # during an architecture review: the condition and its reason
+        # text below were backwards (a bullish market was being reported
+        # as "favors bearish trades"). Mirrors the inversion already
+        # used in this file's Tier 3 blend (`inverted_market`, see
+        # market_context_score above) and in sell_scoring.py's
+        # result.market (same fix, same reasoning).
+        checks["market_score"] = market_score <= 40
 
         if checks["market_score"]:
 
@@ -617,20 +841,170 @@ class SellStrategyEngine:
         tier1_passed = sum(tier1_checks.values()) >= 2
 
         # --------------------------------------------------
-        # TIER 2 — TECHNICAL CONFIRMATION (weighted contribution, not a gate)
+        # TIER 2 — TECHNICAL CONFIRMATION: 4 regime-conditionally-weighted
+        # category factor scores (Trend / Momentum / Volume / Volatility),
+        # mirroring the BUY-side restructuring exactly (see
+        # strategy/buy_strategy.py for the full rationale). breadth/sector
+        # move to Tier 3's market blend below; not_overextended stays a
+        # HARD reject only (see the overextension cap section above), no
+        # longer double-counted as a graded Tier 2 vote too.
+        #
+        # NOTE on asymmetry: SELL's breakdown-engine section tracks
+        # "breakdown" + "failed_breakout" where BUY tracks "breakout" +
+        # "pullback" — these are NOT literal 1:1 mirrors (pre-existing,
+        # not introduced by this restructuring). "failed_breakout" is
+        # grouped into VOLATILITY-diagnostic (same bucket as
+        # "breakdown"/BUY's "breakout") since it's a breakout-pattern
+        # concept, not a trend-support one.
         # --------------------------------------------------
 
         tier1_and_context_keys = {
             "ema_alignment", "market_trend", "sma_alignment",
             "fundamental", "news", "market_score",
+            "breadth", "sector", "not_overextended",
+            # FIX #5: hard reject, not a graded Tier2 vote — mirrors
+            # not_overextended's exclusion.
+            "not_stale_entry",
         }
         tier2_checks = {
             key: value for key, value in checks.items()
             if key not in tier1_and_context_keys
         }
+
+        # "ichimoku" removed (user review) — see the ICHIMOKU CLOUD
+        # NOTE above the check computation site for the full rationale.
+        TREND_CORE = [
+            "price_below_ema20", "supertrend",
+            "adx", "ema_fresh_cross", "pullback_entry",
+        ]
+        MOMENTUM_CORE = ["rsi", "macd_cross", "rsi_fresh_cross"]
+        # FIX #7 (architecture review — evidence family / duplicate
+        # vote), mirrors buy_strategy.py's identical fix: was
+        # ["volume_spike", "obv", "distribution"], but
+        # `checks["distribution"] = checks["obv"] and checks["cmf"]` —
+        # "obv" was counted both standalone and again inside
+        # "distribution" within this same factor-score average. "obv"
+        # removed; "distribution" already carries the OBV-negative
+        # signal (combined with CMF).
+        VOLUME_CORE = ["volume_spike", "distribution"]
+        VOLATILITY_CORE = ["squeeze_breakout", "confirmed_breakdown", "atr_filter", "volatility"]
+
+        # FIX #7: same cheap structural guard as buy_strategy.py — only
+        # catches a literal duplicate key across *_CORE lists, not
+        # signal reuse hidden inside a composite check (see that file's
+        # NOTE for the full caveat).
+        _all_core_keys = TREND_CORE + MOMENTUM_CORE + VOLUME_CORE + VOLATILITY_CORE
+        assert len(_all_core_keys) == len(set(_all_core_keys)), (
+            "Duplicate check key across factor-score CORE lists — the "
+            "same evidence would be double-counted within tier2_score."
+        )
+
+        def _factor_score(core_keys: list[str]) -> float:
+            values = [checks[key] for key in core_keys]
+            return (sum(values) / len(values)) * 100 if values else 50.0
+
+        trend_factor_score = _factor_score(TREND_CORE)
+        momentum_factor_score = _factor_score(MOMENTUM_CORE)
+        volatility_factor_score = _factor_score(VOLATILITY_CORE)
+
+        # FIX #10/#16 (architecture review — volume-pressure model):
+        # mirrors buy_strategy.py's identical fix — see that file's NOTE
+        # for the full rationale and the explicit "this is not a real
+        # buy-vs-sell volume split" honesty caveat. delivery_percentage
+        # is NOT inverted for SELL (unlike market_score, fix #2) — it
+        # measures how much of a day's volume was durable/delivered vs
+        # speculative churn, which has no inherent bullish/bearish
+        # direction; a high reading means "this move (whichever
+        # direction) had real conviction behind it," equally relevant
+        # to a SELL setup as a BUY one.
+        DELIVERY_WEIGHT_IN_VOLUME = 0.35
+        MFI_WEIGHT_IN_VOLUME = 0.15
+
+        # FIX (MFI meaningful-use — raised by user review, mirrors
+        # strategy/buy_strategy.py). checks["mfi"] above collapses MFI's
+        # full 0-100 range into a binary 20<=mfi<=50 cliff, discarding
+        # the extreme readings that are MFI's most information-rich
+        # signal. Replaced with a continuous, direction-aware trapezoid
+        # — the exact mirror of the BUY version around 50, since SELL
+        # wants LOW MFI (bearish money outflow) instead of high:
+        #   mfi >= 80   -> 20   (heavy buying inflow — contradicts a
+        #                        SELL thesis outright, floored not
+        #                        zeroed)
+        #   50-80       -> ramps 20 -> 100 as mfi falls (strengthening
+        #                        bearish flow)
+        #   20-50       -> 100  (healthy bearish money flow — the same
+        #                        sweet spot the old binary check used)
+        #   0-20        -> ramps 100 -> 40 as mfi falls further
+        #                        (deep-oversold bounce-risk — tapered,
+        #                        not zeroed, since a genuine breakdown
+        #                        can stay oversold for a while)
+        # checks["mfi"] itself is left unchanged (reasons text / Tier2
+        # "Technical confirmation: X/Y" informational count only) — only
+        # mfi_component (what actually reaches volume_factor_score)
+        # changes.
+        MFI_LOW_FLOOR = 20.0
+        MFI_HIGH_FLOOR = 40.0
+
+        def _mfi_component_score(mfi_value: float) -> float:
+            if pd.isna(mfi_value):
+                return 50.0  # no data -> neutral, not a fabricated claim
+            if mfi_value >= 80:
+                return MFI_LOW_FLOOR
+            if mfi_value > 50:
+                return MFI_LOW_FLOOR + (80 - mfi_value) * (80.0 / 30.0)
+            if mfi_value >= 20:
+                return 100.0
+            if mfi_value > 0:
+                return 100.0 - (20 - mfi_value) * (60.0 / 20.0)
+            return MFI_HIGH_FLOOR
+
+        volume_core_score = _factor_score(VOLUME_CORE)
+        mfi_component = _mfi_component_score(float(row["mfi_14"]))
+        delivery_pct = row.get("delivery_percentage")
+        has_delivery = delivery_pct is not None
+
+        if has_delivery:
+            delivery_component = min(max(float(delivery_pct), 0.0), 100.0)
+            volume_factor_score = (
+                volume_core_score * (1 - DELIVERY_WEIGHT_IN_VOLUME - MFI_WEIGHT_IN_VOLUME)
+                + mfi_component * MFI_WEIGHT_IN_VOLUME
+                + delivery_component * DELIVERY_WEIGHT_IN_VOLUME
+            )
+        else:
+            volume_factor_score = (
+                volume_core_score * (1 - MFI_WEIGHT_IN_VOLUME)
+                + mfi_component * MFI_WEIGHT_IN_VOLUME
+            )
+
+        reasons.append(
+            f"Volume pressure: direction={volume_core_score:.0f} MFI={mfi_component:.0f} "
+            + (
+                f"delivery={delivery_pct:.1f}% -> {volume_factor_score:.1f}"
+                if has_delivery
+                else f"delivery=unavailable -> {volume_factor_score:.1f}"
+            )
+        )
+
+        # Regime-conditional weights, same ADX thresholds as the BUY side
+        # (trend strength is direction-agnostic).
+        adx_value = float(row["adx_14"])
+
+        if adx_value >= 25:
+            adx_regime = "TRENDING"
+            factor_weights = {"trend": 0.35, "momentum": 0.30, "volume": 0.20, "volatility": 0.15}
+        elif adx_value < 20:
+            adx_regime = "RANGE_BOUND"
+            factor_weights = {"trend": 0.20, "momentum": 0.20, "volume": 0.20, "volatility": 0.40}
+        else:
+            adx_regime = "BASELINE"
+            factor_weights = {"trend": 0.30, "momentum": 0.25, "volume": 0.25, "volatility": 0.20}
+
         tier2_score = (
-            sum(tier2_checks.values()) / max(len(tier2_checks), 1)
-        ) * 100
+            trend_factor_score * factor_weights["trend"]
+            + momentum_factor_score * factor_weights["momentum"]
+            + volume_factor_score * factor_weights["volume"]
+            + volatility_factor_score * factor_weights["volatility"]
+        )
 
         # --------------------------------------------------
         # TIER 3 — CONTEXT (weak fundamentals + negative news + market, weighted)
@@ -640,19 +1014,58 @@ class SellStrategyEngine:
 
         inverted_market = 100.0 - min(max(market_score, 0.0), 100.0)
 
+        # Market-context blend for the Tier 3 "market" slot — mirrors the
+        # BUY side, direction-inverted: WEAK breadth favors SELL (not
+        # STRONG). sector_score is NOT inverted here — same convention as
+        # the existing checks["sector"] gate above (both BUY and SELL
+        # test sector_score >= 70 directly) — see that gate's NOTE for
+        # why this is flagged but not fixed now (no real impact while
+        # sector_score is unavailable).
+        #
+        # FIX #8 (architecture review — sector/breadth placeholders):
+        # mirrors buy_strategy.py's identical fix. sector_score/breadth
+        # are now None when unavailable (was a fabricated 50.0/50.0 —
+        # see execution/scanner.py's NOTE, including the bonus
+        # float-vs-string type-mismatch bug found there). Their weight
+        # redistributes to inverted_market instead of diluting toward a
+        # fabricated neutral value — same real-behavior-change caveat as
+        # the BUY side: market_context_score now equals inverted_market
+        # directly in every real scan today, not a 50/50/50 blend.
+        breadth_state = row.get("breadth", "NEUTRAL")
+        has_breadth = breadth_state is not None
+        has_sector = sector_score is not None
+
+        market_weight, breadth_weight, sector_weight = 0.50, 0.25, 0.25
+        active_weight = market_weight
+        if has_breadth:
+            active_weight += breadth_weight
+        if has_sector:
+            active_weight += sector_weight
+
+        breadth_component = (
+            {"WEAK": 75.0, "STRONG": 25.0}.get(breadth_state, 50.0) * breadth_weight
+            if has_breadth else 0.0
+        )
+        sector_component = (
+            min(max(sector_score, 0.0), 100.0) * sector_weight
+            if has_sector else 0.0
+        )
+        market_context_score = (
+            inverted_market * market_weight
+            + breadth_component
+            + sector_component
+        ) / active_weight
+
         if has_news:
             tier3_score = (
                 fundamental_weakness * 0.55
                 + news_negativity * 0.30
-                # market_score is BUY-oriented (BULL=75, BEAR=25) — invert
-                # it here, since a BEAR market should score HIGH for a
-                # SELL setup, not low.
-                + inverted_market * 0.15
+                + market_context_score * 0.15
             )
         else:
             tier3_score = (
                 fundamental_weakness * (0.55 / 0.70)
-                + inverted_market * (0.15 / 0.70)
+                + market_context_score * (0.15 / 0.70)
             )
 
         # --------------------------------------------------
@@ -667,12 +1080,65 @@ class SellStrategyEngine:
         optional_total = len(optional_checks)
 
         # --------------------------------------------------
-        # FINAL QUALIFICATION
+        # STATES (Point 15, PHASE29_NOTES.md) — mirrors
+        # buy_strategy.py's identical fix. TrendState/SetupState
+        # computed BEFORE qualification, so they can feed the shared
+        # decision/state_rules.py rule table as genuine INPUTS rather
+        # than being derived AFTER-the-fact purely for display.
+        # --------------------------------------------------
+
+        market_state = str(row.get("market_regime", "UNKNOWN")).upper()
+
+        if adx_regime == "RANGE_BOUND":
+            trend_state = "RANGE"
+        elif checks.get("price_below_ema20"):
+            trend_state = "DOWNTREND"
+        else:
+            trend_state = "UPTREND"
+
+        # FIX #5: setup_state distinguishes STALE_BREAKDOWN — mirrors
+        # buy_strategy.py's identical fix.
+        if checks.get("squeeze_breakout"):
+            setup_state = "SQUEEZE_BREAKDOWN"
+        elif checks.get("confirmed_breakdown"):
+            setup_state = "BREAKDOWN"
+        elif checks.get("pullback_entry"):
+            setup_state = "PULLBACK"
+        elif setup_is_stale:
+            setup_state = "STALE_BREAKDOWN"
+        else:
+            setup_state = "NONE"
+
+        # --------------------------------------------------
+        # FINAL QUALIFICATION (Point 15) — mirrors buy_strategy.py's
+        # identical fix; see decision/state_rules.py for the exact rule
+        # order and rationale.
         # --------------------------------------------------
 
         QUALIFY_THRESHOLD = 58.0
 
-        qualified = tier1_passed and overall_score >= QUALIFY_THRESHOLD
+        gate_result = evaluate_entry_state(
+            trend_state=trend_state,
+            unfavorable_trend_state="UPTREND",
+            tier1_passed=tier1_passed,
+            setup_state=setup_state,
+            stale_setup_state="STALE_BREAKDOWN",
+            stale_reason=(
+                "Rejected: stale entry (no fresh trigger on a running "
+                "breakdown), regardless of score."
+            ),
+            not_overextended=checks["not_overextended"],
+            overextended_reason=(
+                "Rejected: overextension cap breached (short-squeeze "
+                "risk), regardless of score."
+            ),
+            overall_score=overall_score,
+            qualify_threshold=QUALIFY_THRESHOLD,
+        )
+
+        qualified = gate_result.qualified
+
+        entry_state = gate_result.entry_state
 
         # --------------------------------------------------
         # CONFIDENCE
@@ -696,7 +1162,17 @@ class SellStrategyEngine:
 
         reasons.append(f"Technical confirmation: {optional_passed}/{optional_total}")
 
+        reasons.append(
+            f"Tier2 factors [{adx_regime}]: Trend={trend_factor_score:.0f} "
+            f"Momentum={momentum_factor_score:.0f} Volume={volume_factor_score:.0f} "
+            f"Volatility={volatility_factor_score:.0f} -> Tier2={tier2_score:.2f}"
+        )
+
         reasons.append(f"Weighted score: {overall_score:.2f}/100 (need >= {QUALIFY_THRESHOLD:.0f})")
+
+        if gate_result.reject_reason:
+
+            reasons.append(gate_result.reject_reason)
 
         reasons.append(f"Confidence: {confidence:.2f}%")
 
@@ -705,6 +1181,20 @@ class SellStrategyEngine:
         # --------------------------------------------------
 
         action = SELL if qualified else NO_TRADE
+
+        # --------------------------------------------------
+        # STATE NARRATIVE (Point 15) — entry_state now comes from the
+        # SAME rule table that decided `qualified` above — mirrors
+        # buy_strategy.py's identical fix.
+        # --------------------------------------------------
+
+        state_narrative = (
+            f"MarketState={market_state} / TrendState={trend_state} / "
+            f"SetupState={setup_state} / EntryState={entry_state}"
+        )
+
+        reasons.append(state_narrative)
+
         # ==========================================================
         # DIAGNOSTICS
         # ==========================================================
@@ -718,11 +1208,21 @@ class SellStrategyEngine:
         reasons.append(f"Checks Failed : {failed_checks}")
 
         logger.info(
-            "SELL Strategy | Action=%s | Confidence=%.2f | Passed=%d/%d",
+            "SELL Strategy | Action=%s | Confidence=%.2f | Passed=%d/%d | "
+            "ADXRegime=%s | Trend=%.1f Momentum=%.1f Volume=%.1f Volatility=%.1f | "
+            "Tier2=%.2f Tier3=%.2f | State=[%s]",
             action,
             confidence,
             passed_checks,
             len(checks),
+            adx_regime,
+            trend_factor_score,
+            momentum_factor_score,
+            volume_factor_score,
+            volatility_factor_score,
+            tier2_score,
+            tier3_score,
+            state_narrative,
         )
 
         # ==========================================================
@@ -739,10 +1239,18 @@ class SellStrategyEngine:
             tier1_passed=tier1_passed,
             tier2_score=round(tier2_score, 2),
             tier3_score=round(tier3_score, 2),
+            trend_factor_score=round(trend_factor_score, 2),
+            momentum_factor_score=round(momentum_factor_score, 2),
+            volume_factor_score=round(volume_factor_score, 2),
+            volatility_factor_score=round(volatility_factor_score, 2),
+            adx_regime=adx_regime,
             fundamental_weakness=round(fundamental_weakness, 2),
+            fundamental_coverage=fundamental_coverage,
             news_negativity=round(news_negativity, 2) if has_news else None,
             overall_score=round(overall_score, 2),
             qualify_threshold=QUALIFY_THRESHOLD,
+            state_narrative=state_narrative,
+            volume_pressure_uses_delivery=has_delivery,
         )
 
     # ==========================================================
