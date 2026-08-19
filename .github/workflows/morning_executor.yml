@@ -1,0 +1,73 @@
+name: Morning Executor
+
+on:
+  schedule:
+    - cron: "46 3 * * *"  # 9:16 AM IST — right after NSE market open (9:15 AM)
+  workflow_dispatch:
+
+concurrency:
+  group: repo-write-lock
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check if cron-job.org already ran today (fallback logic)
+        id: check
+        if: github.event_name == 'schedule'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TODAY=$(date -u +'%Y-%m-%d')
+          RESPONSE=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${{ github.repository }}/actions/workflows/morning_executor.yml/runs?event=workflow_dispatch&per_page=5")
+          ALREADY_RAN=$(echo "$RESPONSE" | python3 -c "import json,sys; data=json.load(sys.stdin); today='$TODAY'; runs=data.get('workflow_runs',[]); found=any(r['created_at'].startswith(today) for r in runs); print('true' if found else 'false')")
+          echo "already_ran=$ALREADY_RAN" >> "$GITHUB_OUTPUT"
+          if [ "$ALREADY_RAN" = "true" ]; then
+            echo "cron-job.org (workflow_dispatch) already ran today - skipping this schedule fallback trigger."
+          else
+            echo "No workflow_dispatch run found today - cron-job.org may have failed. Proceeding via schedule fallback."
+          fi
+
+      - name: Setup Python
+        if: github.event_name != 'schedule' || steps.check.outputs.already_ran != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        if: github.event_name != 'schedule' || steps.check.outputs.already_ran != 'true'
+        run: pip install -r requirements.txt
+      - name: Run Morning Executor
+        if: github.event_name != 'schedule' || steps.check.outputs.already_ran != 'true'
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: PYTHONPATH=. python scripts/morning_executor.py
+      - name: Commit updated state back to repo
+        if: github.event_name != 'schedule' || steps.check.outputs.already_ran != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- storage/trades/ storage/reports/
+          git diff --staged --quiet || git commit -m "Morning execution update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          PUSH_OK=false
+          for i in 1 2 3 4 5; do
+            if git push; then
+              PUSH_OK=true
+              break
+            fi
+            echo "Push rejected (likely a concurrent workflow pushed first) — pulling and retrying ($i/5)..."
+            git stash --include-untracked
+            git pull --rebase origin main
+            git stash pop || true
+            sleep 5
+          done
+          if [ "$PUSH_OK" = false ]; then
+            echo "::error::Push failed after 5 attempts — commit exists locally but was NOT pushed to remote. Data may be lost unless a future run recovers it."
+            exit 1
+          fi

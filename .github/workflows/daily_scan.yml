@@ -2,7 +2,7 @@ name: Daily Scan
 
 on:
   schedule:
-    - cron: "0 17 * * *"  # 10:30 PM IST (17:00 UTC)
+    - cron: "0 15 * * *"  # 8:30 PM IST (15:00 UTC)
   workflow_dispatch:
     inputs:
       force:
@@ -10,6 +10,10 @@ on:
         required: true
         default: false
         type: boolean
+
+concurrency:
+  group: repo-write-lock
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -41,4 +45,19 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A -- reports/ storage/trades/ storage/reports/
           git diff --staged --quiet || git commit -m "Daily scan update: $(date -u +'%Y-%m-%d %H:%M UTC')"
-          git push
+          PUSH_OK=false
+          for i in $(seq 1 12); do
+            if git push; then
+              PUSH_OK=true
+              break
+            fi
+            echo "Push rejected (likely a concurrent workflow pushed first) — pulling and retrying ($i/12)..."
+            git stash --include-untracked
+            git pull --rebase origin main
+            git stash pop || true
+            sleep 300
+          done
+          if [ "$PUSH_OK" = false ]; then
+            echo "::error::Push failed after 5 attempts — commit exists locally but was NOT pushed to remote. Data may be lost unless a future run recovers it."
+            exit 1
+          fi

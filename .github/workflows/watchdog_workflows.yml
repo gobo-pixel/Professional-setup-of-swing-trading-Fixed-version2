@@ -1,0 +1,57 @@
+name: Watchdog - Daily Scan & Morning Executor
+
+on:
+  schedule:
+    - cron: "20 15 * * *"  # 8:50 PM IST — checks Daily Scan (scheduled 8:30 PM IST, 20 min margin)
+    - cron: "50 3 * * *"   # 9:20 AM IST — checks Morning Executor (scheduled 9:16 AM IST, 4 min margin)
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Which workflow to check (for manual runs)"
+        type: choice
+        options: ["daily_scan", "morning_executor"]
+        default: "daily_scan"
+
+concurrency:
+  group: repo-write-lock
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Check Daily Scan status
+        if: github.event.schedule == '20 15 * * *' || (github.event_name == 'workflow_dispatch' && inputs.target == 'daily_scan')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: >
+          PYTHONPATH=. python scripts/watchdog_workflow.py
+          --workflow-file daily_scan.yml
+          --scheduled-hour-utc 15 --scheduled-minute-utc 0
+          --max-delay-minutes 20 --label "Daily Scan"
+
+      - name: Check Morning Executor status
+        if: github.event.schedule == '50 3 * * *' || (github.event_name == 'workflow_dispatch' && inputs.target == 'morning_executor')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: >
+          PYTHONPATH=. python scripts/watchdog_workflow.py
+          --workflow-file morning_executor.yml
+          --scheduled-hour-utc 3 --scheduled-minute-utc 46
+          --max-delay-minutes 4 --label "Morning Executor"
