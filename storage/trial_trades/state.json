@@ -9,6 +9,4386 @@
       "stop_loss": 733.84,
       "target1": 701.31,
       "target1_hit": false
+    },
+    "360ONE.NS": {
+      "trade_id": "trial_360ONE_NS_1787174801",
+      "symbol": "360ONE.NS",
+      "direction": "BUY",
+      "entry_price": 1163.5999755859375,
+      "entry_time": "2026-08-19T21:26:41.126849+00:00",
+      "stop_loss": 1146.15,
+      "target1": 1198.51,
+      "target1_hit": false
+    },
+    "3MINDIA.NS": {
+      "trade_id": "trial_3MINDIA_NS_1787174802",
+      "symbol": "3MINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 34945.0,
+      "entry_time": "2026-08-19T21:26:42.076757+00:00",
+      "stop_loss": 35469.17,
+      "target1": 33896.65,
+      "target1_hit": false
+    },
+    "ACC.NS": {
+      "trade_id": "trial_ACC_NS_1787174802",
+      "symbol": "ACC.NS",
+      "direction": "SELL",
+      "entry_price": 1303.800048828125,
+      "entry_time": "2026-08-19T21:26:42.866412+00:00",
+      "stop_loss": 1323.36,
+      "target1": 1264.69,
+      "target1_hit": false
+    },
+    "AIAENG.NS": {
+      "trade_id": "trial_AIAENG_NS_1787174803",
+      "symbol": "AIAENG.NS",
+      "direction": "SELL",
+      "entry_price": 4447.60009765625,
+      "entry_time": "2026-08-19T21:26:43.689831+00:00",
+      "stop_loss": 4514.31,
+      "target1": 4314.17,
+      "target1_hit": false
+    },
+    "APLAPOLLO.NS": {
+      "trade_id": "trial_APLAPOLLO_NS_1787174804",
+      "symbol": "APLAPOLLO.NS",
+      "direction": "BUY",
+      "entry_price": 2115.0,
+      "entry_time": "2026-08-19T21:26:44.607944+00:00",
+      "stop_loss": 2083.28,
+      "target1": 2178.45,
+      "target1_hit": false
+    },
+    "AUBANK.NS": {
+      "trade_id": "trial_AUBANK_NS_1787174805",
+      "symbol": "AUBANK.NS",
+      "direction": "BUY",
+      "entry_price": 1075.699951171875,
+      "entry_time": "2026-08-19T21:26:45.232400+00:00",
+      "stop_loss": 1059.56,
+      "target1": 1107.97,
+      "target1_hit": false
+    },
+    "AADHARHFC.NS": {
+      "trade_id": "trial_AADHARHFC_NS_1787174806",
+      "symbol": "AADHARHFC.NS",
+      "direction": "SELL",
+      "entry_price": 487.3999938964844,
+      "entry_time": "2026-08-19T21:26:46.143536+00:00",
+      "stop_loss": 494.71,
+      "target1": 472.78,
+      "target1_hit": false
+    },
+    "AARTIIND.NS": {
+      "trade_id": "trial_AARTIIND_NS_1787174807",
+      "symbol": "AARTIIND.NS",
+      "direction": "BUY",
+      "entry_price": 530.0999755859375,
+      "entry_time": "2026-08-19T21:26:47.011068+00:00",
+      "stop_loss": 522.15,
+      "target1": 546.0,
+      "target1_hit": false
+    },
+    "AAVAS.NS": {
+      "trade_id": "trial_AAVAS_NS_1787174807",
+      "symbol": "AAVAS.NS",
+      "direction": "SELL",
+      "entry_price": 1388.300048828125,
+      "entry_time": "2026-08-19T21:26:47.620384+00:00",
+      "stop_loss": 1409.12,
+      "target1": 1346.65,
+      "target1_hit": false
+    },
+    "ABBOTINDIA.NS": {
+      "trade_id": "trial_ABBOTINDIA_NS_1787174808",
+      "symbol": "ABBOTINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 26580.0,
+      "entry_time": "2026-08-19T21:26:48.337870+00:00",
+      "stop_loss": 26978.7,
+      "target1": 25782.6,
+      "target1_hit": false
+    },
+    "ACE.NS": {
+      "trade_id": "trial_ACE_NS_1787174808",
+      "symbol": "ACE.NS",
+      "direction": "BUY",
+      "entry_price": 1184.800048828125,
+      "entry_time": "2026-08-19T21:26:48.969761+00:00",
+      "stop_loss": 1167.03,
+      "target1": 1220.34,
+      "target1_hit": false
+    },
+    "ADANIENSOL.NS": {
+      "trade_id": "trial_ADANIENSOL_NS_1787174810",
+      "symbol": "ADANIENSOL.NS",
+      "direction": "SELL",
+      "entry_price": 1603.0,
+      "entry_time": "2026-08-19T21:26:50.180802+00:00",
+      "stop_loss": 1627.04,
+      "target1": 1554.91,
+      "target1_hit": false
+    },
+    "ADANIENT.NS": {
+      "trade_id": "trial_ADANIENT_NS_1787174810",
+      "symbol": "ADANIENT.NS",
+      "direction": "SELL",
+      "entry_price": 3002.5,
+      "entry_time": "2026-08-19T21:26:50.804729+00:00",
+      "stop_loss": 3047.54,
+      "target1": 2912.42,
+      "target1_hit": false
+    },
+    "ADANIGREEN.NS": {
+      "trade_id": "trial_ADANIGREEN_NS_1787174811",
+      "symbol": "ADANIGREEN.NS",
+      "direction": "SELL",
+      "entry_price": 1308.0,
+      "entry_time": "2026-08-19T21:26:51.390414+00:00",
+      "stop_loss": 1327.62,
+      "target1": 1268.76,
+      "target1_hit": false
+    },
+    "ADANIPORTS.NS": {
+      "trade_id": "trial_ADANIPORTS_NS_1787174811",
+      "symbol": "ADANIPORTS.NS",
+      "direction": "SELL",
+      "entry_price": 1682.4000244140625,
+      "entry_time": "2026-08-19T21:26:51.971130+00:00",
+      "stop_loss": 1707.64,
+      "target1": 1631.93,
+      "target1_hit": false
+    },
+    "ADANIPOWER.NS": {
+      "trade_id": "trial_ADANIPOWER_NS_1787174812",
+      "symbol": "ADANIPOWER.NS",
+      "direction": "SELL",
+      "entry_price": 205.5800018310547,
+      "entry_time": "2026-08-19T21:26:52.529659+00:00",
+      "stop_loss": 208.66,
+      "target1": 199.41,
+      "target1_hit": false
+    },
+    "ATGL.NS": {
+      "trade_id": "trial_ATGL_NS_1787174813",
+      "symbol": "ATGL.NS",
+      "direction": "SELL",
+      "entry_price": 647.2999877929688,
+      "entry_time": "2026-08-19T21:26:53.095672+00:00",
+      "stop_loss": 657.01,
+      "target1": 627.88,
+      "target1_hit": false
+    },
+    "ABCAPITAL.NS": {
+      "trade_id": "trial_ABCAPITAL_NS_1787174813",
+      "symbol": "ABCAPITAL.NS",
+      "direction": "SELL",
+      "entry_price": 402.0,
+      "entry_time": "2026-08-19T21:26:53.689577+00:00",
+      "stop_loss": 408.03,
+      "target1": 389.94,
+      "target1_hit": false
+    },
+    "ABFRL.NS": {
+      "trade_id": "trial_ABFRL_NS_1787174814",
+      "symbol": "ABFRL.NS",
+      "direction": "SELL",
+      "entry_price": 54.970001220703125,
+      "entry_time": "2026-08-19T21:26:54.287504+00:00",
+      "stop_loss": 55.79,
+      "target1": 53.32,
+      "target1_hit": false
+    },
+    "ABLBL.NS": {
+      "trade_id": "trial_ABLBL_NS_1787174814",
+      "symbol": "ABLBL.NS",
+      "direction": "SELL",
+      "entry_price": 88.72000122070312,
+      "entry_time": "2026-08-19T21:26:54.872915+00:00",
+      "stop_loss": 90.05,
+      "target1": 86.06,
+      "target1_hit": false
+    },
+    "ABREL.NS": {
+      "trade_id": "trial_ABREL_NS_1787174815",
+      "symbol": "ABREL.NS",
+      "direction": "SELL",
+      "entry_price": 1390.800048828125,
+      "entry_time": "2026-08-19T21:26:55.508474+00:00",
+      "stop_loss": 1411.66,
+      "target1": 1349.08,
+      "target1_hit": false
+    },
+    "ABSLAMC.NS": {
+      "trade_id": "trial_ABSLAMC_NS_1787174816",
+      "symbol": "ABSLAMC.NS",
+      "direction": "SELL",
+      "entry_price": 1013.2999877929688,
+      "entry_time": "2026-08-19T21:26:56.110892+00:00",
+      "stop_loss": 1028.5,
+      "target1": 982.9,
+      "target1_hit": false
+    },
+    "CPPLUS.NS": {
+      "trade_id": "trial_CPPLUS_NS_1787174816",
+      "symbol": "CPPLUS.NS",
+      "direction": "SELL",
+      "entry_price": 3342.0,
+      "entry_time": "2026-08-19T21:26:56.669245+00:00",
+      "stop_loss": 3392.13,
+      "target1": 3241.74,
+      "target1_hit": false
+    },
+    "AEGISVOPAK.NS": {
+      "trade_id": "trial_AEGISVOPAK_NS_1787174817",
+      "symbol": "AEGISVOPAK.NS",
+      "direction": "SELL",
+      "entry_price": 274.79998779296875,
+      "entry_time": "2026-08-19T21:26:57.459731+00:00",
+      "stop_loss": 278.92,
+      "target1": 266.56,
+      "target1_hit": false
+    },
+    "AFFLE.NS": {
+      "trade_id": "trial_AFFLE_NS_1787174818",
+      "symbol": "AFFLE.NS",
+      "direction": "BUY",
+      "entry_price": 1711.300048828125,
+      "entry_time": "2026-08-19T21:26:58.189146+00:00",
+      "stop_loss": 1685.63,
+      "target1": 1762.64,
+      "target1_hit": false
+    },
+    "AJANTPHARM.NS": {
+      "trade_id": "trial_AJANTPHARM_NS_1787174818",
+      "symbol": "AJANTPHARM.NS",
+      "direction": "BUY",
+      "entry_price": 3706.39990234375,
+      "entry_time": "2026-08-19T21:26:58.806578+00:00",
+      "stop_loss": 3650.8,
+      "target1": 3817.59,
+      "target1_hit": false
+    },
+    "ALKEM.NS": {
+      "trade_id": "trial_ALKEM_NS_1787174819",
+      "symbol": "ALKEM.NS",
+      "direction": "SELL",
+      "entry_price": 5475.0,
+      "entry_time": "2026-08-19T21:26:59.397527+00:00",
+      "stop_loss": 5557.12,
+      "target1": 5310.75,
+      "target1_hit": false
+    },
+    "ABDL.NS": {
+      "trade_id": "trial_ABDL_NS_1787174820",
+      "symbol": "ABDL.NS",
+      "direction": "SELL",
+      "entry_price": 612.5999755859375,
+      "entry_time": "2026-08-19T21:27:00.001663+00:00",
+      "stop_loss": 621.79,
+      "target1": 594.22,
+      "target1_hit": false
+    },
+    "ARE&M.NS": {
+      "trade_id": "trial_ARE&M_NS_1787174820",
+      "symbol": "ARE&M.NS",
+      "direction": "BUY",
+      "entry_price": 935.7999877929688,
+      "entry_time": "2026-08-19T21:27:00.680668+00:00",
+      "stop_loss": 921.76,
+      "target1": 963.87,
+      "target1_hit": false
+    },
+    "AMBER.NS": {
+      "trade_id": "trial_AMBER_NS_1787174821",
+      "symbol": "AMBER.NS",
+      "direction": "SELL",
+      "entry_price": 7350.0,
+      "entry_time": "2026-08-19T21:27:01.272489+00:00",
+      "stop_loss": 7460.25,
+      "target1": 7129.5,
+      "target1_hit": false
+    },
+    "AMBUJACEM.NS": {
+      "trade_id": "trial_AMBUJACEM_NS_1787174821",
+      "symbol": "AMBUJACEM.NS",
+      "direction": "SELL",
+      "entry_price": 412.3999938964844,
+      "entry_time": "2026-08-19T21:27:01.878600+00:00",
+      "stop_loss": 418.59,
+      "target1": 400.03,
+      "target1_hit": false
+    },
+    "ANANDRATHI.NS": {
+      "trade_id": "trial_ANANDRATHI_NS_1787174822",
+      "symbol": "ANANDRATHI.NS",
+      "direction": "BUY",
+      "entry_price": 2194.800048828125,
+      "entry_time": "2026-08-19T21:27:02.509455+00:00",
+      "stop_loss": 2161.88,
+      "target1": 2260.64,
+      "target1_hit": false
+    },
+    "ANANTRAJ.NS": {
+      "trade_id": "trial_ANANTRAJ_NS_1787174823",
+      "symbol": "ANANTRAJ.NS",
+      "direction": "BUY",
+      "entry_price": 627.0499877929688,
+      "entry_time": "2026-08-19T21:27:03.128354+00:00",
+      "stop_loss": 617.64,
+      "target1": 645.86,
+      "target1_hit": false
+    },
+    "ANGELONE.NS": {
+      "trade_id": "trial_ANGELONE_NS_1787174823",
+      "symbol": "ANGELONE.NS",
+      "direction": "SELL",
+      "entry_price": 291.75,
+      "entry_time": "2026-08-19T21:27:03.944512+00:00",
+      "stop_loss": 296.13,
+      "target1": 283.0,
+      "target1_hit": false
+    },
+    "ANTHEM.NS": {
+      "trade_id": "trial_ANTHEM_NS_1787174824",
+      "symbol": "ANTHEM.NS",
+      "direction": "BUY",
+      "entry_price": 891.0499877929688,
+      "entry_time": "2026-08-19T21:27:04.529809+00:00",
+      "stop_loss": 877.68,
+      "target1": 917.78,
+      "target1_hit": false
+    },
+    "ANURAS.NS": {
+      "trade_id": "trial_ANURAS_NS_1787174825",
+      "symbol": "ANURAS.NS",
+      "direction": "SELL",
+      "entry_price": 1210.5,
+      "entry_time": "2026-08-19T21:27:05.104976+00:00",
+      "stop_loss": 1228.66,
+      "target1": 1174.18,
+      "target1_hit": false
+    },
+    "APARINDS.NS": {
+      "trade_id": "trial_APARINDS_NS_1787174825",
+      "symbol": "APARINDS.NS",
+      "direction": "BUY",
+      "entry_price": 17214.0,
+      "entry_time": "2026-08-19T21:27:05.744908+00:00",
+      "stop_loss": 16955.79,
+      "target1": 17730.42,
+      "target1_hit": false
+    },
+    "APOLLOHOSP.NS": {
+      "trade_id": "trial_APOLLOHOSP_NS_1787174826",
+      "symbol": "APOLLOHOSP.NS",
+      "direction": "SELL",
+      "entry_price": 8817.0,
+      "entry_time": "2026-08-19T21:27:06.405647+00:00",
+      "stop_loss": 8949.25,
+      "target1": 8552.49,
+      "target1_hit": false
+    },
+    "APOLLOTYRE.NS": {
+      "trade_id": "trial_APOLLOTYRE_NS_1787174827",
+      "symbol": "APOLLOTYRE.NS",
+      "direction": "BUY",
+      "entry_price": 436.0,
+      "entry_time": "2026-08-19T21:27:07.217221+00:00",
+      "stop_loss": 429.46,
+      "target1": 449.08,
+      "target1_hit": false
+    },
+    "APTUS.NS": {
+      "trade_id": "trial_APTUS_NS_1787174827",
+      "symbol": "APTUS.NS",
+      "direction": "SELL",
+      "entry_price": 257.0,
+      "entry_time": "2026-08-19T21:27:07.839331+00:00",
+      "stop_loss": 260.85,
+      "target1": 249.29,
+      "target1_hit": false
+    },
+    "ASAHIINDIA.NS": {
+      "trade_id": "trial_ASAHIINDIA_NS_1787174828",
+      "symbol": "ASAHIINDIA.NS",
+      "direction": "BUY",
+      "entry_price": 962.7999877929688,
+      "entry_time": "2026-08-19T21:27:08.504328+00:00",
+      "stop_loss": 948.36,
+      "target1": 991.68,
+      "target1_hit": false
+    },
+    "ASHOKLEY.NS": {
+      "trade_id": "trial_ASHOKLEY_NS_1787174829",
+      "symbol": "ASHOKLEY.NS",
+      "direction": "BUY",
+      "entry_price": 176.35000610351562,
+      "entry_time": "2026-08-19T21:27:09.171394+00:00",
+      "stop_loss": 173.7,
+      "target1": 181.64,
+      "target1_hit": false
+    },
+    "ASIANPAINT.NS": {
+      "trade_id": "trial_ASIANPAINT_NS_1787174829",
+      "symbol": "ASIANPAINT.NS",
+      "direction": "SELL",
+      "entry_price": 2628.39990234375,
+      "entry_time": "2026-08-19T21:27:09.979671+00:00",
+      "stop_loss": 2667.83,
+      "target1": 2549.55,
+      "target1_hit": false
+    },
+    "ASTRAL.NS": {
+      "trade_id": "trial_ASTRAL_NS_1787174830",
+      "symbol": "ASTRAL.NS",
+      "direction": "BUY",
+      "entry_price": 1520.0,
+      "entry_time": "2026-08-19T21:27:10.723877+00:00",
+      "stop_loss": 1497.2,
+      "target1": 1565.6,
+      "target1_hit": false
+    },
+    "ATHERENERG.NS": {
+      "trade_id": "trial_ATHERENERG_NS_1787174831",
+      "symbol": "ATHERENERG.NS",
+      "direction": "BUY",
+      "entry_price": 1465.800048828125,
+      "entry_time": "2026-08-19T21:27:11.335039+00:00",
+      "stop_loss": 1443.81,
+      "target1": 1509.77,
+      "target1_hit": false
+    },
+    "AUROPHARMA.NS": {
+      "trade_id": "trial_AUROPHARMA_NS_1787174832",
+      "symbol": "AUROPHARMA.NS",
+      "direction": "BUY",
+      "entry_price": 1645.0,
+      "entry_time": "2026-08-19T21:27:12.083433+00:00",
+      "stop_loss": 1620.33,
+      "target1": 1694.35,
+      "target1_hit": false
+    },
+    "AIIL.NS": {
+      "trade_id": "trial_AIIL_NS_1787174832",
+      "symbol": "AIIL.NS",
+      "direction": "SELL",
+      "entry_price": 553.25,
+      "entry_time": "2026-08-19T21:27:12.664669+00:00",
+      "stop_loss": 561.55,
+      "target1": 536.65,
+      "target1_hit": false
+    },
+    "BEML.NS": {
+      "trade_id": "trial_BEML_NS_1787174833",
+      "symbol": "BEML.NS",
+      "direction": "BUY",
+      "entry_price": 1965.5,
+      "entry_time": "2026-08-19T21:27:13.553634+00:00",
+      "stop_loss": 1936.02,
+      "target1": 2024.47,
+      "target1_hit": false
+    },
+    "BLS.NS": {
+      "trade_id": "trial_BLS_NS_1787174834",
+      "symbol": "BLS.NS",
+      "direction": "BUY",
+      "entry_price": 267.739990234375,
+      "entry_time": "2026-08-19T21:27:14.161335+00:00",
+      "stop_loss": 263.72,
+      "target1": 275.77,
+      "target1_hit": false
+    },
+    "BSE.NS": {
+      "trade_id": "trial_BSE_NS_1787174834",
+      "symbol": "BSE.NS",
+      "direction": "SELL",
+      "entry_price": 3308.0,
+      "entry_time": "2026-08-19T21:27:14.834338+00:00",
+      "stop_loss": 3357.62,
+      "target1": 3208.76,
+      "target1_hit": false
+    },
+    "BAJAJ-AUTO.NS": {
+      "trade_id": "trial_BAJAJ-AUTO_NS_1787174835",
+      "symbol": "BAJAJ-AUTO.NS",
+      "direction": "BUY",
+      "entry_price": 11607.0,
+      "entry_time": "2026-08-19T21:27:15.465243+00:00",
+      "stop_loss": 11432.9,
+      "target1": 11955.21,
+      "target1_hit": false
+    },
+    "BAJFINANCE.NS": {
+      "trade_id": "trial_BAJFINANCE_NS_1787174836",
+      "symbol": "BAJFINANCE.NS",
+      "direction": "BUY",
+      "entry_price": 1094.300048828125,
+      "entry_time": "2026-08-19T21:27:16.292113+00:00",
+      "stop_loss": 1077.89,
+      "target1": 1127.13,
+      "target1_hit": false
+    },
+    "BAJAJFINSV.NS": {
+      "trade_id": "trial_BAJAJFINSV_NS_1787174836",
+      "symbol": "BAJAJFINSV.NS",
+      "direction": "BUY",
+      "entry_price": 2011.199951171875,
+      "entry_time": "2026-08-19T21:27:16.890338+00:00",
+      "stop_loss": 1981.03,
+      "target1": 2071.54,
+      "target1_hit": false
+    },
+    "BAJAJHLDNG.NS": {
+      "trade_id": "trial_BAJAJHLDNG_NS_1787174837",
+      "symbol": "BAJAJHLDNG.NS",
+      "direction": "BUY",
+      "entry_price": 11254.0,
+      "entry_time": "2026-08-19T21:27:17.548161+00:00",
+      "stop_loss": 11085.19,
+      "target1": 11591.62,
+      "target1_hit": false
+    },
+    "BAJAJHFL.NS": {
+      "trade_id": "trial_BAJAJHFL_NS_1787174838",
+      "symbol": "BAJAJHFL.NS",
+      "direction": "SELL",
+      "entry_price": 84.36000061035156,
+      "entry_time": "2026-08-19T21:27:18.115215+00:00",
+      "stop_loss": 85.63,
+      "target1": 81.83,
+      "target1_hit": false
+    },
+    "BALKRISIND.NS": {
+      "trade_id": "trial_BALKRISIND_NS_1787174838",
+      "symbol": "BALKRISIND.NS",
+      "direction": "BUY",
+      "entry_price": 2376.699951171875,
+      "entry_time": "2026-08-19T21:27:18.779954+00:00",
+      "stop_loss": 2341.05,
+      "target1": 2448.0,
+      "target1_hit": false
+    },
+    "BALRAMCHIN.NS": {
+      "trade_id": "trial_BALRAMCHIN_NS_1787174839",
+      "symbol": "BALRAMCHIN.NS",
+      "direction": "BUY",
+      "entry_price": 653.25,
+      "entry_time": "2026-08-19T21:27:19.465746+00:00",
+      "stop_loss": 643.45,
+      "target1": 672.85,
+      "target1_hit": false
+    },
+    "BANDHANBNK.NS": {
+      "trade_id": "trial_BANDHANBNK_NS_1787174840",
+      "symbol": "BANDHANBNK.NS",
+      "direction": "SELL",
+      "entry_price": 170.5,
+      "entry_time": "2026-08-19T21:27:20.062148+00:00",
+      "stop_loss": 173.06,
+      "target1": 165.38,
+      "target1_hit": false
+    },
+    "BANKBARODA.NS": {
+      "trade_id": "trial_BANKBARODA_NS_1787174840",
+      "symbol": "BANKBARODA.NS",
+      "direction": "SELL",
+      "entry_price": 244.0,
+      "entry_time": "2026-08-19T21:27:20.681175+00:00",
+      "stop_loss": 247.66,
+      "target1": 236.68,
+      "target1_hit": false
+    },
+    "BANKINDIA.NS": {
+      "trade_id": "trial_BANKINDIA_NS_1787174841",
+      "symbol": "BANKINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 142.10000610351562,
+      "entry_time": "2026-08-19T21:27:21.422430+00:00",
+      "stop_loss": 144.23,
+      "target1": 137.84,
+      "target1_hit": false
+    },
+    "MAHABANK.NS": {
+      "trade_id": "trial_MAHABANK_NS_1787174842",
+      "symbol": "MAHABANK.NS",
+      "direction": "BUY",
+      "entry_price": 80.48999786376953,
+      "entry_time": "2026-08-19T21:27:22.017213+00:00",
+      "stop_loss": 79.28,
+      "target1": 82.9,
+      "target1_hit": false
+    },
+    "BATAINDIA.NS": {
+      "trade_id": "trial_BATAINDIA_NS_1787174842",
+      "symbol": "BATAINDIA.NS",
+      "direction": "BUY",
+      "entry_price": 753.0999755859375,
+      "entry_time": "2026-08-19T21:27:22.697495+00:00",
+      "stop_loss": 741.8,
+      "target1": 775.69,
+      "target1_hit": false
+    },
+    "BAYERCROP.NS": {
+      "trade_id": "trial_BAYERCROP_NS_1787174843",
+      "symbol": "BAYERCROP.NS",
+      "direction": "SELL",
+      "entry_price": 4105.7001953125,
+      "entry_time": "2026-08-19T21:27:23.277510+00:00",
+      "stop_loss": 4167.29,
+      "target1": 3982.53,
+      "target1_hit": false
+    },
+    "BERGEPAINT.NS": {
+      "trade_id": "trial_BERGEPAINT_NS_1787174844",
+      "symbol": "BERGEPAINT.NS",
+      "direction": "BUY",
+      "entry_price": 541.2000122070312,
+      "entry_time": "2026-08-19T21:27:24.440893+00:00",
+      "stop_loss": 533.08,
+      "target1": 557.44,
+      "target1_hit": false
+    },
+    "BDL.NS": {
+      "trade_id": "trial_BDL_NS_1787174845",
+      "symbol": "BDL.NS",
+      "direction": "BUY",
+      "entry_price": 1393.0,
+      "entry_time": "2026-08-19T21:27:25.055377+00:00",
+      "stop_loss": 1372.11,
+      "target1": 1434.79,
+      "target1_hit": false
+    },
+    "BEL.NS": {
+      "trade_id": "trial_BEL_NS_1787174845",
+      "symbol": "BEL.NS",
+      "direction": "BUY",
+      "entry_price": 412.0,
+      "entry_time": "2026-08-19T21:27:25.700420+00:00",
+      "stop_loss": 405.82,
+      "target1": 424.36,
+      "target1_hit": false
+    },
+    "BHARATFORG.NS": {
+      "trade_id": "trial_BHARATFORG_NS_1787174846",
+      "symbol": "BHARATFORG.NS",
+      "direction": "SELL",
+      "entry_price": 2098.89990234375,
+      "entry_time": "2026-08-19T21:27:26.307305+00:00",
+      "stop_loss": 2130.38,
+      "target1": 2035.93,
+      "target1_hit": false
+    },
+    "BHEL.NS": {
+      "trade_id": "trial_BHEL_NS_1787174847",
+      "symbol": "BHEL.NS",
+      "direction": "BUY",
+      "entry_price": 425.0,
+      "entry_time": "2026-08-19T21:27:27.138810+00:00",
+      "stop_loss": 418.62,
+      "target1": 437.75,
+      "target1_hit": false
+    },
+    "BPCL.NS": {
+      "trade_id": "trial_BPCL_NS_1787174847",
+      "symbol": "BPCL.NS",
+      "direction": "SELL",
+      "entry_price": 310.29998779296875,
+      "entry_time": "2026-08-19T21:27:27.778186+00:00",
+      "stop_loss": 314.95,
+      "target1": 300.99,
+      "target1_hit": false
+    },
+    "BHARTIARTL.NS": {
+      "trade_id": "trial_BHARTIARTL_NS_1787174848",
+      "symbol": "BHARTIARTL.NS",
+      "direction": "SELL",
+      "entry_price": 1934.199951171875,
+      "entry_time": "2026-08-19T21:27:28.375931+00:00",
+      "stop_loss": 1963.21,
+      "target1": 1876.17,
+      "target1_hit": false
+    },
+    "BIKAJI.NS": {
+      "trade_id": "trial_BIKAJI_NS_1787174849",
+      "symbol": "BIKAJI.NS",
+      "direction": "SELL",
+      "entry_price": 608.6500244140625,
+      "entry_time": "2026-08-19T21:27:29.153495+00:00",
+      "stop_loss": 617.78,
+      "target1": 590.39,
+      "target1_hit": false
+    },
+    "GROWW.NS": {
+      "trade_id": "trial_GROWW_NS_1787174850",
+      "symbol": "GROWW.NS",
+      "direction": "SELL",
+      "entry_price": 193.80999755859375,
+      "entry_time": "2026-08-19T21:27:30.194830+00:00",
+      "stop_loss": 196.72,
+      "target1": 188.0,
+      "target1_hit": false
+    },
+    "BIOCON.NS": {
+      "trade_id": "trial_BIOCON_NS_1787174850",
+      "symbol": "BIOCON.NS",
+      "direction": "SELL",
+      "entry_price": 417.5,
+      "entry_time": "2026-08-19T21:27:30.848395+00:00",
+      "stop_loss": 423.76,
+      "target1": 404.97,
+      "target1_hit": false
+    },
+    "BLUEDART.NS": {
+      "trade_id": "trial_BLUEDART_NS_1787174851",
+      "symbol": "BLUEDART.NS",
+      "direction": "BUY",
+      "entry_price": 5085.5,
+      "entry_time": "2026-08-19T21:27:31.790560+00:00",
+      "stop_loss": 5009.22,
+      "target1": 5238.07,
+      "target1_hit": false
+    },
+    "BLUEJET.NS": {
+      "trade_id": "trial_BLUEJET_NS_1787174852",
+      "symbol": "BLUEJET.NS",
+      "direction": "BUY",
+      "entry_price": 607.25,
+      "entry_time": "2026-08-19T21:27:32.358030+00:00",
+      "stop_loss": 598.14,
+      "target1": 625.47,
+      "target1_hit": false
+    },
+    "BLUESTARCO.NS": {
+      "trade_id": "trial_BLUESTARCO_NS_1787174853",
+      "symbol": "BLUESTARCO.NS",
+      "direction": "SELL",
+      "entry_price": 1493.0,
+      "entry_time": "2026-08-19T21:27:33.052214+00:00",
+      "stop_loss": 1515.39,
+      "target1": 1448.21,
+      "target1_hit": false
+    },
+    "BBTC.NS": {
+      "trade_id": "trial_BBTC_NS_1787174853",
+      "symbol": "BBTC.NS",
+      "direction": "SELL",
+      "entry_price": 1473.199951171875,
+      "entry_time": "2026-08-19T21:27:33.742091+00:00",
+      "stop_loss": 1495.3,
+      "target1": 1429.0,
+      "target1_hit": false
+    },
+    "BOSCHLTD.NS": {
+      "trade_id": "trial_BOSCHLTD_NS_1787174854",
+      "symbol": "BOSCHLTD.NS",
+      "direction": "BUY",
+      "entry_price": 48730.0,
+      "entry_time": "2026-08-19T21:27:34.384309+00:00",
+      "stop_loss": 47999.05,
+      "target1": 50191.9,
+      "target1_hit": false
+    },
+    "FIRSTCRY.NS": {
+      "trade_id": "trial_FIRSTCRY_NS_1787174855",
+      "symbol": "FIRSTCRY.NS",
+      "direction": "SELL",
+      "entry_price": 204.64999389648438,
+      "entry_time": "2026-08-19T21:27:35.365565+00:00",
+      "stop_loss": 207.72,
+      "target1": 198.51,
+      "target1_hit": false
+    },
+    "BRIGADE.NS": {
+      "trade_id": "trial_BRIGADE_NS_1787174856",
+      "symbol": "BRIGADE.NS",
+      "direction": "BUY",
+      "entry_price": 588.9000244140625,
+      "entry_time": "2026-08-19T21:27:36.017559+00:00",
+      "stop_loss": 580.07,
+      "target1": 606.57,
+      "target1_hit": false
+    },
+    "MAPMYINDIA.NS": {
+      "trade_id": "trial_MAPMYINDIA_NS_1787174856",
+      "symbol": "MAPMYINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 1012.5999755859375,
+      "entry_time": "2026-08-19T21:27:36.836176+00:00",
+      "stop_loss": 1027.79,
+      "target1": 982.22,
+      "target1_hit": false
+    },
+    "CCL.NS": {
+      "trade_id": "trial_CCL_NS_1787174857",
+      "symbol": "CCL.NS",
+      "direction": "SELL",
+      "entry_price": 1132.0999755859375,
+      "entry_time": "2026-08-19T21:27:37.454324+00:00",
+      "stop_loss": 1149.08,
+      "target1": 1098.14,
+      "target1_hit": false
+    },
+    "CESC.NS": {
+      "trade_id": "trial_CESC_NS_1787174858",
+      "symbol": "CESC.NS",
+      "direction": "BUY",
+      "entry_price": 167.97999572753906,
+      "entry_time": "2026-08-19T21:27:38.089422+00:00",
+      "stop_loss": 165.46,
+      "target1": 173.02,
+      "target1_hit": false
+    },
+    "CIEINDIA.NS": {
+      "trade_id": "trial_CIEINDIA_NS_1787174858",
+      "symbol": "CIEINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 409.70001220703125,
+      "entry_time": "2026-08-19T21:27:38.864403+00:00",
+      "stop_loss": 415.85,
+      "target1": 397.41,
+      "target1_hit": false
+    },
+    "CRISIL.NS": {
+      "trade_id": "trial_CRISIL_NS_1787174859",
+      "symbol": "CRISIL.NS",
+      "direction": "BUY",
+      "entry_price": 4442.5,
+      "entry_time": "2026-08-19T21:27:39.503173+00:00",
+      "stop_loss": 4375.86,
+      "target1": 4575.78,
+      "target1_hit": false
+    },
+    "CANFINHOME.NS": {
+      "trade_id": "trial_CANFINHOME_NS_1787174860",
+      "symbol": "CANFINHOME.NS",
+      "direction": "SELL",
+      "entry_price": 824.1500244140625,
+      "entry_time": "2026-08-19T21:27:40.772854+00:00",
+      "stop_loss": 836.51,
+      "target1": 799.43,
+      "target1_hit": false
+    },
+    "CANHLIFE.NS": {
+      "trade_id": "trial_CANHLIFE_NS_1787174861",
+      "symbol": "CANHLIFE.NS",
+      "direction": "SELL",
+      "entry_price": 149.27000427246094,
+      "entry_time": "2026-08-19T21:27:41.639369+00:00",
+      "stop_loss": 151.51,
+      "target1": 144.79,
+      "target1_hit": false
+    },
+    "CAPLIPOINT.NS": {
+      "trade_id": "trial_CAPLIPOINT_NS_1787174862",
+      "symbol": "CAPLIPOINT.NS",
+      "direction": "SELL",
+      "entry_price": 2529.699951171875,
+      "entry_time": "2026-08-19T21:27:42.395952+00:00",
+      "stop_loss": 2567.65,
+      "target1": 2453.81,
+      "target1_hit": false
+    },
+    "CGCL.NS": {
+      "trade_id": "trial_CGCL_NS_1787174863",
+      "symbol": "CGCL.NS",
+      "direction": "SELL",
+      "entry_price": 225.5399932861328,
+      "entry_time": "2026-08-19T21:27:43.016264+00:00",
+      "stop_loss": 228.92,
+      "target1": 218.77,
+      "target1_hit": false
+    },
+    "CARBORUNIV.NS": {
+      "trade_id": "trial_CARBORUNIV_NS_1787174863",
+      "symbol": "CARBORUNIV.NS",
+      "direction": "BUY",
+      "entry_price": 1126.0,
+      "entry_time": "2026-08-19T21:27:43.723783+00:00",
+      "stop_loss": 1109.11,
+      "target1": 1159.78,
+      "target1_hit": false
+    },
+    "CARTRADE.NS": {
+      "trade_id": "trial_CARTRADE_NS_1787174864",
+      "symbol": "CARTRADE.NS",
+      "direction": "BUY",
+      "entry_price": 2802.60009765625,
+      "entry_time": "2026-08-19T21:27:44.278389+00:00",
+      "stop_loss": 2760.56,
+      "target1": 2886.68,
+      "target1_hit": false
+    },
+    "CEATLTD.NS": {
+      "trade_id": "trial_CEATLTD_NS_1787174865",
+      "symbol": "CEATLTD.NS",
+      "direction": "BUY",
+      "entry_price": 3605.39990234375,
+      "entry_time": "2026-08-19T21:27:45.001283+00:00",
+      "stop_loss": 3551.32,
+      "target1": 3713.56,
+      "target1_hit": false
+    },
+    "CEMPRO.NS": {
+      "trade_id": "trial_CEMPRO_NS_1787174865",
+      "symbol": "CEMPRO.NS",
+      "direction": "SELL",
+      "entry_price": 1324.0,
+      "entry_time": "2026-08-19T21:27:45.634320+00:00",
+      "stop_loss": 1343.86,
+      "target1": 1284.28,
+      "target1_hit": false
+    },
+    "CENTRALBK.NS": {
+      "trade_id": "trial_CENTRALBK_NS_1787174866",
+      "symbol": "CENTRALBK.NS",
+      "direction": "SELL",
+      "entry_price": 31.020000457763672,
+      "entry_time": "2026-08-19T21:27:46.254915+00:00",
+      "stop_loss": 31.49,
+      "target1": 30.09,
+      "target1_hit": false
+    },
+    "CDSL.NS": {
+      "trade_id": "trial_CDSL_NS_1787174866",
+      "symbol": "CDSL.NS",
+      "direction": "SELL",
+      "entry_price": 1340.5999755859375,
+      "entry_time": "2026-08-19T21:27:46.891218+00:00",
+      "stop_loss": 1360.71,
+      "target1": 1300.38,
+      "target1_hit": false
+    },
+    "CHALET.NS": {
+      "trade_id": "trial_CHALET_NS_1787174867",
+      "symbol": "CHALET.NS",
+      "direction": "SELL",
+      "entry_price": 834.4500122070312,
+      "entry_time": "2026-08-19T21:27:47.911090+00:00",
+      "stop_loss": 846.97,
+      "target1": 809.42,
+      "target1_hit": false
+    },
+    "CHAMBLFERT.NS": {
+      "trade_id": "trial_CHAMBLFERT_NS_1787174868",
+      "symbol": "CHAMBLFERT.NS",
+      "direction": "SELL",
+      "entry_price": 434.3999938964844,
+      "entry_time": "2026-08-19T21:27:48.537939+00:00",
+      "stop_loss": 440.92,
+      "target1": 421.37,
+      "target1_hit": false
+    },
+    "CHENNPETRO.NS": {
+      "trade_id": "trial_CHENNPETRO_NS_1787174869",
+      "symbol": "CHENNPETRO.NS",
+      "direction": "BUY",
+      "entry_price": 1404.0,
+      "entry_time": "2026-08-19T21:27:49.178574+00:00",
+      "stop_loss": 1382.94,
+      "target1": 1446.12,
+      "target1_hit": false
+    },
+    "CHOICEIN.NS": {
+      "trade_id": "trial_CHOICEIN_NS_1787174869",
+      "symbol": "CHOICEIN.NS",
+      "direction": "SELL",
+      "entry_price": 803.5999755859375,
+      "entry_time": "2026-08-19T21:27:49.764206+00:00",
+      "stop_loss": 815.65,
+      "target1": 779.49,
+      "target1_hit": false
+    },
+    "CHOLAFIN.NS": {
+      "trade_id": "trial_CHOLAFIN_NS_1787174870",
+      "symbol": "CHOLAFIN.NS",
+      "direction": "BUY",
+      "entry_price": 1868.0,
+      "entry_time": "2026-08-19T21:27:50.568938+00:00",
+      "stop_loss": 1839.98,
+      "target1": 1924.04,
+      "target1_hit": false
+    },
+    "CIPLA.NS": {
+      "trade_id": "trial_CIPLA_NS_1787174871",
+      "symbol": "CIPLA.NS",
+      "direction": "SELL",
+      "entry_price": 1431.0999755859375,
+      "entry_time": "2026-08-19T21:27:51.177563+00:00",
+      "stop_loss": 1452.57,
+      "target1": 1388.17,
+      "target1_hit": false
+    },
+    "CLEAN.NS": {
+      "trade_id": "trial_CLEAN_NS_1787174872",
+      "symbol": "CLEAN.NS",
+      "direction": "BUY",
+      "entry_price": 831.9000244140625,
+      "entry_time": "2026-08-19T21:27:52.148984+00:00",
+      "stop_loss": 819.42,
+      "target1": 856.86,
+      "target1_hit": false
+    },
+    "COALINDIA.NS": {
+      "trade_id": "trial_COALINDIA_NS_1787174872",
+      "symbol": "COALINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 406.8999938964844,
+      "entry_time": "2026-08-19T21:27:52.745520+00:00",
+      "stop_loss": 413.0,
+      "target1": 394.69,
+      "target1_hit": false
+    },
+    "COCHINSHIP.NS": {
+      "trade_id": "trial_COCHINSHIP_NS_1787174873",
+      "symbol": "COCHINSHIP.NS",
+      "direction": "BUY",
+      "entry_price": 1485.0999755859375,
+      "entry_time": "2026-08-19T21:27:53.335637+00:00",
+      "stop_loss": 1462.82,
+      "target1": 1529.65,
+      "target1_hit": false
+    },
+    "COFORGE.NS": {
+      "trade_id": "trial_COFORGE_NS_1787174873",
+      "symbol": "COFORGE.NS",
+      "direction": "BUY",
+      "entry_price": 1773.0,
+      "entry_time": "2026-08-19T21:27:53.982447+00:00",
+      "stop_loss": 1746.4,
+      "target1": 1826.19,
+      "target1_hit": false
+    },
+    "COHANCE.NS": {
+      "trade_id": "trial_COHANCE_NS_1787174874",
+      "symbol": "COHANCE.NS",
+      "direction": "BUY",
+      "entry_price": 455.20001220703125,
+      "entry_time": "2026-08-19T21:27:54.615403+00:00",
+      "stop_loss": 448.37,
+      "target1": 468.86,
+      "target1_hit": false
+    },
+    "COLPAL.NS": {
+      "trade_id": "trial_COLPAL_NS_1787174875",
+      "symbol": "COLPAL.NS",
+      "direction": "SELL",
+      "entry_price": 1903.0,
+      "entry_time": "2026-08-19T21:27:55.615517+00:00",
+      "stop_loss": 1931.54,
+      "target1": 1845.91,
+      "target1_hit": false
+    },
+    "CAMS.NS": {
+      "trade_id": "trial_CAMS_NS_1787174876",
+      "symbol": "CAMS.NS",
+      "direction": "SELL",
+      "entry_price": 762.0,
+      "entry_time": "2026-08-19T21:27:56.285943+00:00",
+      "stop_loss": 773.43,
+      "target1": 739.14,
+      "target1_hit": false
+    },
+    "CONCORDBIO.NS": {
+      "trade_id": "trial_CONCORDBIO_NS_1787174876",
+      "symbol": "CONCORDBIO.NS",
+      "direction": "BUY",
+      "entry_price": 1565.699951171875,
+      "entry_time": "2026-08-19T21:27:56.871019+00:00",
+      "stop_loss": 1542.21,
+      "target1": 1612.67,
+      "target1_hit": false
+    },
+    "CONCOR.NS": {
+      "trade_id": "trial_CONCOR_NS_1787174877",
+      "symbol": "CONCOR.NS",
+      "direction": "BUY",
+      "entry_price": 518.25,
+      "entry_time": "2026-08-19T21:27:57.472588+00:00",
+      "stop_loss": 510.48,
+      "target1": 533.8,
+      "target1_hit": false
+    },
+    "CRAFTSMAN.NS": {
+      "trade_id": "trial_CRAFTSMAN_NS_1787174878",
+      "symbol": "CRAFTSMAN.NS",
+      "direction": "BUY",
+      "entry_price": 10890.5,
+      "entry_time": "2026-08-19T21:27:58.204034+00:00",
+      "stop_loss": 10727.14,
+      "target1": 11217.22,
+      "target1_hit": false
+    },
+    "CROMPTON.NS": {
+      "trade_id": "trial_CROMPTON_NS_1787174878",
+      "symbol": "CROMPTON.NS",
+      "direction": "SELL",
+      "entry_price": 244.8000030517578,
+      "entry_time": "2026-08-19T21:27:58.971171+00:00",
+      "stop_loss": 248.47,
+      "target1": 237.46,
+      "target1_hit": false
+    },
+    "CUMMINSIND.NS": {
+      "trade_id": "trial_CUMMINSIND_NS_1787174879",
+      "symbol": "CUMMINSIND.NS",
+      "direction": "SELL",
+      "entry_price": 5350.0,
+      "entry_time": "2026-08-19T21:27:59.597344+00:00",
+      "stop_loss": 5430.25,
+      "target1": 5189.5,
+      "target1_hit": false
+    },
+    "CYIENT.NS": {
+      "trade_id": "trial_CYIENT_NS_1787174880",
+      "symbol": "CYIENT.NS",
+      "direction": "BUY",
+      "entry_price": 858.5499877929688,
+      "entry_time": "2026-08-19T21:28:00.196367+00:00",
+      "stop_loss": 845.67,
+      "target1": 884.31,
+      "target1_hit": false
+    },
+    "DOMS.NS": {
+      "trade_id": "trial_DOMS_NS_1787174881",
+      "symbol": "DOMS.NS",
+      "direction": "SELL",
+      "entry_price": 2218.60009765625,
+      "entry_time": "2026-08-19T21:28:01.658505+00:00",
+      "stop_loss": 2251.88,
+      "target1": 2152.04,
+      "target1_hit": false
+    },
+    "DABUR.NS": {
+      "trade_id": "trial_DABUR_NS_1787174882",
+      "symbol": "DABUR.NS",
+      "direction": "SELL",
+      "entry_price": 403.5,
+      "entry_time": "2026-08-19T21:28:02.303292+00:00",
+      "stop_loss": 409.55,
+      "target1": 391.39,
+      "target1_hit": false
+    },
+    "DALBHARAT.NS": {
+      "trade_id": "trial_DALBHARAT_NS_1787174883",
+      "symbol": "DALBHARAT.NS",
+      "direction": "SELL",
+      "entry_price": 1837.0999755859375,
+      "entry_time": "2026-08-19T21:28:03.324540+00:00",
+      "stop_loss": 1864.66,
+      "target1": 1781.99,
+      "target1_hit": false
+    },
+    "DATAPATTNS.NS": {
+      "trade_id": "trial_DATAPATTNS_NS_1787174883",
+      "symbol": "DATAPATTNS.NS",
+      "direction": "BUY",
+      "entry_price": 4737.2001953125,
+      "entry_time": "2026-08-19T21:28:03.892956+00:00",
+      "stop_loss": 4666.14,
+      "target1": 4879.32,
+      "target1_hit": false
+    },
+    "DEEPAKFERT.NS": {
+      "trade_id": "trial_DEEPAKFERT_NS_1787174884",
+      "symbol": "DEEPAKFERT.NS",
+      "direction": "SELL",
+      "entry_price": 1472.0,
+      "entry_time": "2026-08-19T21:28:04.573289+00:00",
+      "stop_loss": 1494.08,
+      "target1": 1427.84,
+      "target1_hit": false
+    },
+    "DEEPAKNTR.NS": {
+      "trade_id": "trial_DEEPAKNTR_NS_1787174885",
+      "symbol": "DEEPAKNTR.NS",
+      "direction": "BUY",
+      "entry_price": 1771.0,
+      "entry_time": "2026-08-19T21:28:05.345461+00:00",
+      "stop_loss": 1744.43,
+      "target1": 1824.13,
+      "target1_hit": false
+    },
+    "DELHIVERY.NS": {
+      "trade_id": "trial_DELHIVERY_NS_1787174885",
+      "symbol": "DELHIVERY.NS",
+      "direction": "SELL",
+      "entry_price": 451.79998779296875,
+      "entry_time": "2026-08-19T21:28:05.924436+00:00",
+      "stop_loss": 458.58,
+      "target1": 438.25,
+      "target1_hit": false
+    },
+    "DEVYANI.NS": {
+      "trade_id": "trial_DEVYANI_NS_1787174886",
+      "symbol": "DEVYANI.NS",
+      "direction": "BUY",
+      "entry_price": 142.08999633789062,
+      "entry_time": "2026-08-19T21:28:06.488015+00:00",
+      "stop_loss": 139.96,
+      "target1": 146.35,
+      "target1_hit": false
+    },
+    "DIVISLAB.NS": {
+      "trade_id": "trial_DIVISLAB_NS_1787174887",
+      "symbol": "DIVISLAB.NS",
+      "direction": "BUY",
+      "entry_price": 8588.0,
+      "entry_time": "2026-08-19T21:28:07.099488+00:00",
+      "stop_loss": 8459.18,
+      "target1": 8845.64,
+      "target1_hit": false
+    },
+    "DIXON.NS": {
+      "trade_id": "trial_DIXON_NS_1787174887",
+      "symbol": "DIXON.NS",
+      "direction": "SELL",
+      "entry_price": 14150.0,
+      "entry_time": "2026-08-19T21:28:07.834164+00:00",
+      "stop_loss": 14362.25,
+      "target1": 13725.5,
+      "target1_hit": false
+    },
+    "LALPATHLAB.NS": {
+      "trade_id": "trial_LALPATHLAB_NS_1787174888",
+      "symbol": "LALPATHLAB.NS",
+      "direction": "BUY",
+      "entry_price": 1901.4000244140625,
+      "entry_time": "2026-08-19T21:28:08.447578+00:00",
+      "stop_loss": 1872.88,
+      "target1": 1958.44,
+      "target1_hit": false
+    },
+    "DRREDDY.NS": {
+      "trade_id": "trial_DRREDDY_NS_1787174889",
+      "symbol": "DRREDDY.NS",
+      "direction": "SELL",
+      "entry_price": 1178.800048828125,
+      "entry_time": "2026-08-19T21:28:09.100992+00:00",
+      "stop_loss": 1196.48,
+      "target1": 1143.44,
+      "target1_hit": false
+    },
+    "EIHOTEL.NS": {
+      "trade_id": "trial_EIHOTEL_NS_1787174890",
+      "symbol": "EIHOTEL.NS",
+      "direction": "SELL",
+      "entry_price": 296.70001220703125,
+      "entry_time": "2026-08-19T21:28:10.048664+00:00",
+      "stop_loss": 301.15,
+      "target1": 287.8,
+      "target1_hit": false
+    },
+    "EICHERMOT.NS": {
+      "trade_id": "trial_EICHERMOT_NS_1787174890",
+      "symbol": "EICHERMOT.NS",
+      "direction": "BUY",
+      "entry_price": 8018.5,
+      "entry_time": "2026-08-19T21:28:10.687178+00:00",
+      "stop_loss": 7898.22,
+      "target1": 8259.06,
+      "target1_hit": false
+    },
+    "ELECON.NS": {
+      "trade_id": "trial_ELECON_NS_1787174891",
+      "symbol": "ELECON.NS",
+      "direction": "SELL",
+      "entry_price": 433.95001220703125,
+      "entry_time": "2026-08-19T21:28:11.308594+00:00",
+      "stop_loss": 440.46,
+      "target1": 420.93,
+      "target1_hit": false
+    },
+    "ELGIEQUIP.NS": {
+      "trade_id": "trial_ELGIEQUIP_NS_1787174891",
+      "symbol": "ELGIEQUIP.NS",
+      "direction": "BUY",
+      "entry_price": 614.2000122070312,
+      "entry_time": "2026-08-19T21:28:11.935365+00:00",
+      "stop_loss": 604.99,
+      "target1": 632.63,
+      "target1_hit": false
+    },
+    "EMAMILTD.NS": {
+      "trade_id": "trial_EMAMILTD_NS_1787174892",
+      "symbol": "EMAMILTD.NS",
+      "direction": "SELL",
+      "entry_price": 400.1000061035156,
+      "entry_time": "2026-08-19T21:28:12.681849+00:00",
+      "stop_loss": 406.1,
+      "target1": 388.1,
+      "target1_hit": false
+    },
+    "EMCURE.NS": {
+      "trade_id": "trial_EMCURE_NS_1787174893",
+      "symbol": "EMCURE.NS",
+      "direction": "SELL",
+      "entry_price": 1874.5,
+      "entry_time": "2026-08-19T21:28:13.250093+00:00",
+      "stop_loss": 1902.62,
+      "target1": 1818.26,
+      "target1_hit": false
+    },
+    "EMMVEE.NS": {
+      "trade_id": "trial_EMMVEE_NS_1787174894",
+      "symbol": "EMMVEE.NS",
+      "direction": "SELL",
+      "entry_price": 317.70001220703125,
+      "entry_time": "2026-08-19T21:28:14.501670+00:00",
+      "stop_loss": 322.47,
+      "target1": 308.17,
+      "target1_hit": false
+    },
+    "ENDURANCE.NS": {
+      "trade_id": "trial_ENDURANCE_NS_1787174895",
+      "symbol": "ENDURANCE.NS",
+      "direction": "BUY",
+      "entry_price": 3018.300048828125,
+      "entry_time": "2026-08-19T21:28:15.232080+00:00",
+      "stop_loss": 2973.03,
+      "target1": 3108.85,
+      "target1_hit": false
+    },
+    "ENGINERSIN.NS": {
+      "trade_id": "trial_ENGINERSIN_NS_1787174896",
+      "symbol": "ENGINERSIN.NS",
+      "direction": "BUY",
+      "entry_price": 244.77999877929688,
+      "entry_time": "2026-08-19T21:28:16.027129+00:00",
+      "stop_loss": 241.11,
+      "target1": 252.12,
+      "target1_hit": false
+    },
+    "ERIS.NS": {
+      "trade_id": "trial_ERIS_NS_1787174896",
+      "symbol": "ERIS.NS",
+      "direction": "SELL",
+      "entry_price": 1350.0999755859375,
+      "entry_time": "2026-08-19T21:28:16.587069+00:00",
+      "stop_loss": 1370.35,
+      "target1": 1309.6,
+      "target1_hit": false
+    },
+    "ESCORTS.NS": {
+      "trade_id": "trial_ESCORTS_NS_1787174897",
+      "symbol": "ESCORTS.NS",
+      "direction": "BUY",
+      "entry_price": 3062.10009765625,
+      "entry_time": "2026-08-19T21:28:17.239681+00:00",
+      "stop_loss": 3016.17,
+      "target1": 3153.96,
+      "target1_hit": false
+    },
+    "ETERNAL.NS": {
+      "trade_id": "trial_ETERNAL_NS_1787174897",
+      "symbol": "ETERNAL.NS",
+      "direction": "BUY",
+      "entry_price": 315.8999938964844,
+      "entry_time": "2026-08-19T21:28:17.842292+00:00",
+      "stop_loss": 311.16,
+      "target1": 325.38,
+      "target1_hit": false
+    },
+    "EXIDEIND.NS": {
+      "trade_id": "trial_EXIDEIND_NS_1787174898",
+      "symbol": "EXIDEIND.NS",
+      "direction": "BUY",
+      "entry_price": 465.25,
+      "entry_time": "2026-08-19T21:28:18.466001+00:00",
+      "stop_loss": 458.27,
+      "target1": 479.21,
+      "target1_hit": false
+    },
+    "NYKAA.NS": {
+      "trade_id": "trial_NYKAA_NS_1787174899",
+      "symbol": "NYKAA.NS",
+      "direction": "SELL",
+      "entry_price": 320.6000061035156,
+      "entry_time": "2026-08-19T21:28:19.075452+00:00",
+      "stop_loss": 325.41,
+      "target1": 310.98,
+      "target1_hit": false
+    },
+    "FEDERALBNK.NS": {
+      "trade_id": "trial_FEDERALBNK_NS_1787174899",
+      "symbol": "FEDERALBNK.NS",
+      "direction": "BUY",
+      "entry_price": 357.79998779296875,
+      "entry_time": "2026-08-19T21:28:19.881935+00:00",
+      "stop_loss": 352.43,
+      "target1": 368.53,
+      "target1_hit": false
+    },
+    "FACT.NS": {
+      "trade_id": "trial_FACT_NS_1787174900",
+      "symbol": "FACT.NS",
+      "direction": "SELL",
+      "entry_price": 794.8499755859375,
+      "entry_time": "2026-08-19T21:28:20.512215+00:00",
+      "stop_loss": 806.77,
+      "target1": 771.0,
+      "target1_hit": false
+    },
+    "FINCABLES.NS": {
+      "trade_id": "trial_FINCABLES_NS_1787174901",
+      "symbol": "FINCABLES.NS",
+      "direction": "BUY",
+      "entry_price": 1329.3499755859375,
+      "entry_time": "2026-08-19T21:28:21.153965+00:00",
+      "stop_loss": 1309.41,
+      "target1": 1369.23,
+      "target1_hit": false
+    },
+    "FSL.NS": {
+      "trade_id": "trial_FSL_NS_1787174901",
+      "symbol": "FSL.NS",
+      "direction": "SELL",
+      "entry_price": 263.8500061035156,
+      "entry_time": "2026-08-19T21:28:21.720595+00:00",
+      "stop_loss": 267.81,
+      "target1": 255.93,
+      "target1_hit": false
+    },
+    "FIVESTAR.NS": {
+      "trade_id": "trial_FIVESTAR_NS_1787174902",
+      "symbol": "FIVESTAR.NS",
+      "direction": "SELL",
+      "entry_price": 535.3499755859375,
+      "entry_time": "2026-08-19T21:28:22.324959+00:00",
+      "stop_loss": 543.38,
+      "target1": 519.29,
+      "target1_hit": false
+    },
+    "FORCEMOT.NS": {
+      "trade_id": "trial_FORCEMOT_NS_1787174902",
+      "symbol": "FORCEMOT.NS",
+      "direction": "BUY",
+      "entry_price": 18200.0,
+      "entry_time": "2026-08-19T21:28:22.937512+00:00",
+      "stop_loss": 17927.0,
+      "target1": 18746.0,
+      "target1_hit": false
+    },
+    "FORTIS.NS": {
+      "trade_id": "trial_FORTIS_NS_1787174903",
+      "symbol": "FORTIS.NS",
+      "direction": "SELL",
+      "entry_price": 916.7000122070312,
+      "entry_time": "2026-08-19T21:28:23.525977+00:00",
+      "stop_loss": 930.45,
+      "target1": 889.2,
+      "target1_hit": false
+    },
+    "GVT&D.NS": {
+      "trade_id": "trial_GVT&D_NS_1787174904",
+      "symbol": "GVT&D.NS",
+      "direction": "SELL",
+      "entry_price": 4195.0,
+      "entry_time": "2026-08-19T21:28:24.728559+00:00",
+      "stop_loss": 4257.92,
+      "target1": 4069.15,
+      "target1_hit": false
+    },
+    "GMRAIRPORT.NS": {
+      "trade_id": "trial_GMRAIRPORT_NS_1787174905",
+      "symbol": "GMRAIRPORT.NS",
+      "direction": "SELL",
+      "entry_price": 101.38999938964844,
+      "entry_time": "2026-08-19T21:28:25.341371+00:00",
+      "stop_loss": 102.91,
+      "target1": 98.35,
+      "target1_hit": false
+    },
+    "GABRIEL.NS": {
+      "trade_id": "trial_GABRIEL_NS_1787174906",
+      "symbol": "GABRIEL.NS",
+      "direction": "BUY",
+      "entry_price": 1467.5999755859375,
+      "entry_time": "2026-08-19T21:28:26.156621+00:00",
+      "stop_loss": 1445.59,
+      "target1": 1511.63,
+      "target1_hit": false
+    },
+    "GALLANTT.NS": {
+      "trade_id": "trial_GALLANTT_NS_1787174906",
+      "symbol": "GALLANTT.NS",
+      "direction": "SELL",
+      "entry_price": 576.2999877929688,
+      "entry_time": "2026-08-19T21:28:26.752762+00:00",
+      "stop_loss": 584.94,
+      "target1": 559.01,
+      "target1_hit": false
+    },
+    "GRSE.NS": {
+      "trade_id": "trial_GRSE_NS_1787174907",
+      "symbol": "GRSE.NS",
+      "direction": "BUY",
+      "entry_price": 2677.0,
+      "entry_time": "2026-08-19T21:28:27.343986+00:00",
+      "stop_loss": 2636.84,
+      "target1": 2757.31,
+      "target1_hit": false
+    },
+    "GICRE.NS": {
+      "trade_id": "trial_GICRE_NS_1787174907",
+      "symbol": "GICRE.NS",
+      "direction": "BUY",
+      "entry_price": 359.8999938964844,
+      "entry_time": "2026-08-19T21:28:27.933278+00:00",
+      "stop_loss": 354.5,
+      "target1": 370.7,
+      "target1_hit": false
+    },
+    "GILLETTE.NS": {
+      "trade_id": "trial_GILLETTE_NS_1787174908",
+      "symbol": "GILLETTE.NS",
+      "direction": "SELL",
+      "entry_price": 7517.5,
+      "entry_time": "2026-08-19T21:28:28.534397+00:00",
+      "stop_loss": 7630.26,
+      "target1": 7291.97,
+      "target1_hit": false
+    },
+    "GLAND.NS": {
+      "trade_id": "trial_GLAND_NS_1787174909",
+      "symbol": "GLAND.NS",
+      "direction": "BUY",
+      "entry_price": 2858.60009765625,
+      "entry_time": "2026-08-19T21:28:29.173645+00:00",
+      "stop_loss": 2815.72,
+      "target1": 2944.36,
+      "target1_hit": false
+    },
+    "GLAXO.NS": {
+      "trade_id": "trial_GLAXO_NS_1787174909",
+      "symbol": "GLAXO.NS",
+      "direction": "BUY",
+      "entry_price": 2877.39990234375,
+      "entry_time": "2026-08-19T21:28:29.798035+00:00",
+      "stop_loss": 2834.24,
+      "target1": 2963.72,
+      "target1_hit": false
+    },
+    "GLENMARK.NS": {
+      "trade_id": "trial_GLENMARK_NS_1787174910",
+      "symbol": "GLENMARK.NS",
+      "direction": "BUY",
+      "entry_price": 2305.0,
+      "entry_time": "2026-08-19T21:28:30.411048+00:00",
+      "stop_loss": 2270.43,
+      "target1": 2374.15,
+      "target1_hit": false
+    },
+    "MEDANTA.NS": {
+      "trade_id": "trial_MEDANTA_NS_1787174911",
+      "symbol": "MEDANTA.NS",
+      "direction": "BUY",
+      "entry_price": 1442.699951171875,
+      "entry_time": "2026-08-19T21:28:31.042020+00:00",
+      "stop_loss": 1421.06,
+      "target1": 1485.98,
+      "target1_hit": false
+    },
+    "GODIGIT.NS": {
+      "trade_id": "trial_GODIGIT_NS_1787174911",
+      "symbol": "GODIGIT.NS",
+      "direction": "SELL",
+      "entry_price": 255.75,
+      "entry_time": "2026-08-19T21:28:31.630224+00:00",
+      "stop_loss": 259.59,
+      "target1": 248.08,
+      "target1_hit": false
+    },
+    "GPIL.NS": {
+      "trade_id": "trial_GPIL_NS_1787174912",
+      "symbol": "GPIL.NS",
+      "direction": "BUY",
+      "entry_price": 255.22000122070312,
+      "entry_time": "2026-08-19T21:28:32.245204+00:00",
+      "stop_loss": 251.39,
+      "target1": 262.88,
+      "target1_hit": false
+    },
+    "GODFRYPHLP.NS": {
+      "trade_id": "trial_GODFRYPHLP_NS_1787174912",
+      "symbol": "GODFRYPHLP.NS",
+      "direction": "SELL",
+      "entry_price": 2102.300048828125,
+      "entry_time": "2026-08-19T21:28:32.889166+00:00",
+      "stop_loss": 2133.83,
+      "target1": 2039.23,
+      "target1_hit": false
+    },
+    "GODREJCP.NS": {
+      "trade_id": "trial_GODREJCP_NS_1787174913",
+      "symbol": "GODREJCP.NS",
+      "direction": "SELL",
+      "entry_price": 931.0,
+      "entry_time": "2026-08-19T21:28:33.499652+00:00",
+      "stop_loss": 944.96,
+      "target1": 903.07,
+      "target1_hit": false
+    },
+    "GODREJIND.NS": {
+      "trade_id": "trial_GODREJIND_NS_1787174914",
+      "symbol": "GODREJIND.NS",
+      "direction": "SELL",
+      "entry_price": 1229.9000244140625,
+      "entry_time": "2026-08-19T21:28:34.149095+00:00",
+      "stop_loss": 1248.35,
+      "target1": 1193.0,
+      "target1_hit": false
+    },
+    "GODREJPROP.NS": {
+      "trade_id": "trial_GODREJPROP_NS_1787174914",
+      "symbol": "GODREJPROP.NS",
+      "direction": "SELL",
+      "entry_price": 1997.4000244140625,
+      "entry_time": "2026-08-19T21:28:34.756315+00:00",
+      "stop_loss": 2027.36,
+      "target1": 1937.48,
+      "target1_hit": false
+    },
+    "GRANULES.NS": {
+      "trade_id": "trial_GRANULES_NS_1787174915",
+      "symbol": "GRANULES.NS",
+      "direction": "SELL",
+      "entry_price": 851.2000122070312,
+      "entry_time": "2026-08-19T21:28:35.404991+00:00",
+      "stop_loss": 863.97,
+      "target1": 825.66,
+      "target1_hit": false
+    },
+    "GRAPHITE.NS": {
+      "trade_id": "trial_GRAPHITE_NS_1787174916",
+      "symbol": "GRAPHITE.NS",
+      "direction": "BUY",
+      "entry_price": 737.1500244140625,
+      "entry_time": "2026-08-19T21:28:36.019825+00:00",
+      "stop_loss": 726.09,
+      "target1": 759.26,
+      "target1_hit": false
+    },
+    "GRASIM.NS": {
+      "trade_id": "trial_GRASIM_NS_1787174916",
+      "symbol": "GRASIM.NS",
+      "direction": "BUY",
+      "entry_price": 3278.699951171875,
+      "entry_time": "2026-08-19T21:28:36.641178+00:00",
+      "stop_loss": 3229.52,
+      "target1": 3377.06,
+      "target1_hit": false
+    },
+    "GRAVITA.NS": {
+      "trade_id": "trial_GRAVITA_NS_1787174917",
+      "symbol": "GRAVITA.NS",
+      "direction": "BUY",
+      "entry_price": 1814.0999755859375,
+      "entry_time": "2026-08-19T21:28:37.358852+00:00",
+      "stop_loss": 1786.89,
+      "target1": 1868.52,
+      "target1_hit": false
+    },
+    "GESHIP.NS": {
+      "trade_id": "trial_GESHIP_NS_1787174917",
+      "symbol": "GESHIP.NS",
+      "direction": "SELL",
+      "entry_price": 1302.9000244140625,
+      "entry_time": "2026-08-19T21:28:37.957349+00:00",
+      "stop_loss": 1322.44,
+      "target1": 1263.81,
+      "target1_hit": false
+    },
+    "FLUOROCHEM.NS": {
+      "trade_id": "trial_FLUOROCHEM_NS_1787174918",
+      "symbol": "FLUOROCHEM.NS",
+      "direction": "BUY",
+      "entry_price": 4674.7998046875,
+      "entry_time": "2026-08-19T21:28:38.584522+00:00",
+      "stop_loss": 4604.68,
+      "target1": 4815.04,
+      "target1_hit": false
+    },
+    "GMDCLTD.NS": {
+      "trade_id": "trial_GMDCLTD_NS_1787174919",
+      "symbol": "GMDCLTD.NS",
+      "direction": "SELL",
+      "entry_price": 570.7000122070312,
+      "entry_time": "2026-08-19T21:28:39.197353+00:00",
+      "stop_loss": 579.26,
+      "target1": 553.58,
+      "target1_hit": false
+    },
+    "HEG.NS": {
+      "trade_id": "trial_HEG_NS_1787174919",
+      "symbol": "HEG.NS",
+      "direction": "BUY",
+      "entry_price": 739.25,
+      "entry_time": "2026-08-19T21:28:39.826161+00:00",
+      "stop_loss": 728.16,
+      "target1": 761.43,
+      "target1_hit": false
+    },
+    "HBLENGINE.NS": {
+      "trade_id": "trial_HBLENGINE_NS_1787174920",
+      "symbol": "HBLENGINE.NS",
+      "direction": "SELL",
+      "entry_price": 670.0499877929688,
+      "entry_time": "2026-08-19T21:28:40.454220+00:00",
+      "stop_loss": 680.1,
+      "target1": 649.95,
+      "target1_hit": false
+    },
+    "HDFCAMC.NS": {
+      "trade_id": "trial_HDFCAMC_NS_1787174921",
+      "symbol": "HDFCAMC.NS",
+      "direction": "SELL",
+      "entry_price": 2525.0,
+      "entry_time": "2026-08-19T21:28:41.373419+00:00",
+      "stop_loss": 2562.87,
+      "target1": 2449.25,
+      "target1_hit": false
+    },
+    "HDFCLIFE.NS": {
+      "trade_id": "trial_HDFCLIFE_NS_1787174922",
+      "symbol": "HDFCLIFE.NS",
+      "direction": "SELL",
+      "entry_price": 538.25,
+      "entry_time": "2026-08-19T21:28:42.339525+00:00",
+      "stop_loss": 546.32,
+      "target1": 522.1,
+      "target1_hit": false
+    },
+    "HFCL.NS": {
+      "trade_id": "trial_HFCL_NS_1787174922",
+      "symbol": "HFCL.NS",
+      "direction": "BUY",
+      "entry_price": 230.02999877929688,
+      "entry_time": "2026-08-19T21:28:42.931186+00:00",
+      "stop_loss": 226.58,
+      "target1": 236.93,
+      "target1_hit": false
+    },
+    "HAVELLS.NS": {
+      "trade_id": "trial_HAVELLS_NS_1787174923",
+      "symbol": "HAVELLS.NS",
+      "direction": "BUY",
+      "entry_price": 1299.699951171875,
+      "entry_time": "2026-08-19T21:28:43.606754+00:00",
+      "stop_loss": 1280.2,
+      "target1": 1338.69,
+      "target1_hit": false
+    },
+    "HEROMOTOCO.NS": {
+      "trade_id": "trial_HEROMOTOCO_NS_1787174924",
+      "symbol": "HEROMOTOCO.NS",
+      "direction": "BUY",
+      "entry_price": 5745.5,
+      "entry_time": "2026-08-19T21:28:44.197975+00:00",
+      "stop_loss": 5659.32,
+      "target1": 5917.86,
+      "target1_hit": false
+    },
+    "HEXT.NS": {
+      "trade_id": "trial_HEXT_NS_1787174924",
+      "symbol": "HEXT.NS",
+      "direction": "SELL",
+      "entry_price": 552.75,
+      "entry_time": "2026-08-19T21:28:44.790657+00:00",
+      "stop_loss": 561.04,
+      "target1": 536.17,
+      "target1_hit": false
+    },
+    "HSCL.NS": {
+      "trade_id": "trial_HSCL_NS_1787174925",
+      "symbol": "HSCL.NS",
+      "direction": "BUY",
+      "entry_price": 781.7999877929688,
+      "entry_time": "2026-08-19T21:28:45.573028+00:00",
+      "stop_loss": 770.07,
+      "target1": 805.25,
+      "target1_hit": false
+    },
+    "HINDALCO.NS": {
+      "trade_id": "trial_HINDALCO_NS_1787174926",
+      "symbol": "HINDALCO.NS",
+      "direction": "BUY",
+      "entry_price": 1041.5999755859375,
+      "entry_time": "2026-08-19T21:28:46.203278+00:00",
+      "stop_loss": 1025.98,
+      "target1": 1072.85,
+      "target1_hit": false
+    },
+    "HAL.NS": {
+      "trade_id": "trial_HAL_NS_1787174926",
+      "symbol": "HAL.NS",
+      "direction": "BUY",
+      "entry_price": 5099.0,
+      "entry_time": "2026-08-19T21:28:46.813245+00:00",
+      "stop_loss": 5022.52,
+      "target1": 5251.97,
+      "target1_hit": false
+    },
+    "HINDCOPPER.NS": {
+      "trade_id": "trial_HINDCOPPER_NS_1787174927",
+      "symbol": "HINDCOPPER.NS",
+      "direction": "BUY",
+      "entry_price": 566.3499755859375,
+      "entry_time": "2026-08-19T21:28:47.470961+00:00",
+      "stop_loss": 557.85,
+      "target1": 583.34,
+      "target1_hit": false
+    },
+    "HINDPETRO.NS": {
+      "trade_id": "trial_HINDPETRO_NS_1787174928",
+      "symbol": "HINDPETRO.NS",
+      "direction": "SELL",
+      "entry_price": 366.0,
+      "entry_time": "2026-08-19T21:28:48.083506+00:00",
+      "stop_loss": 371.49,
+      "target1": 355.02,
+      "target1_hit": false
+    },
+    "HINDUNILVR.NS": {
+      "trade_id": "trial_HINDUNILVR_NS_1787174928",
+      "symbol": "HINDUNILVR.NS",
+      "direction": "SELL",
+      "entry_price": 2035.0,
+      "entry_time": "2026-08-19T21:28:48.706139+00:00",
+      "stop_loss": 2065.52,
+      "target1": 1973.95,
+      "target1_hit": false
+    },
+    "POWERINDIA.NS": {
+      "trade_id": "trial_POWERINDIA_NS_1787174929",
+      "symbol": "POWERINDIA.NS",
+      "direction": "BUY",
+      "entry_price": 35275.0,
+      "entry_time": "2026-08-19T21:28:49.484711+00:00",
+      "stop_loss": 34745.88,
+      "target1": 36333.25,
+      "target1_hit": false
+    },
+    "HOMEFIRST.NS": {
+      "trade_id": "trial_HOMEFIRST_NS_1787174930",
+      "symbol": "HOMEFIRST.NS",
+      "direction": "SELL",
+      "entry_price": 1177.0999755859375,
+      "entry_time": "2026-08-19T21:28:50.725591+00:00",
+      "stop_loss": 1194.76,
+      "target1": 1141.79,
+      "target1_hit": false
+    },
+    "HONASA.NS": {
+      "trade_id": "trial_HONASA_NS_1787174931",
+      "symbol": "HONASA.NS",
+      "direction": "BUY",
+      "entry_price": 474.6000061035156,
+      "entry_time": "2026-08-19T21:28:51.355313+00:00",
+      "stop_loss": 467.48,
+      "target1": 488.84,
+      "target1_hit": false
+    },
+    "HONAUT.NS": {
+      "trade_id": "trial_HONAUT_NS_1787174932",
+      "symbol": "HONAUT.NS",
+      "direction": "SELL",
+      "entry_price": 36400.0,
+      "entry_time": "2026-08-19T21:28:52.073388+00:00",
+      "stop_loss": 36946.0,
+      "target1": 35308.0,
+      "target1_hit": false
+    },
+    "HUDCO.NS": {
+      "trade_id": "trial_HUDCO_NS_1787174932",
+      "symbol": "HUDCO.NS",
+      "direction": "SELL",
+      "entry_price": 188.00999450683594,
+      "entry_time": "2026-08-19T21:28:52.686181+00:00",
+      "stop_loss": 190.83,
+      "target1": 182.37,
+      "target1_hit": false
+    },
+    "HYUNDAI.NS": {
+      "trade_id": "trial_HYUNDAI_NS_1787174933",
+      "symbol": "HYUNDAI.NS",
+      "direction": "BUY",
+      "entry_price": 2186.0,
+      "entry_time": "2026-08-19T21:28:53.475342+00:00",
+      "stop_loss": 2153.21,
+      "target1": 2251.58,
+      "target1_hit": false
+    },
+    "ICICIBANK.NS": {
+      "trade_id": "trial_ICICIBANK_NS_1787174934",
+      "symbol": "ICICIBANK.NS",
+      "direction": "SELL",
+      "entry_price": 1412.0,
+      "entry_time": "2026-08-19T21:28:54.167877+00:00",
+      "stop_loss": 1433.18,
+      "target1": 1369.64,
+      "target1_hit": false
+    },
+    "ICICIGI.NS": {
+      "trade_id": "trial_ICICIGI_NS_1787174934",
+      "symbol": "ICICIGI.NS",
+      "direction": "SELL",
+      "entry_price": 1623.800048828125,
+      "entry_time": "2026-08-19T21:28:54.782052+00:00",
+      "stop_loss": 1648.16,
+      "target1": 1575.09,
+      "target1_hit": false
+    },
+    "ICICIPRULI.NS": {
+      "trade_id": "trial_ICICIPRULI_NS_1787174935",
+      "symbol": "ICICIPRULI.NS",
+      "direction": "SELL",
+      "entry_price": 498.20001220703125,
+      "entry_time": "2026-08-19T21:28:55.524623+00:00",
+      "stop_loss": 505.67,
+      "target1": 483.25,
+      "target1_hit": false
+    },
+    "IDBI.NS": {
+      "trade_id": "trial_IDBI_NS_1787174936",
+      "symbol": "IDBI.NS",
+      "direction": "SELL",
+      "entry_price": 81.11000061035156,
+      "entry_time": "2026-08-19T21:28:56.192226+00:00",
+      "stop_loss": 82.33,
+      "target1": 78.68,
+      "target1_hit": false
+    },
+    "IDFCFIRSTB.NS": {
+      "trade_id": "trial_IDFCFIRSTB_NS_1787174936",
+      "symbol": "IDFCFIRSTB.NS",
+      "direction": "BUY",
+      "entry_price": 84.76000213623047,
+      "entry_time": "2026-08-19T21:28:56.783747+00:00",
+      "stop_loss": 83.49,
+      "target1": 87.3,
+      "target1_hit": false
+    },
+    "IFCI.NS": {
+      "trade_id": "trial_IFCI_NS_1787174937",
+      "symbol": "IFCI.NS",
+      "direction": "BUY",
+      "entry_price": 81.36000061035156,
+      "entry_time": "2026-08-19T21:28:57.414605+00:00",
+      "stop_loss": 80.14,
+      "target1": 83.8,
+      "target1_hit": false
+    },
+    "IIFL.NS": {
+      "trade_id": "trial_IIFL_NS_1787174938",
+      "symbol": "IIFL.NS",
+      "direction": "BUY",
+      "entry_price": 622.3499755859375,
+      "entry_time": "2026-08-19T21:28:58.040618+00:00",
+      "stop_loss": 613.01,
+      "target1": 641.02,
+      "target1_hit": false
+    },
+    "IRB.NS": {
+      "trade_id": "trial_IRB_NS_1787174939",
+      "symbol": "IRB.NS",
+      "direction": "SELL",
+      "entry_price": 19.030000686645508,
+      "entry_time": "2026-08-19T21:28:59.173464+00:00",
+      "stop_loss": 19.32,
+      "target1": 18.46,
+      "target1_hit": false
+    },
+    "IRCON.NS": {
+      "trade_id": "trial_IRCON_NS_1787174939",
+      "symbol": "IRCON.NS",
+      "direction": "SELL",
+      "entry_price": 123.62000274658203,
+      "entry_time": "2026-08-19T21:28:59.822730+00:00",
+      "stop_loss": 125.47,
+      "target1": 119.91,
+      "target1_hit": false
+    },
+    "ITCHOTELS.NS": {
+      "trade_id": "trial_ITCHOTELS_NS_1787174940",
+      "symbol": "ITCHOTELS.NS",
+      "direction": "SELL",
+      "entry_price": 164.42999267578125,
+      "entry_time": "2026-08-19T21:29:00.391710+00:00",
+      "stop_loss": 166.9,
+      "target1": 159.5,
+      "target1_hit": false
+    },
+    "ITC.NS": {
+      "trade_id": "trial_ITC_NS_1787174941",
+      "symbol": "ITC.NS",
+      "direction": "SELL",
+      "entry_price": 270.0,
+      "entry_time": "2026-08-19T21:29:01.006020+00:00",
+      "stop_loss": 274.05,
+      "target1": 261.9,
+      "target1_hit": false
+    },
+    "ITI.NS": {
+      "trade_id": "trial_ITI_NS_1787174941",
+      "symbol": "ITI.NS",
+      "direction": "SELL",
+      "entry_price": 280.3500061035156,
+      "entry_time": "2026-08-19T21:29:01.650515+00:00",
+      "stop_loss": 284.56,
+      "target1": 271.94,
+      "target1_hit": false
+    },
+    "INDGN.NS": {
+      "trade_id": "trial_INDGN_NS_1787174942",
+      "symbol": "INDGN.NS",
+      "direction": "BUY",
+      "entry_price": 567.7000122070312,
+      "entry_time": "2026-08-19T21:29:02.239730+00:00",
+      "stop_loss": 559.18,
+      "target1": 584.73,
+      "target1_hit": false
+    },
+    "INDIACEM.NS": {
+      "trade_id": "trial_INDIACEM_NS_1787174942",
+      "symbol": "INDIACEM.NS",
+      "direction": "SELL",
+      "entry_price": 374.5,
+      "entry_time": "2026-08-19T21:29:02.838602+00:00",
+      "stop_loss": 380.12,
+      "target1": 363.26,
+      "target1_hit": false
+    },
+    "INDIAMART.NS": {
+      "trade_id": "trial_INDIAMART_NS_1787174943",
+      "symbol": "INDIAMART.NS",
+      "direction": "SELL",
+      "entry_price": 1753.0999755859375,
+      "entry_time": "2026-08-19T21:29:03.496442+00:00",
+      "stop_loss": 1779.4,
+      "target1": 1700.51,
+      "target1_hit": false
+    },
+    "INDIANB.NS": {
+      "trade_id": "trial_INDIANB_NS_1787174944",
+      "symbol": "INDIANB.NS",
+      "direction": "BUY",
+      "entry_price": 875.0,
+      "entry_time": "2026-08-19T21:29:04.190297+00:00",
+      "stop_loss": 861.88,
+      "target1": 901.25,
+      "target1_hit": false
+    },
+    "IEX.NS": {
+      "trade_id": "trial_IEX_NS_1787174944",
+      "symbol": "IEX.NS",
+      "direction": "SELL",
+      "entry_price": 124.4000015258789,
+      "entry_time": "2026-08-19T21:29:04.774090+00:00",
+      "stop_loss": 126.27,
+      "target1": 120.67,
+      "target1_hit": false
+    },
+    "INDHOTEL.NS": {
+      "trade_id": "trial_INDHOTEL_NS_1787174945",
+      "symbol": "INDHOTEL.NS",
+      "direction": "SELL",
+      "entry_price": 719.0,
+      "entry_time": "2026-08-19T21:29:05.399781+00:00",
+      "stop_loss": 729.78,
+      "target1": 697.43,
+      "target1_hit": false
+    },
+    "IOC.NS": {
+      "trade_id": "trial_IOC_NS_1787174946",
+      "symbol": "IOC.NS",
+      "direction": "SELL",
+      "entry_price": 137.8000030517578,
+      "entry_time": "2026-08-19T21:29:06.039344+00:00",
+      "stop_loss": 139.87,
+      "target1": 133.67,
+      "target1_hit": false
+    },
+    "IOB.NS": {
+      "trade_id": "trial_IOB_NS_1787174946",
+      "symbol": "IOB.NS",
+      "direction": "SELL",
+      "entry_price": 33.27000045776367,
+      "entry_time": "2026-08-19T21:29:06.815776+00:00",
+      "stop_loss": 33.77,
+      "target1": 32.27,
+      "target1_hit": false
+    },
+    "IRCTC.NS": {
+      "trade_id": "trial_IRCTC_NS_1787174947",
+      "symbol": "IRCTC.NS",
+      "direction": "SELL",
+      "entry_price": 493.04998779296875,
+      "entry_time": "2026-08-19T21:29:07.459000+00:00",
+      "stop_loss": 500.45,
+      "target1": 478.26,
+      "target1_hit": false
+    },
+    "IRFC.NS": {
+      "trade_id": "trial_IRFC_NS_1787174948",
+      "symbol": "IRFC.NS",
+      "direction": "SELL",
+      "entry_price": 86.11000061035156,
+      "entry_time": "2026-08-19T21:29:08.037212+00:00",
+      "stop_loss": 87.4,
+      "target1": 83.53,
+      "target1_hit": false
+    },
+    "IREDA.NS": {
+      "trade_id": "trial_IREDA_NS_1787174948",
+      "symbol": "IREDA.NS",
+      "direction": "SELL",
+      "entry_price": 115.2699966430664,
+      "entry_time": "2026-08-19T21:29:08.661497+00:00",
+      "stop_loss": 117.0,
+      "target1": 111.81,
+      "target1_hit": false
+    },
+    "IGL.NS": {
+      "trade_id": "trial_IGL_NS_1787174949",
+      "symbol": "IGL.NS",
+      "direction": "SELL",
+      "entry_price": 149.38999938964844,
+      "entry_time": "2026-08-19T21:29:09.258305+00:00",
+      "stop_loss": 151.63,
+      "target1": 144.91,
+      "target1_hit": false
+    },
+    "INDUSTOWER.NS": {
+      "trade_id": "trial_INDUSTOWER_NS_1787174949",
+      "symbol": "INDUSTOWER.NS",
+      "direction": "SELL",
+      "entry_price": 372.3999938964844,
+      "entry_time": "2026-08-19T21:29:09.857565+00:00",
+      "stop_loss": 377.99,
+      "target1": 361.23,
+      "target1_hit": false
+    },
+    "INDUSINDBK.NS": {
+      "trade_id": "trial_INDUSINDBK_NS_1787174950",
+      "symbol": "INDUSINDBK.NS",
+      "direction": "SELL",
+      "entry_price": 1015.0,
+      "entry_time": "2026-08-19T21:29:10.540771+00:00",
+      "stop_loss": 1030.22,
+      "target1": 984.55,
+      "target1_hit": false
+    },
+    "NAUKRI.NS": {
+      "trade_id": "trial_NAUKRI_NS_1787174951",
+      "symbol": "NAUKRI.NS",
+      "direction": "BUY",
+      "entry_price": 1354.9000244140625,
+      "entry_time": "2026-08-19T21:29:11.191238+00:00",
+      "stop_loss": 1334.58,
+      "target1": 1395.55,
+      "target1_hit": false
+    },
+    "INOXWIND.NS": {
+      "trade_id": "trial_INOXWIND_NS_1787174951",
+      "symbol": "INOXWIND.NS",
+      "direction": "SELL",
+      "entry_price": 74.94999694824219,
+      "entry_time": "2026-08-19T21:29:11.964184+00:00",
+      "stop_loss": 76.07,
+      "target1": 72.7,
+      "target1_hit": false
+    },
+    "INTELLECT.NS": {
+      "trade_id": "trial_INTELLECT_NS_1787174952",
+      "symbol": "INTELLECT.NS",
+      "direction": "SELL",
+      "entry_price": 695.9500122070312,
+      "entry_time": "2026-08-19T21:29:12.587377+00:00",
+      "stop_loss": 706.39,
+      "target1": 675.07,
+      "target1_hit": false
+    },
+    "INDIGO.NS": {
+      "trade_id": "trial_INDIGO_NS_1787174953",
+      "symbol": "INDIGO.NS",
+      "direction": "SELL",
+      "entry_price": 5220.0,
+      "entry_time": "2026-08-19T21:29:13.204127+00:00",
+      "stop_loss": 5298.3,
+      "target1": 5063.4,
+      "target1_hit": false
+    },
+    "IGIL.NS": {
+      "trade_id": "trial_IGIL_NS_1787174953",
+      "symbol": "IGIL.NS",
+      "direction": "BUY",
+      "entry_price": 349.70001220703125,
+      "entry_time": "2026-08-19T21:29:13.793587+00:00",
+      "stop_loss": 344.45,
+      "target1": 360.19,
+      "target1_hit": false
+    },
+    "IPCALAB.NS": {
+      "trade_id": "trial_IPCALAB_NS_1787174954",
+      "symbol": "IPCALAB.NS",
+      "direction": "BUY",
+      "entry_price": 1882.0999755859375,
+      "entry_time": "2026-08-19T21:29:14.559293+00:00",
+      "stop_loss": 1853.87,
+      "target1": 1938.56,
+      "target1_hit": false
+    },
+    "JKCEMENT.NS": {
+      "trade_id": "trial_JKCEMENT_NS_1787174955",
+      "symbol": "JKCEMENT.NS",
+      "direction": "SELL",
+      "entry_price": 5375.5,
+      "entry_time": "2026-08-19T21:29:15.451955+00:00",
+      "stop_loss": 5456.13,
+      "target1": 5214.23,
+      "target1_hit": false
+    },
+    "JBMA.NS": {
+      "trade_id": "trial_JBMA_NS_1787174956",
+      "symbol": "JBMA.NS",
+      "direction": "SELL",
+      "entry_price": 619.8499755859375,
+      "entry_time": "2026-08-19T21:29:16.114155+00:00",
+      "stop_loss": 629.15,
+      "target1": 601.25,
+      "target1_hit": false
+    },
+    "JKTYRE.NS": {
+      "trade_id": "trial_JKTYRE_NS_1787174956",
+      "symbol": "JKTYRE.NS",
+      "direction": "SELL",
+      "entry_price": 383.1499938964844,
+      "entry_time": "2026-08-19T21:29:16.928953+00:00",
+      "stop_loss": 388.9,
+      "target1": 371.66,
+      "target1_hit": false
+    },
+    "JSWCEMENT.NS": {
+      "trade_id": "trial_JSWCEMENT_NS_1787174957",
+      "symbol": "JSWCEMENT.NS",
+      "direction": "SELL",
+      "entry_price": 127.30999755859375,
+      "entry_time": "2026-08-19T21:29:17.635444+00:00",
+      "stop_loss": 129.22,
+      "target1": 123.49,
+      "target1_hit": false
+    },
+    "JSWDULUX.NS": {
+      "trade_id": "trial_JSWDULUX_NS_1787174958",
+      "symbol": "JSWDULUX.NS",
+      "direction": "BUY",
+      "entry_price": 3110.39990234375,
+      "entry_time": "2026-08-19T21:29:18.277749+00:00",
+      "stop_loss": 3063.74,
+      "target1": 3203.71,
+      "target1_hit": false
+    },
+    "JSWENERGY.NS": {
+      "trade_id": "trial_JSWENERGY_NS_1787174958",
+      "symbol": "JSWENERGY.NS",
+      "direction": "SELL",
+      "entry_price": 548.0999755859375,
+      "entry_time": "2026-08-19T21:29:18.881243+00:00",
+      "stop_loss": 556.32,
+      "target1": 531.66,
+      "target1_hit": false
+    },
+    "JSWINFRA.NS": {
+      "trade_id": "trial_JSWINFRA_NS_1787174959",
+      "symbol": "JSWINFRA.NS",
+      "direction": "SELL",
+      "entry_price": 328.6499938964844,
+      "entry_time": "2026-08-19T21:29:19.493593+00:00",
+      "stop_loss": 333.58,
+      "target1": 318.79,
+      "target1_hit": false
+    },
+    "JSWSTEEL.NS": {
+      "trade_id": "trial_JSWSTEEL_NS_1787174960",
+      "symbol": "JSWSTEEL.NS",
+      "direction": "SELL",
+      "entry_price": 1267.5999755859375,
+      "entry_time": "2026-08-19T21:29:20.126003+00:00",
+      "stop_loss": 1286.61,
+      "target1": 1229.57,
+      "target1_hit": false
+    },
+    "JAINREC.NS": {
+      "trade_id": "trial_JAINREC_NS_1787174960",
+      "symbol": "JAINREC.NS",
+      "direction": "SELL",
+      "entry_price": 296.20001220703125,
+      "entry_time": "2026-08-19T21:29:20.715513+00:00",
+      "stop_loss": 300.64,
+      "target1": 287.31,
+      "target1_hit": false
+    },
+    "JPPOWER.NS": {
+      "trade_id": "trial_JPPOWER_NS_1787174961",
+      "symbol": "JPPOWER.NS",
+      "direction": "SELL",
+      "entry_price": 17.31999969482422,
+      "entry_time": "2026-08-19T21:29:21.325990+00:00",
+      "stop_loss": 17.58,
+      "target1": 16.8,
+      "target1_hit": false
+    },
+    "J&KBANK.NS": {
+      "trade_id": "trial_J&KBANK_NS_1787174961",
+      "symbol": "J&KBANK.NS",
+      "direction": "SELL",
+      "entry_price": 150.24000549316406,
+      "entry_time": "2026-08-19T21:29:21.950925+00:00",
+      "stop_loss": 152.49,
+      "target1": 145.73,
+      "target1_hit": false
+    },
+    "JINDALSAW.NS": {
+      "trade_id": "trial_JINDALSAW_NS_1787174962",
+      "symbol": "JINDALSAW.NS",
+      "direction": "BUY",
+      "entry_price": 268.6499938964844,
+      "entry_time": "2026-08-19T21:29:22.594179+00:00",
+      "stop_loss": 264.62,
+      "target1": 276.71,
+      "target1_hit": false
+    },
+    "JINDALSTEL.NS": {
+      "trade_id": "trial_JINDALSTEL_NS_1787174963",
+      "symbol": "JINDALSTEL.NS",
+      "direction": "BUY",
+      "entry_price": 1101.5,
+      "entry_time": "2026-08-19T21:29:23.420636+00:00",
+      "stop_loss": 1084.98,
+      "target1": 1134.55,
+      "target1_hit": false
+    },
+    "JUBLFOOD.NS": {
+      "trade_id": "trial_JUBLFOOD_NS_1787174964",
+      "symbol": "JUBLFOOD.NS",
+      "direction": "BUY",
+      "entry_price": 500.54998779296875,
+      "entry_time": "2026-08-19T21:29:24.154372+00:00",
+      "stop_loss": 493.04,
+      "target1": 515.57,
+      "target1_hit": false
+    },
+    "JUBLINGREA.NS": {
+      "trade_id": "trial_JUBLINGREA_NS_1787174965",
+      "symbol": "JUBLINGREA.NS",
+      "direction": "SELL",
+      "entry_price": 726.7000122070312,
+      "entry_time": "2026-08-19T21:29:25.437134+00:00",
+      "stop_loss": 737.6,
+      "target1": 704.9,
+      "target1_hit": false
+    },
+    "JUBLPHARMA.NS": {
+      "trade_id": "trial_JUBLPHARMA_NS_1787174966",
+      "symbol": "JUBLPHARMA.NS",
+      "direction": "SELL",
+      "entry_price": 866.0,
+      "entry_time": "2026-08-19T21:29:26.014657+00:00",
+      "stop_loss": 878.99,
+      "target1": 840.02,
+      "target1_hit": false
+    },
+    "JWL.NS": {
+      "trade_id": "trial_JWL_NS_1787174966",
+      "symbol": "JWL.NS",
+      "direction": "SELL",
+      "entry_price": 250.6999969482422,
+      "entry_time": "2026-08-19T21:29:26.635178+00:00",
+      "stop_loss": 254.46,
+      "target1": 243.18,
+      "target1_hit": false
+    },
+    "JYOTICNC.NS": {
+      "trade_id": "trial_JYOTICNC_NS_1787174967",
+      "symbol": "JYOTICNC.NS",
+      "direction": "BUY",
+      "entry_price": 929.2000122070312,
+      "entry_time": "2026-08-19T21:29:27.205088+00:00",
+      "stop_loss": 915.26,
+      "target1": 957.08,
+      "target1_hit": false
+    },
+    "KPRMILL.NS": {
+      "trade_id": "trial_KPRMILL_NS_1787174967",
+      "symbol": "KPRMILL.NS",
+      "direction": "BUY",
+      "entry_price": 1123.5,
+      "entry_time": "2026-08-19T21:29:27.818837+00:00",
+      "stop_loss": 1106.65,
+      "target1": 1157.2,
+      "target1_hit": false
+    },
+    "KEI.NS": {
+      "trade_id": "trial_KEI_NS_1787174968",
+      "symbol": "KEI.NS",
+      "direction": "BUY",
+      "entry_price": 5790.0,
+      "entry_time": "2026-08-19T21:29:28.447515+00:00",
+      "stop_loss": 5703.15,
+      "target1": 5963.7,
+      "target1_hit": false
+    },
+    "KPIL.NS": {
+      "trade_id": "trial_KPIL_NS_1787174969",
+      "symbol": "KPIL.NS",
+      "direction": "BUY",
+      "entry_price": 1403.5,
+      "entry_time": "2026-08-19T21:29:29.439242+00:00",
+      "stop_loss": 1382.45,
+      "target1": 1445.61,
+      "target1_hit": false
+    },
+    "KALYANKJIL.NS": {
+      "trade_id": "trial_KALYANKJIL_NS_1787174970",
+      "symbol": "KALYANKJIL.NS",
+      "direction": "BUY",
+      "entry_price": 601.5999755859375,
+      "entry_time": "2026-08-19T21:29:30.033286+00:00",
+      "stop_loss": 592.58,
+      "target1": 619.65,
+      "target1_hit": false
+    },
+    "KARURVYSYA.NS": {
+      "trade_id": "trial_KARURVYSYA_NS_1787174970",
+      "symbol": "KARURVYSYA.NS",
+      "direction": "SELL",
+      "entry_price": 333.8999938964844,
+      "entry_time": "2026-08-19T21:29:30.719660+00:00",
+      "stop_loss": 338.91,
+      "target1": 323.88,
+      "target1_hit": false
+    },
+    "KAYNES.NS": {
+      "trade_id": "trial_KAYNES_NS_1787174971",
+      "symbol": "KAYNES.NS",
+      "direction": "BUY",
+      "entry_price": 3644.10009765625,
+      "entry_time": "2026-08-19T21:29:31.285722+00:00",
+      "stop_loss": 3589.44,
+      "target1": 3753.42,
+      "target1_hit": false
+    },
+    "KEC.NS": {
+      "trade_id": "trial_KEC_NS_1787174971",
+      "symbol": "KEC.NS",
+      "direction": "SELL",
+      "entry_price": 428.6000061035156,
+      "entry_time": "2026-08-19T21:29:31.915592+00:00",
+      "stop_loss": 435.03,
+      "target1": 415.74,
+      "target1_hit": false
+    },
+    "KFINTECH.NS": {
+      "trade_id": "trial_KFINTECH_NS_1787174972",
+      "symbol": "KFINTECH.NS",
+      "direction": "BUY",
+      "entry_price": 957.5999755859375,
+      "entry_time": "2026-08-19T21:29:32.548752+00:00",
+      "stop_loss": 943.24,
+      "target1": 986.33,
+      "target1_hit": false
+    },
+    "KIRLOSENG.NS": {
+      "trade_id": "trial_KIRLOSENG_NS_1787174973",
+      "symbol": "KIRLOSENG.NS",
+      "direction": "SELL",
+      "entry_price": 2125.699951171875,
+      "entry_time": "2026-08-19T21:29:33.168265+00:00",
+      "stop_loss": 2157.59,
+      "target1": 2061.93,
+      "target1_hit": false
+    },
+    "KIMS.NS": {
+      "trade_id": "trial_KIMS_NS_1787174973",
+      "symbol": "KIMS.NS",
+      "direction": "BUY",
+      "entry_price": 805.5,
+      "entry_time": "2026-08-19T21:29:33.922999+00:00",
+      "stop_loss": 793.42,
+      "target1": 829.67,
+      "target1_hit": false
+    },
+    "LTF.NS": {
+      "trade_id": "trial_LTF_NS_1787174974",
+      "symbol": "LTF.NS",
+      "direction": "BUY",
+      "entry_price": 325.1000061035156,
+      "entry_time": "2026-08-19T21:29:34.558490+00:00",
+      "stop_loss": 320.22,
+      "target1": 334.85,
+      "target1_hit": false
+    },
+    "LTTS.NS": {
+      "trade_id": "trial_LTTS_NS_1787174975",
+      "symbol": "LTTS.NS",
+      "direction": "BUY",
+      "entry_price": 3509.89990234375,
+      "entry_time": "2026-08-19T21:29:35.137923+00:00",
+      "stop_loss": 3457.25,
+      "target1": 3615.2,
+      "target1_hit": false
+    },
+    "LGEINDIA.NS": {
+      "trade_id": "trial_LGEINDIA_NS_1787174975",
+      "symbol": "LGEINDIA.NS",
+      "direction": "BUY",
+      "entry_price": 1649.4000244140625,
+      "entry_time": "2026-08-19T21:29:35.736334+00:00",
+      "stop_loss": 1624.66,
+      "target1": 1698.88,
+      "target1_hit": false
+    },
+    "LICHSGFIN.NS": {
+      "trade_id": "trial_LICHSGFIN_NS_1787174976",
+      "symbol": "LICHSGFIN.NS",
+      "direction": "SELL",
+      "entry_price": 498.79998779296875,
+      "entry_time": "2026-08-19T21:29:36.336527+00:00",
+      "stop_loss": 506.28,
+      "target1": 483.84,
+      "target1_hit": false
+    },
+    "LTFOODS.NS": {
+      "trade_id": "trial_LTFOODS_NS_1787174976",
+      "symbol": "LTFOODS.NS",
+      "direction": "BUY",
+      "entry_price": 426.29998779296875,
+      "entry_time": "2026-08-19T21:29:36.967761+00:00",
+      "stop_loss": 419.91,
+      "target1": 439.09,
+      "target1_hit": false
+    },
+    "LTM.NS": {
+      "trade_id": "trial_LTM_NS_1787174977",
+      "symbol": "LTM.NS",
+      "direction": "BUY",
+      "entry_price": 4562.2001953125,
+      "entry_time": "2026-08-19T21:29:37.569356+00:00",
+      "stop_loss": 4493.77,
+      "target1": 4699.07,
+      "target1_hit": false
+    },
+    "LT.NS": {
+      "trade_id": "trial_LT_NS_1787174978",
+      "symbol": "LT.NS",
+      "direction": "BUY",
+      "entry_price": 4064.300048828125,
+      "entry_time": "2026-08-19T21:29:38.156518+00:00",
+      "stop_loss": 4003.34,
+      "target1": 4186.23,
+      "target1_hit": false
+    },
+    "LATENTVIEW.NS": {
+      "trade_id": "trial_LATENTVIEW_NS_1787174978",
+      "symbol": "LATENTVIEW.NS",
+      "direction": "SELL",
+      "entry_price": 281.6000061035156,
+      "entry_time": "2026-08-19T21:29:38.706234+00:00",
+      "stop_loss": 285.82,
+      "target1": 273.15,
+      "target1_hit": false
+    },
+    "LAURUSLABS.NS": {
+      "trade_id": "trial_LAURUSLABS_NS_1787174979",
+      "symbol": "LAURUSLABS.NS",
+      "direction": "BUY",
+      "entry_price": 1814.0,
+      "entry_time": "2026-08-19T21:29:39.361204+00:00",
+      "stop_loss": 1786.79,
+      "target1": 1868.42,
+      "target1_hit": false
+    },
+    "THELEELA.NS": {
+      "trade_id": "trial_THELEELA_NS_1787174979",
+      "symbol": "THELEELA.NS",
+      "direction": "BUY",
+      "entry_price": 519.1500244140625,
+      "entry_time": "2026-08-19T21:29:39.964938+00:00",
+      "stop_loss": 511.36,
+      "target1": 534.72,
+      "target1_hit": false
+    },
+    "LEMONTREE.NS": {
+      "trade_id": "trial_LEMONTREE_NS_1787174980",
+      "symbol": "LEMONTREE.NS",
+      "direction": "SELL",
+      "entry_price": 109.0199966430664,
+      "entry_time": "2026-08-19T21:29:40.557862+00:00",
+      "stop_loss": 110.66,
+      "target1": 105.75,
+      "target1_hit": false
+    },
+    "LENSKART.NS": {
+      "trade_id": "trial_LENSKART_NS_1787174981",
+      "symbol": "LENSKART.NS",
+      "direction": "BUY",
+      "entry_price": 628.4000244140625,
+      "entry_time": "2026-08-19T21:29:41.397028+00:00",
+      "stop_loss": 618.97,
+      "target1": 647.25,
+      "target1_hit": false
+    },
+    "LICI.NS": {
+      "trade_id": "trial_LICI_NS_1787174982",
+      "symbol": "LICI.NS",
+      "direction": "SELL",
+      "entry_price": 410.0,
+      "entry_time": "2026-08-19T21:29:42.522648+00:00",
+      "stop_loss": 416.15,
+      "target1": 397.7,
+      "target1_hit": false
+    },
+    "LINDEINDIA.NS": {
+      "trade_id": "trial_LINDEINDIA_NS_1787174983",
+      "symbol": "LINDEINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 6725.5,
+      "entry_time": "2026-08-19T21:29:43.177128+00:00",
+      "stop_loss": 6826.38,
+      "target1": 6523.73,
+      "target1_hit": false
+    },
+    "LUPIN.NS": {
+      "trade_id": "trial_LUPIN_NS_1787174984",
+      "symbol": "LUPIN.NS",
+      "direction": "SELL",
+      "entry_price": 2232.0,
+      "entry_time": "2026-08-19T21:29:44.307378+00:00",
+      "stop_loss": 2265.48,
+      "target1": 2165.04,
+      "target1_hit": false
+    },
+    "MRF.NS": {
+      "trade_id": "trial_MRF_NS_1787174985",
+      "symbol": "MRF.NS",
+      "direction": "BUY",
+      "entry_price": 133505.0,
+      "entry_time": "2026-08-19T21:29:45.016355+00:00",
+      "stop_loss": 131502.42,
+      "target1": 137510.15,
+      "target1_hit": false
+    },
+    "MGL.NS": {
+      "trade_id": "trial_MGL_NS_1787174985",
+      "symbol": "MGL.NS",
+      "direction": "BUY",
+      "entry_price": 1111.4000244140625,
+      "entry_time": "2026-08-19T21:29:45.648799+00:00",
+      "stop_loss": 1094.73,
+      "target1": 1144.74,
+      "target1_hit": false
+    },
+    "M&MFIN.NS": {
+      "trade_id": "trial_M&MFIN_NS_1787174986",
+      "symbol": "M&MFIN.NS",
+      "direction": "BUY",
+      "entry_price": 386.20001220703125,
+      "entry_time": "2026-08-19T21:29:46.322529+00:00",
+      "stop_loss": 380.41,
+      "target1": 397.79,
+      "target1_hit": false
+    },
+    "M&M.NS": {
+      "trade_id": "trial_M&M_NS_1787174986",
+      "symbol": "M&M.NS",
+      "direction": "BUY",
+      "entry_price": 3421.5,
+      "entry_time": "2026-08-19T21:29:46.969394+00:00",
+      "stop_loss": 3370.18,
+      "target1": 3524.14,
+      "target1_hit": false
+    },
+    "MRPL.NS": {
+      "trade_id": "trial_MRPL_NS_1787174987",
+      "symbol": "MRPL.NS",
+      "direction": "BUY",
+      "entry_price": 177.44000244140625,
+      "entry_time": "2026-08-19T21:29:47.708471+00:00",
+      "stop_loss": 174.78,
+      "target1": 182.76,
+      "target1_hit": false
+    },
+    "MANKIND.NS": {
+      "trade_id": "trial_MANKIND_NS_1787174988",
+      "symbol": "MANKIND.NS",
+      "direction": "SELL",
+      "entry_price": 2380.0,
+      "entry_time": "2026-08-19T21:29:48.326784+00:00",
+      "stop_loss": 2415.7,
+      "target1": 2308.6,
+      "target1_hit": false
+    },
+    "MARICO.NS": {
+      "trade_id": "trial_MARICO_NS_1787174988",
+      "symbol": "MARICO.NS",
+      "direction": "SELL",
+      "entry_price": 841.5499877929688,
+      "entry_time": "2026-08-19T21:29:48.970558+00:00",
+      "stop_loss": 854.17,
+      "target1": 816.3,
+      "target1_hit": false
+    },
+    "MFSL.NS": {
+      "trade_id": "trial_MFSL_NS_1787174990",
+      "symbol": "MFSL.NS",
+      "direction": "BUY",
+      "entry_price": 1584.5,
+      "entry_time": "2026-08-19T21:29:50.272326+00:00",
+      "stop_loss": 1560.73,
+      "target1": 1632.04,
+      "target1_hit": false
+    },
+    "MAXHEALTH.NS": {
+      "trade_id": "trial_MAXHEALTH_NS_1787174990",
+      "symbol": "MAXHEALTH.NS",
+      "direction": "SELL",
+      "entry_price": 1014.4000244140625,
+      "entry_time": "2026-08-19T21:29:50.872589+00:00",
+      "stop_loss": 1029.62,
+      "target1": 983.97,
+      "target1_hit": false
+    },
+    "MAZDOCK.NS": {
+      "trade_id": "trial_MAZDOCK_NS_1787174991",
+      "symbol": "MAZDOCK.NS",
+      "direction": "BUY",
+      "entry_price": 2587.0,
+      "entry_time": "2026-08-19T21:29:51.471560+00:00",
+      "stop_loss": 2548.2,
+      "target1": 2664.61,
+      "target1_hit": false
+    },
+    "MEESHO.NS": {
+      "trade_id": "trial_MEESHO_NS_1787174992",
+      "symbol": "MEESHO.NS",
+      "direction": "BUY",
+      "entry_price": 192.9499969482422,
+      "entry_time": "2026-08-19T21:29:52.030406+00:00",
+      "stop_loss": 190.06,
+      "target1": 198.74,
+      "target1_hit": false
+    },
+    "MINDACORP.NS": {
+      "trade_id": "trial_MINDACORP_NS_1787174992",
+      "symbol": "MINDACORP.NS",
+      "direction": "BUY",
+      "entry_price": 745.25,
+      "entry_time": "2026-08-19T21:29:52.694484+00:00",
+      "stop_loss": 734.07,
+      "target1": 767.61,
+      "target1_hit": false
+    },
+    "MCX.NS": {
+      "trade_id": "trial_MCX_NS_1787174993",
+      "symbol": "MCX.NS",
+      "direction": "BUY",
+      "entry_price": 3040.0,
+      "entry_time": "2026-08-19T21:29:53.846928+00:00",
+      "stop_loss": 2994.4,
+      "target1": 3131.2,
+      "target1_hit": false
+    },
+    "MUTHOOTFIN.NS": {
+      "trade_id": "trial_MUTHOOTFIN_NS_1787174994",
+      "symbol": "MUTHOOTFIN.NS",
+      "direction": "SELL",
+      "entry_price": 2894.10009765625,
+      "entry_time": "2026-08-19T21:29:54.441962+00:00",
+      "stop_loss": 2937.51,
+      "target1": 2807.28,
+      "target1_hit": false
+    },
+    "NATCOPHARM.NS": {
+      "trade_id": "trial_NATCOPHARM_NS_1787174995",
+      "symbol": "NATCOPHARM.NS",
+      "direction": "SELL",
+      "entry_price": 898.3499755859375,
+      "entry_time": "2026-08-19T21:29:55.055537+00:00",
+      "stop_loss": 911.83,
+      "target1": 871.4,
+      "target1_hit": false
+    },
+    "NBCC.NS": {
+      "trade_id": "trial_NBCC_NS_1787174995",
+      "symbol": "NBCC.NS",
+      "direction": "SELL",
+      "entry_price": 88.0,
+      "entry_time": "2026-08-19T21:29:55.645130+00:00",
+      "stop_loss": 89.32,
+      "target1": 85.36,
+      "target1_hit": false
+    },
+    "NHPC.NS": {
+      "trade_id": "trial_NHPC_NS_1787174996",
+      "symbol": "NHPC.NS",
+      "direction": "SELL",
+      "entry_price": 76.7300033569336,
+      "entry_time": "2026-08-19T21:29:56.415480+00:00",
+      "stop_loss": 77.88,
+      "target1": 74.43,
+      "target1_hit": false
+    },
+    "NLCINDIA.NS": {
+      "trade_id": "trial_NLCINDIA_NS_1787174997",
+      "symbol": "NLCINDIA.NS",
+      "direction": "SELL",
+      "entry_price": 276.6499938964844,
+      "entry_time": "2026-08-19T21:29:57.015709+00:00",
+      "stop_loss": 280.8,
+      "target1": 268.35,
+      "target1_hit": false
+    },
+    "NSLNISP.NS": {
+      "trade_id": "trial_NSLNISP_NS_1787174997",
+      "symbol": "NSLNISP.NS",
+      "direction": "SELL",
+      "entry_price": 40.4900016784668,
+      "entry_time": "2026-08-19T21:29:57.736293+00:00",
+      "stop_loss": 41.1,
+      "target1": 39.28,
+      "target1_hit": false
+    },
+    "NTPC.NS": {
+      "trade_id": "trial_NTPC_NS_1787174999",
+      "symbol": "NTPC.NS",
+      "direction": "SELL",
+      "entry_price": 337.1000061035156,
+      "entry_time": "2026-08-19T21:29:59.358879+00:00",
+      "stop_loss": 342.16,
+      "target1": 326.99,
+      "target1_hit": false
+    },
+    "NH.NS": {
+      "trade_id": "trial_NH_NS_1787174999",
+      "symbol": "NH.NS",
+      "direction": "SELL",
+      "entry_price": 1803.0,
+      "entry_time": "2026-08-19T21:29:59.987776+00:00",
+      "stop_loss": 1830.04,
+      "target1": 1748.91,
+      "target1_hit": false
+    },
+    "NATIONALUM.NS": {
+      "trade_id": "trial_NATIONALUM_NS_1787175000",
+      "symbol": "NATIONALUM.NS",
+      "direction": "BUY",
+      "entry_price": 388.0,
+      "entry_time": "2026-08-19T21:30:00.640632+00:00",
+      "stop_loss": 382.18,
+      "target1": 399.64,
+      "target1_hit": false
+    },
+    "NAVA.NS": {
+      "trade_id": "trial_NAVA_NS_1787175001",
+      "symbol": "NAVA.NS",
+      "direction": "SELL",
+      "entry_price": 558.9000244140625,
+      "entry_time": "2026-08-19T21:30:01.706556+00:00",
+      "stop_loss": 567.28,
+      "target1": 542.13,
+      "target1_hit": false
+    },
+    "NAVINFLUOR.NS": {
+      "trade_id": "trial_NAVINFLUOR_NS_1787175002",
+      "symbol": "NAVINFLUOR.NS",
+      "direction": "BUY",
+      "entry_price": 8255.0,
+      "entry_time": "2026-08-19T21:30:02.313637+00:00",
+      "stop_loss": 8131.18,
+      "target1": 8502.65,
+      "target1_hit": false
+    },
+    "NETWEB.NS": {
+      "trade_id": "trial_NETWEB_NS_1787175003",
+      "symbol": "NETWEB.NS",
+      "direction": "BUY",
+      "entry_price": 5354.5,
+      "entry_time": "2026-08-19T21:30:03.706548+00:00",
+      "stop_loss": 5274.18,
+      "target1": 5515.14,
+      "target1_hit": false
+    },
+    "NEULANDLAB.NS": {
+      "trade_id": "trial_NEULANDLAB_NS_1787175004",
+      "symbol": "NEULANDLAB.NS",
+      "direction": "BUY",
+      "entry_price": 23370.0,
+      "entry_time": "2026-08-19T21:30:04.325976+00:00",
+      "stop_loss": 23019.45,
+      "target1": 24071.1,
+      "target1_hit": false
+    },
+    "NEWGEN.NS": {
+      "trade_id": "trial_NEWGEN_NS_1787175004",
+      "symbol": "NEWGEN.NS",
+      "direction": "SELL",
+      "entry_price": 528.4500122070312,
+      "entry_time": "2026-08-19T21:30:04.911981+00:00",
+      "stop_loss": 536.38,
+      "target1": 512.6,
+      "target1_hit": false
+    },
+    "NAM-INDIA.NS": {
+      "trade_id": "trial_NAM-INDIA_NS_1787175005",
+      "symbol": "NAM-INDIA.NS",
+      "direction": "SELL",
+      "entry_price": 1170.5999755859375,
+      "entry_time": "2026-08-19T21:30:05.539600+00:00",
+      "stop_loss": 1188.16,
+      "target1": 1135.48,
+      "target1_hit": false
+    },
+    "NIVABUPA.NS": {
+      "trade_id": "trial_NIVABUPA_NS_1787175006",
+      "symbol": "NIVABUPA.NS",
+      "direction": "SELL",
+      "entry_price": 83.73999786376953,
+      "entry_time": "2026-08-19T21:30:06.260337+00:00",
+      "stop_loss": 85.0,
+      "target1": 81.23,
+      "target1_hit": false
+    },
+    "NUVAMA.NS": {
+      "trade_id": "trial_NUVAMA_NS_1787175006",
+      "symbol": "NUVAMA.NS",
+      "direction": "SELL",
+      "entry_price": 1746.800048828125,
+      "entry_time": "2026-08-19T21:30:06.933307+00:00",
+      "stop_loss": 1773.0,
+      "target1": 1694.4,
+      "target1_hit": false
+    },
+    "NUVOCO.NS": {
+      "trade_id": "trial_NUVOCO_NS_1787175007",
+      "symbol": "NUVOCO.NS",
+      "direction": "SELL",
+      "entry_price": 326.45001220703125,
+      "entry_time": "2026-08-19T21:30:07.573414+00:00",
+      "stop_loss": 331.35,
+      "target1": 316.66,
+      "target1_hit": false
+    },
+    "ONGC.NS": {
+      "trade_id": "trial_ONGC_NS_1787175008",
+      "symbol": "ONGC.NS",
+      "direction": "SELL",
+      "entry_price": 239.5,
+      "entry_time": "2026-08-19T21:30:08.646356+00:00",
+      "stop_loss": 243.09,
+      "target1": 232.31,
+      "target1_hit": false
+    },
+    "OIL.NS": {
+      "trade_id": "trial_OIL_NS_1787175009",
+      "symbol": "OIL.NS",
+      "direction": "BUY",
+      "entry_price": 480.5,
+      "entry_time": "2026-08-19T21:30:09.722421+00:00",
+      "stop_loss": 473.29,
+      "target1": 494.92,
+      "target1_hit": false
+    },
+    "OLAELEC.NS": {
+      "trade_id": "trial_OLAELEC_NS_1787175010",
+      "symbol": "OLAELEC.NS",
+      "direction": "SELL",
+      "entry_price": 38.61000061035156,
+      "entry_time": "2026-08-19T21:30:10.349906+00:00",
+      "stop_loss": 39.19,
+      "target1": 37.45,
+      "target1_hit": false
+    },
+    "OLECTRA.NS": {
+      "trade_id": "trial_OLECTRA_NS_1787175011",
+      "symbol": "OLECTRA.NS",
+      "direction": "SELL",
+      "entry_price": 1324.0999755859375,
+      "entry_time": "2026-08-19T21:30:11.030373+00:00",
+      "stop_loss": 1343.96,
+      "target1": 1284.38,
+      "target1_hit": false
+    },
+    "PAYTM.NS": {
+      "trade_id": "trial_PAYTM_NS_1787175011",
+      "symbol": "PAYTM.NS",
+      "direction": "BUY",
+      "entry_price": 1546.300048828125,
+      "entry_time": "2026-08-19T21:30:11.669498+00:00",
+      "stop_loss": 1523.11,
+      "target1": 1592.69,
+      "target1_hit": false
+    },
+    "ONESOURCE.NS": {
+      "trade_id": "trial_ONESOURCE_NS_1787175012",
+      "symbol": "ONESOURCE.NS",
+      "direction": "SELL",
+      "entry_price": 1542.300048828125,
+      "entry_time": "2026-08-19T21:30:12.335561+00:00",
+      "stop_loss": 1565.43,
+      "target1": 1496.03,
+      "target1_hit": false
+    },
+    "OFSS.NS": {
+      "trade_id": "trial_OFSS_NS_1787175012",
+      "symbol": "OFSS.NS",
+      "direction": "BUY",
+      "entry_price": 11623.0,
+      "entry_time": "2026-08-19T21:30:12.972784+00:00",
+      "stop_loss": 11448.66,
+      "target1": 11971.69,
+      "target1_hit": false
+    },
+    "POLICYBZR.NS": {
+      "trade_id": "trial_POLICYBZR_NS_1787175013",
+      "symbol": "POLICYBZR.NS",
+      "direction": "BUY",
+      "entry_price": 1747.0,
+      "entry_time": "2026-08-19T21:30:13.562253+00:00",
+      "stop_loss": 1720.8,
+      "target1": 1799.41,
+      "target1_hit": false
+    },
+    "PCBL.NS": {
+      "trade_id": "trial_PCBL_NS_1787175014",
+      "symbol": "PCBL.NS",
+      "direction": "BUY",
+      "entry_price": 326.54998779296875,
+      "entry_time": "2026-08-19T21:30:14.307233+00:00",
+      "stop_loss": 321.65,
+      "target1": 336.35,
+      "target1_hit": false
+    },
+    "PGEL.NS": {
+      "trade_id": "trial_PGEL_NS_1787175014",
+      "symbol": "PGEL.NS",
+      "direction": "SELL",
+      "entry_price": 597.0,
+      "entry_time": "2026-08-19T21:30:14.902549+00:00",
+      "stop_loss": 605.95,
+      "target1": 579.09,
+      "target1_hit": false
+    },
+    "PIIND.NS": {
+      "trade_id": "trial_PIIND_NS_1787175015",
+      "symbol": "PIIND.NS",
+      "direction": "SELL",
+      "entry_price": 2515.0,
+      "entry_time": "2026-08-19T21:30:15.707889+00:00",
+      "stop_loss": 2552.72,
+      "target1": 2439.55,
+      "target1_hit": false
+    },
+    "PNBHOUSING.NS": {
+      "trade_id": "trial_PNBHOUSING_NS_1787175016",
+      "symbol": "PNBHOUSING.NS",
+      "direction": "BUY",
+      "entry_price": 1145.800048828125,
+      "entry_time": "2026-08-19T21:30:16.382424+00:00",
+      "stop_loss": 1128.61,
+      "target1": 1180.17,
+      "target1_hit": false
+    },
+    "PTCIL.NS": {
+      "trade_id": "trial_PTCIL_NS_1787175017",
+      "symbol": "PTCIL.NS",
+      "direction": "BUY",
+      "entry_price": 19791.0,
+      "entry_time": "2026-08-19T21:30:17.087491+00:00",
+      "stop_loss": 19494.13,
+      "target1": 20384.73,
+      "target1_hit": false
+    },
+    "PVRINOX.NS": {
+      "trade_id": "trial_PVRINOX_NS_1787175017",
+      "symbol": "PVRINOX.NS",
+      "direction": "BUY",
+      "entry_price": 1198.0999755859375,
+      "entry_time": "2026-08-19T21:30:17.697749+00:00",
+      "stop_loss": 1180.13,
+      "target1": 1234.04,
+      "target1_hit": false
+    },
+    "PAGEIND.NS": {
+      "trade_id": "trial_PAGEIND_NS_1787175018",
+      "symbol": "PAGEIND.NS",
+      "direction": "SELL",
+      "entry_price": 36425.0,
+      "entry_time": "2026-08-19T21:30:18.323850+00:00",
+      "stop_loss": 36971.38,
+      "target1": 35332.25,
+      "target1_hit": false
+    },
+    "PARADEEP.NS": {
+      "trade_id": "trial_PARADEEP_NS_1787175019",
+      "symbol": "PARADEEP.NS",
+      "direction": "BUY",
+      "entry_price": 147.82000732421875,
+      "entry_time": "2026-08-19T21:30:19.042602+00:00",
+      "stop_loss": 145.6,
+      "target1": 152.25,
+      "target1_hit": false
+    },
+    "PATANJALI.NS": {
+      "trade_id": "trial_PATANJALI_NS_1787175019",
+      "symbol": "PATANJALI.NS",
+      "direction": "BUY",
+      "entry_price": 351.6499938964844,
+      "entry_time": "2026-08-19T21:30:19.621832+00:00",
+      "stop_loss": 346.38,
+      "target1": 362.2,
+      "target1_hit": false
+    },
+    "PERSISTENT.NS": {
+      "trade_id": "trial_PERSISTENT_NS_1787175020",
+      "symbol": "PERSISTENT.NS",
+      "direction": "BUY",
+      "entry_price": 5442.5,
+      "entry_time": "2026-08-19T21:30:20.239339+00:00",
+      "stop_loss": 5360.86,
+      "target1": 5605.78,
+      "target1_hit": false
+    },
+    "PETRONET.NS": {
+      "trade_id": "trial_PETRONET_NS_1787175020",
+      "symbol": "PETRONET.NS",
+      "direction": "BUY",
+      "entry_price": 286.25,
+      "entry_time": "2026-08-19T21:30:20.915162+00:00",
+      "stop_loss": 281.96,
+      "target1": 294.84,
+      "target1_hit": false
+    },
+    "PFIZER.NS": {
+      "trade_id": "trial_PFIZER_NS_1787175021",
+      "symbol": "PFIZER.NS",
+      "direction": "BUY",
+      "entry_price": 4799.2998046875,
+      "entry_time": "2026-08-19T21:30:21.558561+00:00",
+      "stop_loss": 4727.31,
+      "target1": 4943.28,
+      "target1_hit": false
+    },
+    "PHOENIXLTD.NS": {
+      "trade_id": "trial_PHOENIXLTD_NS_1787175022",
+      "symbol": "PHOENIXLTD.NS",
+      "direction": "SELL",
+      "entry_price": 1940.0,
+      "entry_time": "2026-08-19T21:30:22.204677+00:00",
+      "stop_loss": 1969.1,
+      "target1": 1881.8,
+      "target1_hit": false
+    },
+    "PWL.NS": {
+      "trade_id": "trial_PWL_NS_1787175022",
+      "symbol": "PWL.NS",
+      "direction": "SELL",
+      "entry_price": 122.05000305175781,
+      "entry_time": "2026-08-19T21:30:22.803661+00:00",
+      "stop_loss": 123.88,
+      "target1": 118.39,
+      "target1_hit": false
+    },
+    "PIDILITIND.NS": {
+      "trade_id": "trial_PIDILITIND_NS_1787175023",
+      "symbol": "PIDILITIND.NS",
+      "direction": "BUY",
+      "entry_price": 1674.0,
+      "entry_time": "2026-08-19T21:30:23.421884+00:00",
+      "stop_loss": 1648.89,
+      "target1": 1724.22,
+      "target1_hit": false
+    },
+    "PINELABS.NS": {
+      "trade_id": "trial_PINELABS_NS_1787175024",
+      "symbol": "PINELABS.NS",
+      "direction": "BUY",
+      "entry_price": 160.32000732421875,
+      "entry_time": "2026-08-19T21:30:24.043108+00:00",
+      "stop_loss": 157.92,
+      "target1": 165.13,
+      "target1_hit": false
+    },
+    "PIRAMALFIN.NS": {
+      "trade_id": "trial_PIRAMALFIN_NS_1787175024",
+      "symbol": "PIRAMALFIN.NS",
+      "direction": "SELL",
+      "entry_price": 2060.5,
+      "entry_time": "2026-08-19T21:30:24.639629+00:00",
+      "stop_loss": 2091.41,
+      "target1": 1998.68,
+      "target1_hit": false
+    },
+    "PPLPHARMA.NS": {
+      "trade_id": "trial_PPLPHARMA_NS_1787175025",
+      "symbol": "PPLPHARMA.NS",
+      "direction": "BUY",
+      "entry_price": 210.52999877929688,
+      "entry_time": "2026-08-19T21:30:25.237412+00:00",
+      "stop_loss": 207.37,
+      "target1": 216.85,
+      "target1_hit": false
+    },
+    "POLYMED.NS": {
+      "trade_id": "trial_POLYMED_NS_1787175025",
+      "symbol": "POLYMED.NS",
+      "direction": "BUY",
+      "entry_price": 1784.699951171875,
+      "entry_time": "2026-08-19T21:30:25.820743+00:00",
+      "stop_loss": 1757.93,
+      "target1": 1838.24,
+      "target1_hit": false
+    },
+    "POLYCAB.NS": {
+      "trade_id": "trial_POLYCAB_NS_1787175026",
+      "symbol": "POLYCAB.NS",
+      "direction": "BUY",
+      "entry_price": 9139.0,
+      "entry_time": "2026-08-19T21:30:26.418638+00:00",
+      "stop_loss": 9001.91,
+      "target1": 9413.17,
+      "target1_hit": false
+    },
+    "POONAWALLA.NS": {
+      "trade_id": "trial_POONAWALLA_NS_1787175027",
+      "symbol": "POONAWALLA.NS",
+      "direction": "BUY",
+      "entry_price": 497.8999938964844,
+      "entry_time": "2026-08-19T21:30:27.071754+00:00",
+      "stop_loss": 490.43,
+      "target1": 512.84,
+      "target1_hit": false
+    },
+    "PFC.NS": {
+      "trade_id": "trial_PFC_NS_1787175027",
+      "symbol": "PFC.NS",
+      "direction": "SELL",
+      "entry_price": 374.45001220703125,
+      "entry_time": "2026-08-19T21:30:27.928845+00:00",
+      "stop_loss": 380.07,
+      "target1": 363.22,
+      "target1_hit": false
+    },
+    "POWERGRID.NS": {
+      "trade_id": "trial_POWERGRID_NS_1787175028",
+      "symbol": "POWERGRID.NS",
+      "direction": "SELL",
+      "entry_price": 268.0,
+      "entry_time": "2026-08-19T21:30:28.556855+00:00",
+      "stop_loss": 272.02,
+      "target1": 259.96,
+      "target1_hit": false
+    },
+    "PREMIERENE.NS": {
+      "trade_id": "trial_PREMIERENE_NS_1787175029",
+      "symbol": "PREMIERENE.NS",
+      "direction": "SELL",
+      "entry_price": 1014.7000122070312,
+      "entry_time": "2026-08-19T21:30:29.138067+00:00",
+      "stop_loss": 1029.92,
+      "target1": 984.26,
+      "target1_hit": false
+    },
+    "PRESTIGE.NS": {
+      "trade_id": "trial_PRESTIGE_NS_1787175030",
+      "symbol": "PRESTIGE.NS",
+      "direction": "SELL",
+      "entry_price": 1590.0,
+      "entry_time": "2026-08-19T21:30:30.153609+00:00",
+      "stop_loss": 1613.85,
+      "target1": 1542.3,
+      "target1_hit": false
+    },
+    "PNB.NS": {
+      "trade_id": "trial_PNB_NS_1787175030",
+      "symbol": "PNB.NS",
+      "direction": "BUY",
+      "entry_price": 116.5,
+      "entry_time": "2026-08-19T21:30:30.783545+00:00",
+      "stop_loss": 114.75,
+      "target1": 120.0,
+      "target1_hit": false
+    },
+    "RRKABEL.NS": {
+      "trade_id": "trial_RRKABEL_NS_1787175031",
+      "symbol": "RRKABEL.NS",
+      "direction": "BUY",
+      "entry_price": 2784.89990234375,
+      "entry_time": "2026-08-19T21:30:31.389892+00:00",
+      "stop_loss": 2743.13,
+      "target1": 2868.45,
+      "target1_hit": false
+    },
+    "RBLBANK.NS": {
+      "trade_id": "trial_RBLBANK_NS_1787175032",
+      "symbol": "RBLBANK.NS",
+      "direction": "BUY",
+      "entry_price": 383.0,
+      "entry_time": "2026-08-19T21:30:32.013889+00:00",
+      "stop_loss": 377.25,
+      "target1": 394.49,
+      "target1_hit": false
+    },
+    "RECLTD.NS": {
+      "trade_id": "trial_RECLTD_NS_1787175032",
+      "symbol": "RECLTD.NS",
+      "direction": "SELL",
+      "entry_price": 338.5,
+      "entry_time": "2026-08-19T21:30:32.658594+00:00",
+      "stop_loss": 343.58,
+      "target1": 328.34,
+      "target1_hit": false
+    },
+    "RHIM.NS": {
+      "trade_id": "trial_RHIM_NS_1787175033",
+      "symbol": "RHIM.NS",
+      "direction": "SELL",
+      "entry_price": 380.0,
+      "entry_time": "2026-08-19T21:30:33.310654+00:00",
+      "stop_loss": 385.7,
+      "target1": 368.6,
+      "target1_hit": false
+    },
+    "RITES.NS": {
+      "trade_id": "trial_RITES_NS_1787175033",
+      "symbol": "RITES.NS",
+      "direction": "SELL",
+      "entry_price": 218.49000549316406,
+      "entry_time": "2026-08-19T21:30:33.900376+00:00",
+      "stop_loss": 221.77,
+      "target1": 211.94,
+      "target1_hit": false
+    },
+    "RADICO.NS": {
+      "trade_id": "trial_RADICO_NS_1787175034",
+      "symbol": "RADICO.NS",
+      "direction": "BUY",
+      "entry_price": 4732.89990234375,
+      "entry_time": "2026-08-19T21:30:34.534501+00:00",
+      "stop_loss": 4661.91,
+      "target1": 4874.89,
+      "target1_hit": false
+    },
+    "RVNL.NS": {
+      "trade_id": "trial_RVNL_NS_1787175035",
+      "symbol": "RVNL.NS",
+      "direction": "SELL",
+      "entry_price": 225.0,
+      "entry_time": "2026-08-19T21:30:35.092990+00:00",
+      "stop_loss": 228.37,
+      "target1": 218.25,
+      "target1_hit": false
+    },
+    "RAILTEL.NS": {
+      "trade_id": "trial_RAILTEL_NS_1787175035",
+      "symbol": "RAILTEL.NS",
+      "direction": "SELL",
+      "entry_price": 277.1499938964844,
+      "entry_time": "2026-08-19T21:30:35.723026+00:00",
+      "stop_loss": 281.31,
+      "target1": 268.84,
+      "target1_hit": false
+    },
+    "RAINBOW.NS": {
+      "trade_id": "trial_RAINBOW_NS_1787175036",
+      "symbol": "RAINBOW.NS",
+      "direction": "SELL",
+      "entry_price": 1458.699951171875,
+      "entry_time": "2026-08-19T21:30:36.352544+00:00",
+      "stop_loss": 1480.58,
+      "target1": 1414.94,
+      "target1_hit": false
+    },
+    "RKFORGE.NS": {
+      "trade_id": "trial_RKFORGE_NS_1787175036",
+      "symbol": "RKFORGE.NS",
+      "direction": "BUY",
+      "entry_price": 754.3499755859375,
+      "entry_time": "2026-08-19T21:30:36.963428+00:00",
+      "stop_loss": 743.03,
+      "target1": 776.98,
+      "target1_hit": false
+    },
+    "REDINGTON.NS": {
+      "trade_id": "trial_REDINGTON_NS_1787175037",
+      "symbol": "REDINGTON.NS",
+      "direction": "BUY",
+      "entry_price": 326.29998779296875,
+      "entry_time": "2026-08-19T21:30:37.874659+00:00",
+      "stop_loss": 321.41,
+      "target1": 336.09,
+      "target1_hit": false
+    },
+    "RELIANCE.NS": {
+      "trade_id": "trial_RELIANCE_NS_1787175038",
+      "symbol": "RELIANCE.NS",
+      "direction": "BUY",
+      "entry_price": 1322.0,
+      "entry_time": "2026-08-19T21:30:38.590028+00:00",
+      "stop_loss": 1302.17,
+      "target1": 1361.66,
+      "target1_hit": false
+    },
+    "RPOWER.NS": {
+      "trade_id": "trial_RPOWER_NS_1787175039",
+      "symbol": "RPOWER.NS",
+      "direction": "SELL",
+      "entry_price": 22.450000762939453,
+      "entry_time": "2026-08-19T21:30:39.591447+00:00",
+      "stop_loss": 22.79,
+      "target1": 21.78,
+      "target1_hit": false
+    },
+    "SBFC.NS": {
+      "trade_id": "trial_SBFC_NS_1787175040",
+      "symbol": "SBFC.NS",
+      "direction": "BUY",
+      "entry_price": 93.66999816894531,
+      "entry_time": "2026-08-19T21:30:40.250881+00:00",
+      "stop_loss": 92.26,
+      "target1": 96.48,
+      "target1_hit": false
+    },
+    "SBICARD.NS": {
+      "trade_id": "trial_SBICARD_NS_1787175040",
+      "symbol": "SBICARD.NS",
+      "direction": "SELL",
+      "entry_price": 615.0,
+      "entry_time": "2026-08-19T21:30:40.873026+00:00",
+      "stop_loss": 624.22,
+      "target1": 596.55,
+      "target1_hit": false
+    },
+    "SBILIFE.NS": {
+      "trade_id": "trial_SBILIFE_NS_1787175041",
+      "symbol": "SBILIFE.NS",
+      "direction": "SELL",
+      "entry_price": 1778.0,
+      "entry_time": "2026-08-19T21:30:41.455677+00:00",
+      "stop_loss": 1804.67,
+      "target1": 1724.66,
+      "target1_hit": false
+    },
+    "SJVN.NS": {
+      "trade_id": "trial_SJVN_NS_1787175042",
+      "symbol": "SJVN.NS",
+      "direction": "SELL",
+      "entry_price": 66.29000091552734,
+      "entry_time": "2026-08-19T21:30:42.053386+00:00",
+      "stop_loss": 67.28,
+      "target1": 64.3,
+      "target1_hit": false
+    },
+    "SRF.NS": {
+      "trade_id": "trial_SRF_NS_1787175042",
+      "symbol": "SRF.NS",
+      "direction": "SELL",
+      "entry_price": 2630.0,
+      "entry_time": "2026-08-19T21:30:42.687634+00:00",
+      "stop_loss": 2669.45,
+      "target1": 2551.1,
+      "target1_hit": false
+    },
+    "SAILIFE.NS": {
+      "trade_id": "trial_SAILIFE_NS_1787175043",
+      "symbol": "SAILIFE.NS",
+      "direction": "BUY",
+      "entry_price": 1440.0999755859375,
+      "entry_time": "2026-08-19T21:30:43.488290+00:00",
+      "stop_loss": 1418.5,
+      "target1": 1483.3,
+      "target1_hit": false
+    },
+    "SAMMAANCAP.NS": {
+      "trade_id": "trial_SAMMAANCAP_NS_1787175044",
+      "symbol": "SAMMAANCAP.NS",
+      "direction": "SELL",
+      "entry_price": 150.22999572753906,
+      "entry_time": "2026-08-19T21:30:44.120577+00:00",
+      "stop_loss": 152.48,
+      "target1": 145.72,
+      "target1_hit": false
+    },
+    "MOTHERSON.NS": {
+      "trade_id": "trial_MOTHERSON_NS_1787175044",
+      "symbol": "MOTHERSON.NS",
+      "direction": "BUY",
+      "entry_price": 170.39999389648438,
+      "entry_time": "2026-08-19T21:30:44.718942+00:00",
+      "stop_loss": 167.84,
+      "target1": 175.51,
+      "target1_hit": false
+    },
+    "SAPPHIRE.NS": {
+      "trade_id": "trial_SAPPHIRE_NS_1787175045",
+      "symbol": "SAPPHIRE.NS",
+      "direction": "BUY",
+      "entry_price": 231.99000549316406,
+      "entry_time": "2026-08-19T21:30:45.282355+00:00",
+      "stop_loss": 228.51,
+      "target1": 238.95,
+      "target1_hit": false
+    },
+    "SARDAEN.NS": {
+      "trade_id": "trial_SARDAEN_NS_1787175045",
+      "symbol": "SARDAEN.NS",
+      "direction": "BUY",
+      "entry_price": 518.1500244140625,
+      "entry_time": "2026-08-19T21:30:45.872137+00:00",
+      "stop_loss": 510.38,
+      "target1": 533.69,
+      "target1_hit": false
+    },
+    "SAREGAMA.NS": {
+      "trade_id": "trial_SAREGAMA_NS_1787175046",
+      "symbol": "SAREGAMA.NS",
+      "direction": "SELL",
+      "entry_price": 513.9500122070312,
+      "entry_time": "2026-08-19T21:30:46.820396+00:00",
+      "stop_loss": 521.66,
+      "target1": 498.53,
+      "target1_hit": false
+    },
+    "SCHAEFFLER.NS": {
+      "trade_id": "trial_SCHAEFFLER_NS_1787175047",
+      "symbol": "SCHAEFFLER.NS",
+      "direction": "SELL",
+      "entry_price": 4073.300048828125,
+      "entry_time": "2026-08-19T21:30:47.441110+00:00",
+      "stop_loss": 4134.4,
+      "target1": 3951.1,
+      "target1_hit": false
+    },
+    "SCHNEIDER.NS": {
+      "trade_id": "trial_SCHNEIDER_NS_1787175048",
+      "symbol": "SCHNEIDER.NS",
+      "direction": "SELL",
+      "entry_price": 1274.4000244140625,
+      "entry_time": "2026-08-19T21:30:48.202269+00:00",
+      "stop_loss": 1293.52,
+      "target1": 1236.17,
+      "target1_hit": false
+    },
+    "SCI.NS": {
+      "trade_id": "trial_SCI_NS_1787175049",
+      "symbol": "SCI.NS",
+      "direction": "BUY",
+      "entry_price": 295.75,
+      "entry_time": "2026-08-19T21:30:49.167562+00:00",
+      "stop_loss": 291.31,
+      "target1": 304.62,
+      "target1_hit": false
+    },
+    "SHREECEM.NS": {
+      "trade_id": "trial_SHREECEM_NS_1787175049",
+      "symbol": "SHREECEM.NS",
+      "direction": "SELL",
+      "entry_price": 24725.0,
+      "entry_time": "2026-08-19T21:30:49.779676+00:00",
+      "stop_loss": 25095.87,
+      "target1": 23983.25,
+      "target1_hit": false
+    },
+    "SHRIRAMFIN.NS": {
+      "trade_id": "trial_SHRIRAMFIN_NS_1787175050",
+      "symbol": "SHRIRAMFIN.NS",
+      "direction": "BUY",
+      "entry_price": 1108.4000244140625,
+      "entry_time": "2026-08-19T21:30:50.405962+00:00",
+      "stop_loss": 1091.77,
+      "target1": 1141.65,
+      "target1_hit": false
+    },
+    "SHYAMMETL.NS": {
+      "trade_id": "trial_SHYAMMETL_NS_1787175050",
+      "symbol": "SHYAMMETL.NS",
+      "direction": "SELL",
+      "entry_price": 990.5999755859375,
+      "entry_time": "2026-08-19T21:30:50.989376+00:00",
+      "stop_loss": 1005.46,
+      "target1": 960.88,
+      "target1_hit": false
+    },
+    "ENRIN.NS": {
+      "trade_id": "trial_ENRIN_NS_1787175051",
+      "symbol": "ENRIN.NS",
+      "direction": "BUY",
+      "entry_price": 3593.199951171875,
+      "entry_time": "2026-08-19T21:30:51.577424+00:00",
+      "stop_loss": 3539.3,
+      "target1": 3701.0,
+      "target1_hit": false
+    },
+    "SIEMENS.NS": {
+      "trade_id": "trial_SIEMENS_NS_1787175052",
+      "symbol": "SIEMENS.NS",
+      "direction": "BUY",
+      "entry_price": 3957.0,
+      "entry_time": "2026-08-19T21:30:52.184097+00:00",
+      "stop_loss": 3897.64,
+      "target1": 4075.71,
+      "target1_hit": false
+    },
+    "SOBHA.NS": {
+      "trade_id": "trial_SOBHA_NS_1787175052",
+      "symbol": "SOBHA.NS",
+      "direction": "SELL",
+      "entry_price": 1308.300048828125,
+      "entry_time": "2026-08-19T21:30:52.991679+00:00",
+      "stop_loss": 1327.92,
+      "target1": 1269.05,
+      "target1_hit": false
+    },
+    "SOLARINDS.NS": {
+      "trade_id": "trial_SOLARINDS_NS_1787175053",
+      "symbol": "SOLARINDS.NS",
+      "direction": "BUY",
+      "entry_price": 20280.0,
+      "entry_time": "2026-08-19T21:30:53.618409+00:00",
+      "stop_loss": 19975.8,
+      "target1": 20888.4,
+      "target1_hit": false
+    },
+    "SONACOMS.NS": {
+      "trade_id": "trial_SONACOMS_NS_1787175054",
+      "symbol": "SONACOMS.NS",
+      "direction": "BUY",
+      "entry_price": 824.0,
+      "entry_time": "2026-08-19T21:30:54.225836+00:00",
+      "stop_loss": 811.64,
+      "target1": 848.72,
+      "target1_hit": false
+    },
+    "SONATSOFTW.NS": {
+      "trade_id": "trial_SONATSOFTW_NS_1787175054",
+      "symbol": "SONATSOFTW.NS",
+      "direction": "SELL",
+      "entry_price": 309.45001220703125,
+      "entry_time": "2026-08-19T21:30:54.829363+00:00",
+      "stop_loss": 314.09,
+      "target1": 300.17,
+      "target1_hit": false
+    },
+    "STARHEALTH.NS": {
+      "trade_id": "trial_STARHEALTH_NS_1787175055",
+      "symbol": "STARHEALTH.NS",
+      "direction": "SELL",
+      "entry_price": 583.9000244140625,
+      "entry_time": "2026-08-19T21:30:55.452860+00:00",
+      "stop_loss": 592.66,
+      "target1": 566.38,
+      "target1_hit": false
+    },
+    "SBIN.NS": {
+      "trade_id": "trial_SBIN_NS_1787175056",
+      "symbol": "SBIN.NS",
+      "direction": "SELL",
+      "entry_price": 1053.0,
+      "entry_time": "2026-08-19T21:30:56.109743+00:00",
+      "stop_loss": 1068.79,
+      "target1": 1021.41,
+      "target1_hit": false
+    },
+    "SAIL.NS": {
+      "trade_id": "trial_SAIL_NS_1787175056",
+      "symbol": "SAIL.NS",
+      "direction": "BUY",
+      "entry_price": 170.1999969482422,
+      "entry_time": "2026-08-19T21:30:56.716923+00:00",
+      "stop_loss": 167.65,
+      "target1": 175.31,
+      "target1_hit": false
+    },
+    "SUMICHEM.NS": {
+      "trade_id": "trial_SUMICHEM_NS_1787175057",
+      "symbol": "SUMICHEM.NS",
+      "direction": "BUY",
+      "entry_price": 563.0999755859375,
+      "entry_time": "2026-08-19T21:30:57.312099+00:00",
+      "stop_loss": 554.65,
+      "target1": 579.99,
+      "target1_hit": false
+    },
+    "SUNPHARMA.NS": {
+      "trade_id": "trial_SUNPHARMA_NS_1787175057",
+      "symbol": "SUNPHARMA.NS",
+      "direction": "SELL",
+      "entry_price": 1875.0999755859375,
+      "entry_time": "2026-08-19T21:30:57.935744+00:00",
+      "stop_loss": 1903.23,
+      "target1": 1818.85,
+      "target1_hit": false
+    },
+    "SUNTV.NS": {
+      "trade_id": "trial_SUNTV_NS_1787175058",
+      "symbol": "SUNTV.NS",
+      "direction": "SELL",
+      "entry_price": 482.79998779296875,
+      "entry_time": "2026-08-19T21:30:58.566046+00:00",
+      "stop_loss": 490.04,
+      "target1": 468.32,
+      "target1_hit": false
+    },
+    "SUNDARMFIN.NS": {
+      "trade_id": "trial_SUNDARMFIN_NS_1787175059",
+      "symbol": "SUNDARMFIN.NS",
+      "direction": "BUY",
+      "entry_price": 4619.60009765625,
+      "entry_time": "2026-08-19T21:30:59.169189+00:00",
+      "stop_loss": 4550.31,
+      "target1": 4758.19,
+      "target1_hit": false
+    },
+    "SUPREMEIND.NS": {
+      "trade_id": "trial_SUPREMEIND_NS_1787175059",
+      "symbol": "SUPREMEIND.NS",
+      "direction": "BUY",
+      "entry_price": 3604.0,
+      "entry_time": "2026-08-19T21:30:59.795896+00:00",
+      "stop_loss": 3549.94,
+      "target1": 3712.12,
+      "target1_hit": false
+    },
+    "SPLPETRO.NS": {
+      "trade_id": "trial_SPLPETRO_NS_1787175061",
+      "symbol": "SPLPETRO.NS",
+      "direction": "SELL",
+      "entry_price": 707.0,
+      "entry_time": "2026-08-19T21:31:01.163287+00:00",
+      "stop_loss": 717.6,
+      "target1": 685.79,
+      "target1_hit": false
+    },
+    "SUZLON.NS": {
+      "trade_id": "trial_SUZLON_NS_1787175061",
+      "symbol": "SUZLON.NS",
+      "direction": "SELL",
+      "entry_price": 47.779998779296875,
+      "entry_time": "2026-08-19T21:31:01.758816+00:00",
+      "stop_loss": 48.5,
+      "target1": 46.35,
+      "target1_hit": false
+    },
+    "SWANCORP.NS": {
+      "trade_id": "trial_SWANCORP_NS_1787175062",
+      "symbol": "SWANCORP.NS",
+      "direction": "SELL",
+      "entry_price": 304.54998779296875,
+      "entry_time": "2026-08-19T21:31:02.413581+00:00",
+      "stop_loss": 309.12,
+      "target1": 295.41,
+      "target1_hit": false
+    },
+    "SYNGENE.NS": {
+      "trade_id": "trial_SYNGENE_NS_1787175063",
+      "symbol": "SYNGENE.NS",
+      "direction": "SELL",
+      "entry_price": 404.1000061035156,
+      "entry_time": "2026-08-19T21:31:03.110951+00:00",
+      "stop_loss": 410.16,
+      "target1": 391.98,
+      "target1_hit": false
+    },
+    "SYRMA.NS": {
+      "trade_id": "trial_SYRMA_NS_1787175063",
+      "symbol": "SYRMA.NS",
+      "direction": "BUY",
+      "entry_price": 1500.0999755859375,
+      "entry_time": "2026-08-19T21:31:03.849913+00:00",
+      "stop_loss": 1477.6,
+      "target1": 1545.1,
+      "target1_hit": false
+    },
+    "TBOTEK.NS": {
+      "trade_id": "trial_TBOTEK_NS_1787175064",
+      "symbol": "TBOTEK.NS",
+      "direction": "BUY",
+      "entry_price": 1708.199951171875,
+      "entry_time": "2026-08-19T21:31:04.465319+00:00",
+      "stop_loss": 1682.58,
+      "target1": 1759.45,
+      "target1_hit": false
+    },
+    "TVSMOTOR.NS": {
+      "trade_id": "trial_TVSMOTOR_NS_1787175065",
+      "symbol": "TVSMOTOR.NS",
+      "direction": "BUY",
+      "entry_price": 4356.7998046875,
+      "entry_time": "2026-08-19T21:31:05.094900+00:00",
+      "stop_loss": 4291.45,
+      "target1": 4487.5,
+      "target1_hit": false
+    },
+    "TATACAP.NS": {
+      "trade_id": "trial_TATACAP_NS_1787175065",
+      "symbol": "TATACAP.NS",
+      "direction": "BUY",
+      "entry_price": 363.1499938964844,
+      "entry_time": "2026-08-19T21:31:05.695485+00:00",
+      "stop_loss": 357.7,
+      "target1": 374.04,
+      "target1_hit": false
+    },
+    "TATACHEM.NS": {
+      "trade_id": "trial_TATACHEM_NS_1787175066",
+      "symbol": "TATACHEM.NS",
+      "direction": "SELL",
+      "entry_price": 653.0,
+      "entry_time": "2026-08-19T21:31:06.315607+00:00",
+      "stop_loss": 662.79,
+      "target1": 633.41,
+      "target1_hit": false
+    },
+    "TATACOMM.NS": {
+      "trade_id": "trial_TATACOMM_NS_1787175066",
+      "symbol": "TATACOMM.NS",
+      "direction": "SELL",
+      "entry_price": 1689.800048828125,
+      "entry_time": "2026-08-19T21:31:06.937671+00:00",
+      "stop_loss": 1715.15,
+      "target1": 1639.11,
+      "target1_hit": false
+    },
+    "TATACONSUM.NS": {
+      "trade_id": "trial_TATACONSUM_NS_1787175067",
+      "symbol": "TATACONSUM.NS",
+      "direction": "SELL",
+      "entry_price": 1061.5999755859375,
+      "entry_time": "2026-08-19T21:31:07.838343+00:00",
+      "stop_loss": 1077.52,
+      "target1": 1029.75,
+      "target1_hit": false
+    },
+    "TATAELXSI.NS": {
+      "trade_id": "trial_TATAELXSI_NS_1787175068",
+      "symbol": "TATAELXSI.NS",
+      "direction": "BUY",
+      "entry_price": 3662.0,
+      "entry_time": "2026-08-19T21:31:08.540532+00:00",
+      "stop_loss": 3607.07,
+      "target1": 3771.86,
+      "target1_hit": false
+    },
+    "TATAINVEST.NS": {
+      "trade_id": "trial_TATAINVEST_NS_1787175069",
+      "symbol": "TATAINVEST.NS",
+      "direction": "SELL",
+      "entry_price": 647.2000122070312,
+      "entry_time": "2026-08-19T21:31:09.279308+00:00",
+      "stop_loss": 656.91,
+      "target1": 627.78,
+      "target1_hit": false
+    },
+    "TMCV.NS": {
+      "trade_id": "trial_TMCV_NS_1787175069",
+      "symbol": "TMCV.NS",
+      "direction": "BUY",
+      "entry_price": 471.6499938964844,
+      "entry_time": "2026-08-19T21:31:09.819072+00:00",
+      "stop_loss": 464.58,
+      "target1": 485.8,
+      "target1_hit": false
+    },
+    "TMPV.NS": {
+      "trade_id": "trial_TMPV_NS_1787175070",
+      "symbol": "TMPV.NS",
+      "direction": "SELL",
+      "entry_price": 322.79998779296875,
+      "entry_time": "2026-08-19T21:31:10.486303+00:00",
+      "stop_loss": 327.64,
+      "target1": 313.12,
+      "target1_hit": false
+    },
+    "TATAPOWER.NS": {
+      "trade_id": "trial_TATAPOWER_NS_1787175071",
+      "symbol": "TATAPOWER.NS",
+      "direction": "SELL",
+      "entry_price": 381.0,
+      "entry_time": "2026-08-19T21:31:11.155590+00:00",
+      "stop_loss": 386.71,
+      "target1": 369.57,
+      "target1_hit": false
+    },
+    "TATASTEEL.NS": {
+      "trade_id": "trial_TATASTEEL_NS_1787175071",
+      "symbol": "TATASTEEL.NS",
+      "direction": "SELL",
+      "entry_price": 185.5,
+      "entry_time": "2026-08-19T21:31:11.765672+00:00",
+      "stop_loss": 188.28,
+      "target1": 179.94,
+      "target1_hit": false
+    },
+    "TATATECH.NS": {
+      "trade_id": "trial_TATATECH_NS_1787175072",
+      "symbol": "TATATECH.NS",
+      "direction": "BUY",
+      "entry_price": 835.7999877929688,
+      "entry_time": "2026-08-19T21:31:12.364464+00:00",
+      "stop_loss": 823.26,
+      "target1": 860.87,
+      "target1_hit": false
+    },
+    "TTML.NS": {
+      "trade_id": "trial_TTML_NS_1787175072",
+      "symbol": "TTML.NS",
+      "direction": "SELL",
+      "entry_price": 37.849998474121094,
+      "entry_time": "2026-08-19T21:31:12.934786+00:00",
+      "stop_loss": 38.42,
+      "target1": 36.71,
+      "target1_hit": false
+    },
+    "TECHNOE.NS": {
+      "trade_id": "trial_TECHNOE_NS_1787175073",
+      "symbol": "TECHNOE.NS",
+      "direction": "SELL",
+      "entry_price": 1002.4500122070312,
+      "entry_time": "2026-08-19T21:31:13.700650+00:00",
+      "stop_loss": 1017.49,
+      "target1": 972.38,
+      "target1_hit": false
+    },
+    "TEGA.NS": {
+      "trade_id": "trial_TEGA_NS_1787175074",
+      "symbol": "TEGA.NS",
+      "direction": "BUY",
+      "entry_price": 1733.9000244140625,
+      "entry_time": "2026-08-19T21:31:14.324192+00:00",
+      "stop_loss": 1707.89,
+      "target1": 1785.92,
+      "target1_hit": false
+    },
+    "TEJASNET.NS": {
+      "trade_id": "trial_TEJASNET_NS_1787175074",
+      "symbol": "TEJASNET.NS",
+      "direction": "SELL",
+      "entry_price": 519.2999877929688,
+      "entry_time": "2026-08-19T21:31:14.926997+00:00",
+      "stop_loss": 527.09,
+      "target1": 503.72,
+      "target1_hit": false
+    },
+    "TENNIND.NS": {
+      "trade_id": "trial_TENNIND_NS_1787175075",
+      "symbol": "TENNIND.NS",
+      "direction": "SELL",
+      "entry_price": 550.2999877929688,
+      "entry_time": "2026-08-19T21:31:15.602121+00:00",
+      "stop_loss": 558.55,
+      "target1": 533.79,
+      "target1_hit": false
+    },
+    "NIACL.NS": {
+      "trade_id": "trial_NIACL_NS_1787175076",
+      "symbol": "NIACL.NS",
+      "direction": "BUY",
+      "entry_price": 184.0800018310547,
+      "entry_time": "2026-08-19T21:31:16.226806+00:00",
+      "stop_loss": 181.32,
+      "target1": 189.6,
+      "target1_hit": false
+    },
+    "RAMCOCEM.NS": {
+      "trade_id": "trial_RAMCOCEM_NS_1787175076",
+      "symbol": "RAMCOCEM.NS",
+      "direction": "SELL",
+      "entry_price": 909.7999877929688,
+      "entry_time": "2026-08-19T21:31:16.846138+00:00",
+      "stop_loss": 923.45,
+      "target1": 882.51,
+      "target1_hit": false
+    },
+    "THERMAX.NS": {
+      "trade_id": "trial_THERMAX_NS_1787175077",
+      "symbol": "THERMAX.NS",
+      "direction": "SELL",
+      "entry_price": 4079.89990234375,
+      "entry_time": "2026-08-19T21:31:17.482514+00:00",
+      "stop_loss": 4141.1,
+      "target1": 3957.5,
+      "target1_hit": false
+    },
+    "TIMKEN.NS": {
+      "trade_id": "trial_TIMKEN_NS_1787175078",
+      "symbol": "TIMKEN.NS",
+      "direction": "BUY",
+      "entry_price": 3299.5,
+      "entry_time": "2026-08-19T21:31:18.181277+00:00",
+      "stop_loss": 3250.01,
+      "target1": 3398.49,
+      "target1_hit": false
+    },
+    "TITAGARH.NS": {
+      "trade_id": "trial_TITAGARH_NS_1787175078",
+      "symbol": "TITAGARH.NS",
+      "direction": "SELL",
+      "entry_price": 841.4000244140625,
+      "entry_time": "2026-08-19T21:31:18.810640+00:00",
+      "stop_loss": 854.02,
+      "target1": 816.16,
+      "target1_hit": false
+    },
+    "TITAN.NS": {
+      "trade_id": "trial_TITAN_NS_1787175079",
+      "symbol": "TITAN.NS",
+      "direction": "BUY",
+      "entry_price": 5048.60009765625,
+      "entry_time": "2026-08-19T21:31:19.404005+00:00",
+      "stop_loss": 4972.87,
+      "target1": 5200.06,
+      "target1_hit": false
+    },
+    "TORNTPOWER.NS": {
+      "trade_id": "trial_TORNTPOWER_NS_1787175080",
+      "symbol": "TORNTPOWER.NS",
+      "direction": "SELL",
+      "entry_price": 1264.0999755859375,
+      "entry_time": "2026-08-19T21:31:20.232957+00:00",
+      "stop_loss": 1283.06,
+      "target1": 1226.18,
+      "target1_hit": false
+    },
+    "TARIL.NS": {
+      "trade_id": "trial_TARIL_NS_1787175080",
+      "symbol": "TARIL.NS",
+      "direction": "SELL",
+      "entry_price": 297.5,
+      "entry_time": "2026-08-19T21:31:20.830510+00:00",
+      "stop_loss": 301.96,
+      "target1": 288.57,
+      "target1_hit": false
+    },
+    "TRAVELFOOD.NS": {
+      "trade_id": "trial_TRAVELFOOD_NS_1787175081",
+      "symbol": "TRAVELFOOD.NS",
+      "direction": "BUY",
+      "entry_price": 1346.4000244140625,
+      "entry_time": "2026-08-19T21:31:21.415672+00:00",
+      "stop_loss": 1326.2,
+      "target1": 1386.79,
+      "target1_hit": false
+    },
+    "TRIDENT.NS": {
+      "trade_id": "trial_TRIDENT_NS_1787175082",
+      "symbol": "TRIDENT.NS",
+      "direction": "SELL",
+      "entry_price": 24.469999313354492,
+      "entry_time": "2026-08-19T21:31:22.285289+00:00",
+      "stop_loss": 24.84,
+      "target1": 23.74,
+      "target1_hit": false
+    },
+    "TRITURBINE.NS": {
+      "trade_id": "trial_TRITURBINE_NS_1787175082",
+      "symbol": "TRITURBINE.NS",
+      "direction": "SELL",
+      "entry_price": 581.9000244140625,
+      "entry_time": "2026-08-19T21:31:22.864197+00:00",
+      "stop_loss": 590.63,
+      "target1": 564.44,
+      "target1_hit": false
+    },
+    "TIINDIA.NS": {
+      "trade_id": "trial_TIINDIA_NS_1787175083",
+      "symbol": "TIINDIA.NS",
+      "direction": "BUY",
+      "entry_price": 2959.0,
+      "entry_time": "2026-08-19T21:31:23.486564+00:00",
+      "stop_loss": 2914.61,
+      "target1": 3047.77,
+      "target1_hit": false
+    },
+    "UCOBANK.NS": {
+      "trade_id": "trial_UCOBANK_NS_1787175084",
+      "symbol": "UCOBANK.NS",
+      "direction": "SELL",
+      "entry_price": 25.899999618530273,
+      "entry_time": "2026-08-19T21:31:24.126577+00:00",
+      "stop_loss": 26.29,
+      "target1": 25.12,
+      "target1_hit": false
+    },
+    "UNOMINDA.NS": {
+      "trade_id": "trial_UNOMINDA_NS_1787175084",
+      "symbol": "UNOMINDA.NS",
+      "direction": "BUY",
+      "entry_price": 1273.0,
+      "entry_time": "2026-08-19T21:31:24.771490+00:00",
+      "stop_loss": 1253.9,
+      "target1": 1311.19,
+      "target1_hit": false
+    },
+    "UPL.NS": {
+      "trade_id": "trial_UPL_NS_1787175085",
+      "symbol": "UPL.NS",
+      "direction": "SELL",
+      "entry_price": 560.0499877929688,
+      "entry_time": "2026-08-19T21:31:25.493981+00:00",
+      "stop_loss": 568.45,
+      "target1": 543.25,
+      "target1_hit": false
+    },
+    "UTIAMC.NS": {
+      "trade_id": "trial_UTIAMC_NS_1787175086",
+      "symbol": "UTIAMC.NS",
+      "direction": "SELL",
+      "entry_price": 894.5999755859375,
+      "entry_time": "2026-08-19T21:31:26.082243+00:00",
+      "stop_loss": 908.02,
+      "target1": 867.76,
+      "target1_hit": false
+    },
+    "ULTRACEMCO.NS": {
+      "trade_id": "trial_ULTRACEMCO_NS_1787175086",
+      "symbol": "ULTRACEMCO.NS",
+      "direction": "SELL",
+      "entry_price": 11499.0,
+      "entry_time": "2026-08-19T21:31:26.808177+00:00",
+      "stop_loss": 11671.48,
+      "target1": 11154.03,
+      "target1_hit": false
+    },
+    "UNIONBANK.NS": {
+      "trade_id": "trial_UNIONBANK_NS_1787175087",
+      "symbol": "UNIONBANK.NS",
+      "direction": "BUY",
+      "entry_price": 185.5,
+      "entry_time": "2026-08-19T21:31:27.414729+00:00",
+      "stop_loss": 182.72,
+      "target1": 191.06,
+      "target1_hit": false
+    },
+    "UBL.NS": {
+      "trade_id": "trial_UBL_NS_1787175088",
+      "symbol": "UBL.NS",
+      "direction": "SELL",
+      "entry_price": 1355.5,
+      "entry_time": "2026-08-19T21:31:28.023660+00:00",
+      "stop_loss": 1375.83,
+      "target1": 1314.84,
+      "target1_hit": false
+    },
+    "UNITDSPR.NS": {
+      "trade_id": "trial_UNITDSPR_NS_1787175088",
+      "symbol": "UNITDSPR.NS",
+      "direction": "BUY",
+      "entry_price": 1520.9000244140625,
+      "entry_time": "2026-08-19T21:31:28.662110+00:00",
+      "stop_loss": 1498.09,
+      "target1": 1566.53,
+      "target1_hit": false
+    },
+    "URBANCO.NS": {
+      "trade_id": "trial_URBANCO_NS_1787175089",
+      "symbol": "URBANCO.NS",
+      "direction": "BUY",
+      "entry_price": 144.97000122070312,
+      "entry_time": "2026-08-19T21:31:29.242153+00:00",
+      "stop_loss": 142.8,
+      "target1": 149.32,
+      "target1_hit": false
+    },
+    "USHAMART.NS": {
+      "trade_id": "trial_USHAMART_NS_1787175089",
+      "symbol": "USHAMART.NS",
+      "direction": "SELL",
+      "entry_price": 498.79998779296875,
+      "entry_time": "2026-08-19T21:31:29.876516+00:00",
+      "stop_loss": 506.28,
+      "target1": 483.84,
+      "target1_hit": false
+    },
+    "VTL.NS": {
+      "trade_id": "trial_VTL_NS_1787175090",
+      "symbol": "VTL.NS",
+      "direction": "SELL",
+      "entry_price": 598.9000244140625,
+      "entry_time": "2026-08-19T21:31:30.497482+00:00",
+      "stop_loss": 607.88,
+      "target1": 580.93,
+      "target1_hit": false
+    },
+    "VBL.NS": {
+      "trade_id": "trial_VBL_NS_1787175091",
+      "symbol": "VBL.NS",
+      "direction": "SELL",
+      "entry_price": 439.29998779296875,
+      "entry_time": "2026-08-19T21:31:31.087861+00:00",
+      "stop_loss": 445.89,
+      "target1": 426.12,
+      "target1_hit": false
+    },
+    "VIJAYA.NS": {
+      "trade_id": "trial_VIJAYA_NS_1787175091",
+      "symbol": "VIJAYA.NS",
+      "direction": "BUY",
+      "entry_price": 1497.300048828125,
+      "entry_time": "2026-08-19T21:31:31.837931+00:00",
+      "stop_loss": 1474.84,
+      "target1": 1542.22,
+      "target1_hit": false
+    },
+    "VMM.NS": {
+      "trade_id": "trial_VMM_NS_1787175092",
+      "symbol": "VMM.NS",
+      "direction": "SELL",
+      "entry_price": 103.70999908447266,
+      "entry_time": "2026-08-19T21:31:32.470392+00:00",
+      "stop_loss": 105.27,
+      "target1": 100.6,
+      "target1_hit": false
+    },
+    "IDEA.NS": {
+      "trade_id": "trial_IDEA_NS_1787175093",
+      "symbol": "IDEA.NS",
+      "direction": "BUY",
+      "entry_price": 14.119999885559082,
+      "entry_time": "2026-08-19T21:31:33.087577+00:00",
+      "stop_loss": 13.91,
+      "target1": 14.54,
+      "target1_hit": false
+    },
+    "VOLTAS.NS": {
+      "trade_id": "trial_VOLTAS_NS_1787175093",
+      "symbol": "VOLTAS.NS",
+      "direction": "SELL",
+      "entry_price": 1252.9000244140625,
+      "entry_time": "2026-08-19T21:31:33.699186+00:00",
+      "stop_loss": 1271.69,
+      "target1": 1215.31,
+      "target1_hit": false
+    },
+    "WAAREEENER.NS": {
+      "trade_id": "trial_WAAREEENER_NS_1787175094",
+      "symbol": "WAAREEENER.NS",
+      "direction": "SELL",
+      "entry_price": 2709.10009765625,
+      "entry_time": "2026-08-19T21:31:34.258261+00:00",
+      "stop_loss": 2749.74,
+      "target1": 2627.83,
+      "target1_hit": false
+    },
+    "WELCORP.NS": {
+      "trade_id": "trial_WELCORP_NS_1787175094",
+      "symbol": "WELCORP.NS",
+      "direction": "BUY",
+      "entry_price": 1917.0999755859375,
+      "entry_time": "2026-08-19T21:31:34.853736+00:00",
+      "stop_loss": 1888.34,
+      "target1": 1974.61,
+      "target1_hit": false
+    },
+    "WELSPUNLIV.NS": {
+      "trade_id": "trial_WELSPUNLIV_NS_1787175095",
+      "symbol": "WELSPUNLIV.NS",
+      "direction": "BUY",
+      "entry_price": 177.7899932861328,
+      "entry_time": "2026-08-19T21:31:35.462657+00:00",
+      "stop_loss": 175.12,
+      "target1": 183.12,
+      "target1_hit": false
+    },
+    "WHIRLPOOL.NS": {
+      "trade_id": "trial_WHIRLPOOL_NS_1787175096",
+      "symbol": "WHIRLPOOL.NS",
+      "direction": "SELL",
+      "entry_price": 769.0,
+      "entry_time": "2026-08-19T21:31:36.065954+00:00",
+      "stop_loss": 780.53,
+      "target1": 745.93,
+      "target1_hit": false
+    },
+    "WOCKPHARMA.NS": {
+      "trade_id": "trial_WOCKPHARMA_NS_1787175096",
+      "symbol": "WOCKPHARMA.NS",
+      "direction": "SELL",
+      "entry_price": 1859.9000244140625,
+      "entry_time": "2026-08-19T21:31:36.857863+00:00",
+      "stop_loss": 1887.8,
+      "target1": 1804.1,
+      "target1_hit": false
+    },
+    "YESBANK.NS": {
+      "trade_id": "trial_YESBANK_NS_1787175097",
+      "symbol": "YESBANK.NS",
+      "direction": "SELL",
+      "entry_price": 22.459999084472656,
+      "entry_time": "2026-08-19T21:31:37.481092+00:00",
+      "stop_loss": 22.8,
+      "target1": 21.79,
+      "target1_hit": false
+    },
+    "ZFCVINDIA.NS": {
+      "trade_id": "trial_ZFCVINDIA_NS_1787175098",
+      "symbol": "ZFCVINDIA.NS",
+      "direction": "BUY",
+      "entry_price": 2672.699951171875,
+      "entry_time": "2026-08-19T21:31:38.102413+00:00",
+      "stop_loss": 2632.61,
+      "target1": 2752.88,
+      "target1_hit": false
+    },
+    "ZENTEC.NS": {
+      "trade_id": "trial_ZENTEC_NS_1787175098",
+      "symbol": "ZENTEC.NS",
+      "direction": "BUY",
+      "entry_price": 1982.4000244140625,
+      "entry_time": "2026-08-19T21:31:38.897539+00:00",
+      "stop_loss": 1952.66,
+      "target1": 2041.87,
+      "target1_hit": false
+    },
+    "ZENSARTECH.NS": {
+      "trade_id": "trial_ZENSARTECH_NS_1787175099",
+      "symbol": "ZENSARTECH.NS",
+      "direction": "SELL",
+      "entry_price": 484.8999938964844,
+      "entry_time": "2026-08-19T21:31:39.531855+00:00",
+      "stop_loss": 492.17,
+      "target1": 470.35,
+      "target1_hit": false
+    },
+    "ZYDUSLIFE.NS": {
+      "trade_id": "trial_ZYDUSLIFE_NS_1787175100",
+      "symbol": "ZYDUSLIFE.NS",
+      "direction": "SELL",
+      "entry_price": 1115.5999755859375,
+      "entry_time": "2026-08-19T21:31:40.173617+00:00",
+      "stop_loss": 1132.33,
+      "target1": 1082.13,
+      "target1_hit": false
+    },
+    "ZYDUSWELL.NS": {
+      "trade_id": "trial_ZYDUSWELL_NS_1787175100",
+      "symbol": "ZYDUSWELL.NS",
+      "direction": "SELL",
+      "entry_price": 496.6499938964844,
+      "entry_time": "2026-08-19T21:31:40.880865+00:00",
+      "stop_loss": 504.1,
+      "target1": 481.75,
+      "target1_hit": false
+    },
+    "ECLERX.NS": {
+      "trade_id": "trial_ECLERX_NS_1787175101",
+      "symbol": "ECLERX.NS",
+      "direction": "SELL",
+      "entry_price": 1805.199951171875,
+      "entry_time": "2026-08-19T21:31:41.511496+00:00",
+      "stop_loss": 1832.28,
+      "target1": 1751.04,
+      "target1_hit": false
     }
   }
 }
