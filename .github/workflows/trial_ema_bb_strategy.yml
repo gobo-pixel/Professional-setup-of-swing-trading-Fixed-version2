@@ -1,0 +1,69 @@
+name: Trial EMA(26/70/240) Strategy (temporary experiment)
+
+# TEMPORARY — separate from Daily Scan / Paper Trading. Does not call
+# scripts/run_paper_trading.py or scripts/generate_full_report.py, so
+# the live production pipeline's own schedule is completely unaffected
+# by this workflow existing or running.
+
+on:
+  schedule:
+    - cron: "30 14 * * *"  # 8:00 PM IST (14:30 UTC)
+  workflow_dispatch:
+    inputs:
+      symbols:
+        description: "Optional — comma-separated symbols to test with instead of the full Nifty500 watchlist (e.g. 'HDFCBANK.NS,TCS.NS'). Leave blank for the full watchlist."
+        required: false
+        default: ""
+
+concurrency:
+  group: repo-write-lock
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  trial_scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run trial EMA(26/70/240) strategy
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          PYTHONPATH=. python scripts/trial_ema_bb_strategy.py \
+            ${{ inputs.symbols != '' && format('--symbols "{0}"', inputs.symbols) || '' }}
+
+      - name: Commit updated trial state back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- storage/trial_trades/
+          git diff --staged --quiet || git commit -m "Trial EMA strategy update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          PUSH_OK=false
+          for i in 1 2 3 4 5; do
+            if git push; then
+              PUSH_OK=true
+              break
+            fi
+            echo "Push rejected (likely a concurrent workflow pushed first) — pulling and retrying ($i/5)..."
+            git stash --include-untracked
+            git pull --rebase origin main
+            git stash pop || true
+            sleep 60
+          done
+          if [ "$PUSH_OK" = false ]; then
+            echo "::error::Push failed after 5 attempts — commit exists locally but was NOT pushed to remote."
+            exit 1
+          fi
