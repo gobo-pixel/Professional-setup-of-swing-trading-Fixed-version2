@@ -1,0 +1,14 @@
+{
+  "open_positions": {
+    "HDFCBANK.NS": {
+      "trade_id": "trial_HDFCBANK_NS_1787174698",
+      "symbol": "HDFCBANK.NS",
+      "direction": "SELL",
+      "entry_price": 723.0,
+      "entry_time": "2026-08-19T21:24:58.573742+00:00",
+      "stop_loss": 733.84,
+      "target1": 701.31,
+      "target1_hit": false
+    }
+  }
+}
