@@ -34,6 +34,15 @@ class AppConfig:
     telegram_bot_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
     telegram_chat_id: str = os.getenv("TELEGRAM_CHAT_ID", "")
 
+    # Morning-executor gap-vs-overnight-news check: signed bias
+    # (range [-1, +1]) beyond which overnight news is considered
+    # "strongly against" the trade direction and the candidate is
+    # skipped. NOTE: 0.5 is an unvalidated starting default (not
+    # derived from backtest/research) — deliberately configurable
+    # here so it can be tuned once real outcome-data accumulates,
+    # rather than silently hardcoded as if it were a proven value.
+    news_skip_bias_threshold: float = float(os.getenv("NEWS_SKIP_BIAS_THRESHOLD", "0.5"))
+
     data_dir: Path = STORAGE_DIR
     cache_dir: Path = CACHE_DIR
     log_dir: Path = LOG_DIR
