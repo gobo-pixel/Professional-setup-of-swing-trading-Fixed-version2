@@ -177,11 +177,17 @@ def monitor_position(position: dict, latest_close: float) -> tuple[dict, list[tu
     (possibly mutated) position and a list of (event_type, level)
     tuples — event_type is 'TARGET1_HIT_SL_SHIFTED' or
     'STOP_LOSS_HIT'. Mirrors BUY and SELL exactly (opposite
-    comparison directions, identical logic shape)."""
+    comparison directions, identical logic shape). Also updates
+    highest_price/lowest_price (direction-agnostic — just the raw
+    extremes seen since entry, used for the holding-status message)."""
     events: list[tuple[str, float]] = []
     direction = position["direction"]
     target1 = position["target1"]
     target1_hit = position.get("target1_hit", False)
+
+    entry_price = position["entry_price"]
+    position["highest_price"] = max(position.get("highest_price", entry_price), latest_close)
+    position["lowest_price"] = min(position.get("lowest_price", entry_price), latest_close)
 
     if direction == "BUY":
         if not target1_hit and latest_close >= target1:
@@ -230,6 +236,119 @@ def _pnl_percent(direction: str, entry_price: float, exit_price: float) -> float
     return (entry_price - exit_price) / entry_price * 100
 
 
+def _format_scan_summary(
+    scanned: int,
+    buy_count: int,
+    sell_count: int,
+    no_trade_count: int,
+    new_buy_count: int,
+    new_sell_count: int,
+    target1_shift_symbols: list[str],
+    stop_hit_symbols: list[str],
+    open_count: int,
+) -> str:
+    """ONE consolidated message per run — replaces the old
+    one-message-per-signal spam. Only counts + short (capped) symbol
+    lists for the two event types, so length stays bounded regardless
+    of how many symbols were scanned."""
+
+    def _capped_list(symbols: list[str], cap: int = 10) -> str:
+        if not symbols:
+            return ""
+        shown = ", ".join(symbols[:cap])
+        extra = f", +{len(symbols) - cap} more" if len(symbols) > cap else ""
+        return f" ({shown}{extra})"
+
+    lines = [
+        "[TRIAL_SCAN_COMPLETED]",
+        f"Trial scan completed — {scanned} symbol(s) scanned.",
+        f"BUY: {buy_count} | SELL: {sell_count} | NO_TRADE: {no_trade_count}",
+        "",
+        f"New positions opened: {new_buy_count + new_sell_count} "
+        f"({new_buy_count} BUY, {new_sell_count} SELL)",
+        f"Target1 hit, stop-loss shifted: {len(target1_shift_symbols)}"
+        f"{_capped_list(target1_shift_symbols)}",
+        f"Stop-loss hit, closed: {len(stop_hit_symbols)}"
+        f"{_capped_list(stop_hit_symbols)}",
+        f"Open positions now: {open_count}",
+    ]
+    return "\n".join(lines)
+
+
+def _format_holding_entry(index: int, symbol: str, position: dict, latest_close: float) -> str:
+    direction = position["direction"]
+    entry_price = position["entry_price"]
+    entry_date = position["entry_time"][:10]
+
+    try:
+        entry_dt = datetime.fromisoformat(position["entry_time"])
+        holding_days = (datetime.now(timezone.utc) - entry_dt).days
+    except ValueError:  # pragma: no cover - defensive, malformed state
+        holding_days = None
+
+    pnl_percent = _pnl_percent(direction, entry_price, latest_close)
+
+    highest_price = position.get("highest_price", entry_price)
+    lowest_price = position.get("lowest_price", entry_price)
+    highest_pct = _pnl_percent(direction, entry_price, highest_price)
+    lowest_pct = _pnl_percent(direction, entry_price, lowest_price)
+
+    if position.get("target1_hit"):
+        target_line = f"Target1 (3%): HIT — stop-loss trailing at {position['stop_loss']:.2f}"
+    else:
+        if direction == "BUY":
+            remaining_pct = (position["target1"] - latest_close) / entry_price * 100
+        else:
+            remaining_pct = (latest_close - position["target1"]) / entry_price * 100
+        target_line = f"Target1 (3%): {remaining_pct:.2f}% remaining"
+
+    stop_distance_pct = (
+        abs(latest_close - position["stop_loss"]) / latest_close * 100 if latest_close else 0.0
+    )
+    holding_line = f"{holding_days} day(s)" if holding_days is not None else "unknown"
+
+    return (
+        f"{index}. {symbol} ({direction}) — HOLD\n"
+        f"   Entry: {entry_price:.2f} ({entry_date}) | Current: {latest_close:.2f}\n"
+        f"   Holding: {holding_line}\n"
+        f"   PnL: {pnl_percent:+.2f}%\n"
+        f"   Highest: {highest_pct:+.2f}% | Lowest: {lowest_pct:+.2f}% (since entry)\n"
+        f"   {target_line}\n"
+        f"   Stop-loss distance: {stop_distance_pct:.2f}%"
+    )
+
+
+def _format_holding_status_messages(
+    open_positions: dict,
+    latest_close_by_symbol: dict,
+    chunk_size: int = 10,
+) -> list[str]:
+    """One message listing ALL open positions, chunked at
+    `chunk_size` entries per message so a large position count still
+    stays under Telegram's per-message length limit — never one
+    message per position."""
+    relevant = [(sym, pos) for sym, pos in open_positions.items() if sym in latest_close_by_symbol]
+    if not relevant:
+        return []
+
+    entries = [
+        _format_holding_entry(idx, sym, pos, latest_close_by_symbol[sym])
+        for idx, (sym, pos) in enumerate(relevant, start=1)
+    ]
+
+    chunks = [entries[i : i + chunk_size] for i in range(0, len(entries), chunk_size)]
+    total_chunks = len(chunks)
+
+    messages = []
+    for chunk_idx, chunk in enumerate(chunks, start=1):
+        header = f"[TRIAL_HOLDING_STATUS] Open Positions ({len(relevant)})"
+        if total_chunks > 1:
+            header += f" — part {chunk_idx}/{total_chunks}"
+        messages.append(f"{header}\n\n" + "\n\n".join(chunk))
+
+    return messages
+
+
 def run(
     symbols: list[str],
     state_path: Path = STATE_PATH,
@@ -237,16 +356,24 @@ def run(
     market_provider: MarketDataProvider | None = None,
     notify=send_telegram,
 ) -> dict:
-    """Runs one full cycle: monitor open positions first, then scan
-    remaining symbols for a fresh signal. Returns a small summary dict
-    (useful for tests and for the CLI's own printed summary)."""
+    """Runs one full cycle: for every symbol, classify its current
+    signal (for the scan-summary stats), monitor it if a position is
+    already open, or act on a fresh signal if not. Sends exactly TWO
+    kinds of Telegram message per run — one scan summary, and one (or
+    a few, chunked) holding-status message — never one message per
+    individual signal/position."""
     provider = market_provider or MarketDataProvider()
     state = load_state(state_path)
     open_positions = state["open_positions"]
 
-    new_signal_count = 0
-    target_shift_count = 0
-    stop_hit_count = 0
+    buy_count = 0
+    sell_count = 0
+    no_trade_count = 0
+    new_buy_count = 0
+    new_sell_count = 0
+    target1_shift_symbols: list[str] = []
+    stop_hit_symbols: list[str] = []
+    latest_close_by_symbol: dict[str, float] = {}
 
     for symbol in symbols:
         try:
@@ -261,6 +388,15 @@ def run(
         dataframe = compute_emas(dataframe)
         latest = dataframe.iloc[-1]
         latest_close = float(latest["close"])
+        latest_close_by_symbol[symbol] = latest_close
+
+        signal = evaluate_signal(latest)
+        if signal == "BUY":
+            buy_count += 1
+        elif signal == "SELL":
+            sell_count += 1
+        else:
+            no_trade_count += 1
 
         if symbol in open_positions:
             position, events = monitor_position(open_positions[symbol], latest_close)
@@ -268,23 +404,11 @@ def run(
             closed = False
             for event_type, level in events:
                 if event_type == "TARGET1_HIT_SL_SHIFTED":
-                    target_shift_count += 1
-                    notify(
-                        f"[TRIAL] {symbol} {position['direction']} — Target1 "
-                        f"(3%) hit @ {latest_close:.2f}. Stop-loss shifted to "
-                        f"{level:.2f} (locked-in). Position still open, no "
-                        f"fixed final target."
-                    )
+                    target1_shift_symbols.append(symbol)
                 elif event_type == "STOP_LOSS_HIT":
-                    stop_hit_count += 1
+                    stop_hit_symbols.append(symbol)
                     entry_price = position["entry_price"]
                     pnl_percent = _pnl_percent(position["direction"], entry_price, latest_close)
-                    notify(
-                        f"[TRIAL] {symbol} {position['direction']} — "
-                        f"Stop-loss hit @ {latest_close:.2f} (SL was "
-                        f"{level:.2f}). Position CLOSED. P&L: "
-                        f"{pnl_percent:.2f}%."
-                    )
                     append_trade_log(
                         {
                             "trade_id": position["trade_id"],
@@ -308,7 +432,6 @@ def run(
 
             continue
 
-        signal = evaluate_signal(latest)
         if signal == "NO_TRADE":
             continue
 
@@ -324,20 +447,42 @@ def run(
             "stop_loss": stop_loss,
             "target1": target1,
             "target1_hit": False,
+            "highest_price": latest_close,
+            "lowest_price": latest_close,
         }
-        new_signal_count += 1
-        notify(
-            f"[TRIAL] NEW {signal} signal — {symbol} @ {latest_close:.2f}. "
-            f"Stop-loss {stop_loss:.2f} (1.5%), Target1 {target1:.2f} (3%). "
-            f"EMA{EMA_FAST}/{EMA_MID}/{EMA_SLOW} trend-aligned {signal}."
-        )
+        if signal == "BUY":
+            new_buy_count += 1
+        else:
+            new_sell_count += 1
 
     save_state(state, state_path)
 
+    scan_summary = _format_scan_summary(
+        scanned=len(symbols),
+        buy_count=buy_count,
+        sell_count=sell_count,
+        no_trade_count=no_trade_count,
+        new_buy_count=new_buy_count,
+        new_sell_count=new_sell_count,
+        target1_shift_symbols=target1_shift_symbols,
+        stop_hit_symbols=stop_hit_symbols,
+        open_count=len(open_positions),
+    )
+    notify(scan_summary)
+
+    for holding_message in _format_holding_status_messages(open_positions, latest_close_by_symbol):
+        notify(holding_message)
+
     summary = {
-        "new_signals": new_signal_count,
-        "target1_shifts": target_shift_count,
-        "stop_losses_hit": stop_hit_count,
+        "scanned": len(symbols),
+        "buy_count": buy_count,
+        "sell_count": sell_count,
+        "no_trade_count": no_trade_count,
+        "new_signals": new_buy_count + new_sell_count,
+        "new_buy_count": new_buy_count,
+        "new_sell_count": new_sell_count,
+        "target1_shifts": len(target1_shift_symbols),
+        "stop_losses_hit": len(stop_hit_symbols),
         "open_positions": len(open_positions),
     }
     logger.info("Trial run complete: %s", summary)
@@ -391,7 +536,10 @@ def main() -> None:
     summary = run(symbols)
 
     print(
-        f"Done. New signals: {summary['new_signals']}, "
+        f"Done. BUY: {summary['buy_count']} | SELL: {summary['sell_count']} | "
+        f"NO_TRADE: {summary['no_trade_count']}. "
+        f"New positions: {summary['new_signals']} "
+        f"({summary['new_buy_count']} BUY, {summary['new_sell_count']} SELL). "
         f"Target1 stop-shifts: {summary['target1_shifts']}, "
         f"Stop-losses hit: {summary['stop_losses_hit']}, "
         f"Open positions now: {summary['open_positions']}."
