@@ -1,0 +1,190 @@
+{
+  "signal_counts": {
+    "NO_TRADE": 398,
+    "BUY": 101,
+    "SELL": 1
+  },
+  "total_scans": 500,
+  "buy_stats": {
+    "count": 101,
+    "avg_confidence": 71.95,
+    "min_confidence": 65.01,
+    "max_confidence": 81.32
+  },
+  "sell_stats": {
+    "count": 1,
+    "avg_confidence": 70.05,
+    "min_confidence": 70.05,
+    "max_confidence": 70.05
+  },
+  "no_trade_stats": {
+    "count": 398
+  },
+  "sell_signal_vs_opened": {
+    "sell_signals": 1,
+    "sell_trades_opened": 0,
+    "gap": 1,
+    "gap_reasons": {
+      "Risk Engine": 1
+    }
+  },
+  "tier1_pass_rate": {
+    "buy": 40.4,
+    "sell": 28.0
+  },
+  "tier_contribution": {
+    "buy_tier2_avg": 37.54,
+    "buy_tier2_n": 500,
+    "buy_tier3_avg": 65.09,
+    "buy_tier3_n": 500,
+    "sell_tier2_avg": 37.1,
+    "sell_tier2_n": 500,
+    "sell_tier3_avg": 34.91,
+    "sell_tier3_n": 500
+  },
+  "tier4_rejection_reasons": {
+    "Decision engine rejected trade.": 398,
+    "NaN values detected.": 100,
+    "Circuit breaker active.": 2
+  },
+  "sector_stats": {
+    "Financial Services": {
+      "NO_TRADE": 73,
+      "BUY": 24
+    },
+    "Industrials": {
+      "NO_TRADE": 71,
+      "BUY": 19
+    },
+    "Basic Materials": {
+      "NO_TRADE": 49,
+      "BUY": 12,
+      "SELL": 1
+    },
+    "Utilities": {
+      "NO_TRADE": 20,
+      "BUY": 1
+    },
+    "Consumer Defensive": {
+      "NO_TRADE": 27,
+      "BUY": 1
+    },
+    "Healthcare": {
+      "NO_TRADE": 39,
+      "BUY": 12
+    },
+    "Energy": {
+      "NO_TRADE": 11,
+      "BUY": 4
+    },
+    "Consumer Cyclical": {
+      "NO_TRADE": 52,
+      "BUY": 17
+    },
+    "Real Estate": {
+      "NO_TRADE": 9,
+      "BUY": 2
+    },
+    "Communication Services": {
+      "NO_TRADE": 11,
+      "BUY": 3
+    },
+    "Technology": {
+      "NO_TRADE": 35,
+      "BUY": 6
+    },
+    "UNKNOWN": {
+      "NO_TRADE": 1
+    }
+  },
+  "unknown_sector_symbols": [
+    "JSWDULUX.NS"
+  ],
+  "regime_percentages": {
+    "BULL": 38.6,
+    "BEAR": 31.0,
+    "SIDEWAYS": 30.4
+  },
+  "top_buy_sectors": [
+    [
+      "Financial Services",
+      24
+    ],
+    [
+      "Industrials",
+      19
+    ],
+    [
+      "Consumer Cyclical",
+      17
+    ]
+  ],
+  "weakest_buy_sectors": [
+    [
+      "UNKNOWN",
+      0
+    ],
+    [
+      "Utilities",
+      1
+    ],
+    [
+      "Consumer Defensive",
+      1
+    ]
+  ],
+  "rejection_funnel": {
+    "buy_side_scanned": 499,
+    "buy_candidates": 101,
+    "rejected_by_trend": 297,
+    "rejected_by_risk": 0,
+    "rejected_by_portfolio": 0,
+    "rejected_by_liquidity": 0,
+    "rejected_by_score_threshold": 101,
+    "rejected_by_insufficient_history": 0,
+    "rejected_by_other": 0,
+    "other_reasons_breakdown": {},
+    "executed": 0
+  },
+  "execution_summary": {
+    "buy_generated": 101,
+    "buy_executed": 0,
+    "buy_rejected": 101,
+    "reasons": {
+      "Not Attempted (ranked below daily candidate limit)": 81,
+      "Risk Engine (execution stage)": 20
+    }
+  },
+  "regime_stats": {
+    "BULL": {
+      "NO_TRADE": 92,
+      "BUY": 101
+    },
+    "BEAR": {
+      "NO_TRADE": 154,
+      "SELL": 1
+    },
+    "SIDEWAYS": {
+      "NO_TRADE": 152
+    }
+  },
+  "top_rejection_reasons": {
+    "AI rejected the trade due to insufficient conviction.": 398,
+    "BUY engine validation failed (combined score 54.0, need 65).": 7,
+    "SELL engine validation failed (combined score 39.8, need 65).": 6,
+    "BUY engine validation failed (combined score 56.3, need 65).": 5,
+    "BUY engine validation failed (combined score 58.1, need 65).": 5,
+    "BUY engine validation failed (combined score 53.9, need 65).": 4,
+    "SELL engine validation failed (combined score 44.4, need 65).": 4,
+    "BUY engine validation failed (combined score 41.4, need 65).": 4,
+    "SELL engine validation failed (combined score 49.3, need 65).": 4,
+    "SELL engine validation failed (combined score 46.3, need 65).": 4
+  },
+  "daily_summary": {
+    "2026-08-19": {
+      "NO_TRADE": 398,
+      "BUY": 101,
+      "SELL": 1
+    }
+  }
+}
