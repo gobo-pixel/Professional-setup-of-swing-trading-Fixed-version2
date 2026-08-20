@@ -17,16 +17,22 @@ from scripts.trial_ema_bb_strategy import (
     EMA_FAST,
     EMA_MID,
     EMA_SLOW,
+    STARTING_CAPITAL,
     STOP_LOSS_PERCENT,
     TARGET1_PERCENT,
+    _default_state,
     _format_holding_entry,
     _format_holding_status_messages,
     _format_scan_summary,
     _load_symbols,
+    _pnl_amount,
     _pnl_percent,
     append_trade_log,
+    compute_atr,
     compute_emas,
     compute_initial_stop_target,
+    compute_position_size,
+    compute_volume_average,
     evaluate_signal,
     load_state,
     monitor_position,
@@ -125,18 +131,133 @@ def test_compute_initial_stop_target_sell():
 
 
 # ---------------------------------------------------------------------
+# compute_atr / compute_volume_average
+# ---------------------------------------------------------------------
+
+
+def test_compute_atr_nan_before_period_minus_one_bars():
+    df = _synthetic_ohlcv([100.0 + i for i in range(10)])  # only 10 bars, ATR_PERIOD=14
+    atr = compute_atr(df)
+    assert atr.isna().all()  # never enough history for a real ATR(14) yet
+
+
+def test_compute_atr_has_real_value_once_enough_history():
+    df = _synthetic_ohlcv([100.0 + i for i in range(30)])
+    atr = compute_atr(df)
+    assert not pd.isna(atr.iloc[-1])
+    assert atr.iloc[-1] > 0  # real true-range based volatility, not zero/fabricated
+
+
+def test_compute_volume_average_uses_partial_window():
+    df = pd.DataFrame(
+        {
+            "open": [1, 1, 1, 1, 1],
+            "high": [1, 1, 1, 1, 1],
+            "low": [1, 1, 1, 1, 1],
+            "close": [1, 1, 1, 1, 1],
+            "volume": [100, 200, 300, 400, 500],
+        }
+    )
+    avg = compute_volume_average(df)
+    # only 5 rows available (< VOLUME_AVG_PERIOD=20) — min_periods=1 means
+    # the latest value is the mean of everything available so far, not NaN.
+    assert avg.iloc[-1] == pytest.approx(300.0)
+
+
+# ---------------------------------------------------------------------
+# compute_position_size
+# ---------------------------------------------------------------------
+
+
+def test_compute_position_size_basic_case():
+    sizing = compute_position_size(
+        entry_price=100.0,
+        stop_distance=1.5,
+        atr_percent=0.5,  # <=1.0 -> volatility_adjustment=1.00
+        average_volume=6_000_000,  # >=5M -> liquidity_adjustment=1.00
+        total_capital=100_000.0,
+        available_cash=100_000.0,
+    )
+    # base_allocation = 0.02 + 0.18*0.5 = 0.11; adjustment_factor = 1.0
+    assert sizing["allocation_percent"] == pytest.approx(0.11)
+    assert sizing["kelly_fraction"] == pytest.approx(0.5)
+    assert sizing["volatility_adjustment"] == pytest.approx(1.00)
+    assert sizing["liquidity_adjustment"] == pytest.approx(1.00)
+    # capital_quantity = floor(11000/100) = 110; atr_quantity = floor(2000/1.5) = 1333
+    assert sizing["capital_quantity"] == 110
+    assert sizing["atr_quantity"] == 1333
+    assert sizing["quantity"] == 110  # capital-bound, not ATR-bound
+    assert sizing["position_value"] == pytest.approx(11_000.0)
+
+
+def test_compute_position_size_atr_bound_when_stop_distance_wide():
+    sizing = compute_position_size(
+        entry_price=10.0,
+        stop_distance=10.0,  # wide stop relative to a small risk budget
+        atr_percent=0.5,
+        average_volume=6_000_000,
+        total_capital=1_000.0,  # risk_per_trade = 20
+        available_cash=100_000.0,
+    )
+    assert sizing["atr_quantity"] == 2  # floor(20/10)
+    assert sizing["quantity"] == 2  # ATR-bound, not capital-bound
+
+
+def test_compute_position_size_zero_when_capital_too_small():
+    sizing = compute_position_size(
+        entry_price=100_000.0,  # a very expensive stock
+        stop_distance=1_500.0,
+        atr_percent=0.5,
+        average_volume=6_000_000,
+        total_capital=100.0,
+        available_cash=100.0,  # nowhere near 1 share's worth
+    )
+    assert sizing["quantity"] == 0  # legitimately 0, never forced to 1
+    assert sizing["position_value"] == 0.0
+
+
+def test_compute_position_size_low_liquidity_low_volatility_bucket_math():
+    sizing = compute_position_size(
+        entry_price=100.0,
+        stop_distance=1.5,
+        atr_percent=6.0,  # >5.0 -> volatility_adjustment=0.40
+        average_volume=100_000,  # <500k -> liquidity_adjustment=0.40
+        total_capital=100_000.0,
+        available_cash=100_000.0,
+    )
+    assert sizing["volatility_adjustment"] == pytest.approx(0.40)
+    assert sizing["liquidity_adjustment"] == pytest.approx(0.40)
+    # allocation clamped to MIN_CAPITAL_ALLOCATION floor (0.02) since
+    # 0.11 * 0.16 = 0.0176 < 0.02
+    assert sizing["allocation_percent"] == pytest.approx(0.02)
+
+
+# ---------------------------------------------------------------------
+# _pnl_amount
+# ---------------------------------------------------------------------
+
+
+def test_pnl_amount_matches_percent_of_invested():
+    assert _pnl_amount(10_000.0, 5.0) == pytest.approx(500.0)
+    assert _pnl_amount(10_000.0, -3.0) == pytest.approx(-300.0)
+    assert _pnl_amount(0.0, 10.0) == pytest.approx(0.0)
+
+
+# ---------------------------------------------------------------------
 # monitor_position
 # ---------------------------------------------------------------------
 
 
-def _open_position(direction: str, entry_price: float = 1000.0) -> dict:
+def _open_position(direction: str, entry_price: float = 1000.0, quantity: int = 10) -> dict:
     stop_loss, target1 = compute_initial_stop_target(direction, entry_price)
     return {
         "trade_id": "trial_TEST_1",
         "symbol": "TEST.NS",
         "direction": direction,
+        "quantity": quantity,
         "entry_price": entry_price,
         "entry_time": "2026-08-19T00:00:00+00:00",
+        "invested_amount": round(quantity * entry_price, 2),
         "stop_loss": stop_loss,
         "target1": target1,
         "target1_hit": False,
@@ -248,14 +369,20 @@ def test_pnl_percent_buy_loss():
 # ---------------------------------------------------------------------
 
 
-def test_load_state_missing_file_returns_empty_open_positions(tmp_path):
+def test_load_state_missing_file_returns_default_state_with_starting_capital(tmp_path):
     state = load_state(tmp_path / "does_not_exist.json")
-    assert state == {"open_positions": {}}
+    assert state == _default_state()
+    assert state["open_positions"] == {}
+    assert state["capital"]["starting_capital"] == STARTING_CAPITAL
+    assert state["capital"]["available_cash"] == STARTING_CAPITAL
 
 
 def test_save_and_load_state_roundtrip(tmp_path):
     path = tmp_path / "nested" / "state.json"
-    state = {"open_positions": {"TEST.NS": _open_position("BUY")}}
+    state = {
+        "open_positions": {"TEST.NS": _open_position("BUY")},
+        "capital": {"starting_capital": 50_000.0, "available_cash": 42_000.0},
+    }
 
     save_state(state, path)
     reloaded = load_state(path)
@@ -271,6 +398,31 @@ def test_load_state_tolerates_missing_open_positions_key(tmp_path):
     assert state["open_positions"] == {}
 
 
+def test_load_state_tolerates_missing_capital_key(tmp_path):
+    # An old state.json written before capital tracking existed —
+    # must NOT crash, and must backfill STARTING_CAPITAL rather than
+    # 0 (which would look like the account is already broke).
+    path = tmp_path / "state.json"
+    path.write_text(json.dumps({"open_positions": {}}), encoding="utf-8")
+
+    state = load_state(path)
+    assert state["capital"]["available_cash"] == STARTING_CAPITAL
+    assert state["capital"]["starting_capital"] == STARTING_CAPITAL
+
+
+def test_load_state_preserves_real_available_cash_on_subsequent_runs(tmp_path):
+    # This is the important case: once a state file exists with a
+    # REAL (non-default) available_cash, loading it must never
+    # silently reset back to STARTING_CAPITAL.
+    path = tmp_path / "state.json"
+    save_state(
+        {"open_positions": {}, "capital": {"starting_capital": STARTING_CAPITAL, "available_cash": 37_500.25}},
+        path,
+    )
+    state = load_state(path)
+    assert state["capital"]["available_cash"] == 37_500.25
+
+
 # ---------------------------------------------------------------------
 # trade log
 # ---------------------------------------------------------------------
@@ -281,13 +433,16 @@ def _trade_row(symbol: str = "TEST.NS") -> dict:
         "trade_id": "trial_TEST_1",
         "symbol": symbol,
         "direction": "BUY",
+        "quantity": 10,
         "entry_price": 1000.0,
         "entry_time": "2026-08-19T00:00:00+00:00",
+        "invested_amount": 10000.0,
         "exit_price": 985.0,
         "exit_time": "2026-08-20T00:00:00+00:00",
         "exit_reason": "STOP_LOSS_HIT",
         "target1_hit": False,
         "pnl_percent": -1.5,
+        "pnl_amount": -150.0,
     }
 
 
@@ -440,7 +595,16 @@ def test_run_opens_new_position_on_buy_signal(tmp_path):
 
     state = load_state(tmp_path / "state.json")
     assert "UP.NS" in state["open_positions"]
-    assert state["open_positions"]["UP.NS"]["direction"] == "BUY"
+    position = state["open_positions"]["UP.NS"]
+    assert position["direction"] == "BUY"
+    assert position["quantity"] > 0
+    assert position["invested_amount"] == round(position["quantity"] * position["entry_price"], 2)
+
+    # capital was actually debited by the invested amount
+    assert state["capital"]["available_cash"] == round(
+        STARTING_CAPITAL - position["invested_amount"], 2
+    )
+    assert summary["available_cash"] == state["capital"]["available_cash"]
 
 
 def test_run_opens_new_position_on_sell_signal(tmp_path):
@@ -459,7 +623,36 @@ def test_run_opens_new_position_on_sell_signal(tmp_path):
     assert summary["new_signals"] == 1
     assert summary["new_sell_count"] == 1
     state = load_state(tmp_path / "state.json")
-    assert state["open_positions"]["DOWN.NS"]["direction"] == "SELL"
+    position = state["open_positions"]["DOWN.NS"]
+    assert position["direction"] == "SELL"
+    assert position["quantity"] > 0
+
+
+def test_run_skips_new_position_when_capital_exhausted(tmp_path):
+    uptrend = _synthetic_ohlcv([100.0 + i * 2 for i in range(30)])
+    provider = _FakeProvider({"UP.NS": uptrend})
+
+    state_path = tmp_path / "state.json"
+    save_state(
+        {
+            "open_positions": {},
+            "capital": {"starting_capital": STARTING_CAPITAL, "available_cash": 0.0},
+        },
+        state_path,
+    )
+
+    messages = []
+    summary = run(
+        symbols=["UP.NS"],
+        state_path=state_path,
+        trade_log_path=tmp_path / "trade_log.csv",
+        market_provider=provider,
+        notify=messages.append,
+    )
+
+    assert summary["new_signals"] == 0
+    assert summary["skipped_insufficient_capital"] == 1
+    assert "Signal found but skipped (insufficient capital/risk budget): 1 (UP.NS)" in messages[0]
 
 
 def test_run_reports_buy_sell_no_trade_counts_across_all_scanned_symbols(tmp_path):
@@ -546,13 +739,24 @@ def test_run_shifts_stop_loss_on_target1_and_reports_it(tmp_path):
 
 
 def test_run_closes_position_on_stop_loss_and_writes_trade_log(tmp_path):
-    position = _open_position("BUY", entry_price=1000.0)
-    crash = _synthetic_ohlcv([position["stop_loss"] - 5.0] * 5)
+    position = _open_position("BUY", entry_price=1000.0, quantity=10)
+    crash_price = position["stop_loss"] - 5.0
+    crash = _synthetic_ohlcv([crash_price] * 5)
     provider = _FakeProvider({"OPEN.NS": crash})
 
     state_path = tmp_path / "state.json"
     trade_log_path = tmp_path / "trade_log.csv"
-    save_state({"open_positions": {"OPEN.NS": position}}, state_path)
+    starting_cash = 50_000.0
+    save_state(
+        {
+            "open_positions": {"OPEN.NS": position},
+            "capital": {
+                "starting_capital": STARTING_CAPITAL,
+                "available_cash": starting_cash,
+            },
+        },
+        state_path,
+    )
 
     messages = []
     summary = run(
@@ -572,8 +776,17 @@ def test_run_closes_position_on_stop_loss_and_writes_trade_log(tmp_path):
     final_state = load_state(state_path)
     assert "OPEN.NS" not in final_state["open_positions"]
 
+    # capital released back: committed invested_amount + realized (negative) P&L
+    expected_pnl_percent = _pnl_percent("BUY", 1000.0, crash_price)
+    expected_pnl_amount = _pnl_amount(position["invested_amount"], expected_pnl_percent)
+    expected_cash = round(starting_cash + position["invested_amount"] + expected_pnl_amount, 2)
+    assert final_state["capital"]["available_cash"] == expected_cash
+    assert expected_pnl_amount < 0  # this scenario is a loss
+
     log_lines = trade_log_path.read_text(encoding="utf-8").splitlines()
     assert len(log_lines) == 2  # header + one closed trade
+    assert "quantity" in log_lines[0]
+    assert "pnl_amount" in log_lines[0]
 
 
 def test_run_handles_fetch_failure_gracefully(tmp_path):
@@ -619,13 +832,21 @@ def test_format_scan_summary_basic_counts():
         new_sell_count=0,
         target1_shift_symbols=[],
         stop_hit_symbols=[],
+        skipped_capital_symbols=[],
         open_count=14,
+        available_cash=45_000.0,
+        net_worth=105_000.0,
+        starting_capital=STARTING_CAPITAL,
     )
     assert message.startswith("[TRIAL_SCAN_COMPLETED]")
     assert "500 symbol(s) scanned" in message
     assert "BUY: 101 | SELL: 1 | NO_TRADE: 398" in message
     assert "New positions opened: 5 (5 BUY, 0 SELL)" in message
     assert "Open positions now: 14" in message
+    assert "Available Cash: ₹45,000.00" in message
+    assert "Net Worth: ₹1,05,000.00" not in message  # no Indian-style grouping
+    assert "Net Worth: ₹105,000.00" in message
+    assert "Overall P&L: ₹5,000.00 (+5.00%)" in message
 
 
 def test_format_scan_summary_caps_long_symbol_lists():
@@ -639,10 +860,33 @@ def test_format_scan_summary_caps_long_symbol_lists():
         new_sell_count=0,
         target1_shift_symbols=symbols,
         stop_hit_symbols=[],
+        skipped_capital_symbols=[],
         open_count=15,
+        available_cash=0.0,
+        net_worth=STARTING_CAPITAL,
+        starting_capital=STARTING_CAPITAL,
     )
     assert "+5 more" in message
     assert "SYM14.NS" not in message  # beyond the cap of 10
+
+
+def test_format_scan_summary_negative_pnl():
+    message = _format_scan_summary(
+        scanned=10,
+        buy_count=0,
+        sell_count=0,
+        no_trade_count=10,
+        new_buy_count=0,
+        new_sell_count=0,
+        target1_shift_symbols=[],
+        stop_hit_symbols=[],
+        skipped_capital_symbols=[],
+        open_count=0,
+        available_cash=90_000.0,
+        net_worth=90_000.0,
+        starting_capital=STARTING_CAPITAL,
+    )
+    assert "Overall P&L: ₹-10,000.00 (-10.00%)" in message
 
 
 # ---------------------------------------------------------------------
@@ -651,20 +895,40 @@ def test_format_scan_summary_caps_long_symbol_lists():
 
 
 def test_format_holding_entry_buy_progress_remaining():
-    position = _open_position("BUY", entry_price=1000.0)
+    position = _open_position("BUY", entry_price=1000.0, quantity=10)
     entry = _format_holding_entry(1, "TEST.NS", position, 1010.0)
     assert "TEST.NS (BUY) — HOLD" in entry
-    assert "PnL: +1.00%" in entry
+    assert "Qty: 10" in entry
+    assert "Invested: ₹10,000.00" in entry
+    assert "Current Value: ₹10,100.00" in entry
+    assert "PnL: +1.00% (₹+100.00)" in entry
     assert "Target1 (3%): 2.00% remaining" in entry
 
 
 def test_format_holding_entry_target1_hit_shows_trailing_stop():
-    position = _open_position("BUY", entry_price=1000.0)
+    position = _open_position("BUY", entry_price=1000.0, quantity=10)
     position["target1_hit"] = True
     position["stop_loss"] = position["target1"]
     entry = _format_holding_entry(1, "TEST.NS", position, 1035.0)
     assert "Target1 (3%): HIT" in entry
     assert f"{position['stop_loss']:.2f}" in entry
+
+
+def test_format_holding_entry_sell_loss_shows_negative_pnl_amount():
+    position = _open_position("SELL", entry_price=1000.0, quantity=5)
+    entry = _format_holding_entry(1, "TEST.NS", position, 1020.0)  # price rose = SELL loses
+    # (1000-1020)/1000*100 = -2.00%; invested=5000 -> pnl_amount=-100.00
+    assert "PnL: -2.00% (₹-100.00)" in entry
+
+
+def test_format_holding_entry_missing_quantity_defaults_to_zero():
+    # backward-compat: a position saved before capital tracking existed
+    position = _open_position("BUY", entry_price=1000.0)
+    del position["quantity"]
+    del position["invested_amount"]
+    entry = _format_holding_entry(1, "TEST.NS", position, 1010.0)
+    assert "Qty: 0" in entry
+    assert "Invested: ₹0.00" in entry
 
 
 def test_format_holding_status_messages_empty_when_no_open_positions():
