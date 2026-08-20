@@ -1,9 +1,14 @@
-name: Trial EMA(26/70/240) Strategy (temporary experiment)
+name: Trial EMA(26/70/240) Strategy — Daily Scan (temporary experiment)
 
 # TEMPORARY — separate from Daily Scan / Paper Trading. Does not call
 # scripts/run_paper_trading.py or scripts/generate_full_report.py, so
 # the live production pipeline's own schedule is completely unaffected
 # by this workflow existing or running.
+#
+# This is the DAILY SCAN half only (--mode scan) — opens NEW positions
+# after market close using EOD data. Existing open positions are
+# checked separately, intraday, by trial_position_monitor.yml
+# (9:30/11:30/13:30/14:30 IST) — NOT here.
 
 on:
   schedule:
@@ -42,7 +47,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          PYTHONPATH=. python scripts/trial_ema_bb_strategy.py \
+          PYTHONPATH=. python scripts/trial_ema_bb_strategy.py --mode scan \
             ${{ inputs.symbols != '' && format('--symbols "{0}"', inputs.symbols) || '' }}
 
       - name: Commit updated trial state back to repo
@@ -50,7 +55,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A -- storage/trial_trades/
-          git diff --staged --quiet || git commit -m "Trial EMA strategy update: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git diff --staged --quiet || git commit -m "Trial EMA strategy daily scan: $(date -u +'%Y-%m-%d %H:%M UTC')"
           PUSH_OK=false
           for i in 1 2 3 4 5; do
             if git push; then
