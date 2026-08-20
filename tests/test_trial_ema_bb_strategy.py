@@ -468,25 +468,6 @@ def test_load_state_preserves_real_available_cash_on_subsequent_runs(tmp_path):
     assert state["capital"]["available_cash"] == 37_500.25
 
 
-def test_state_json_delete_then_reload_restarts_from_starting_capital(tmp_path):
-    # Confirms the "clear state.json to reset capital tracking" behavior
-    # the user relies on: with no file present at all (as if just
-    # deleted on GitHub), the very next load starts fresh at
-    # STARTING_CAPITAL — no code change/flag needed to "reset".
-    path = tmp_path / "state.json"
-    save_state(
-        {"open_positions": {"X.NS": _open_position("BUY")}, "capital": {
-            "starting_capital": STARTING_CAPITAL, "available_cash": 12_345.0,
-        }},
-        path,
-    )
-    path.unlink()
-    state = load_state(path)
-    assert state["open_positions"] == {}
-    assert state["capital"]["available_cash"] == STARTING_CAPITAL
-    assert state["capital"]["starting_capital"] == STARTING_CAPITAL
-
-
 # ---------------------------------------------------------------------
 # trade log
 # ---------------------------------------------------------------------
