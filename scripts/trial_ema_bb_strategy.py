@@ -116,7 +116,7 @@ VOLUME_AVG_PERIOD = 20
 
 # Capital / position sizing — adapted from risk/position_sizing.py, see
 # module docstring above for exactly which pieces are real vs. neutral.
-STARTING_CAPITAL = 100_000.0
+STARTING_CAPITAL = 1_000_000.0
 MAX_RISK_PER_TRADE = 0.02
 MIN_CAPITAL_ALLOCATION = 0.02
 MAX_CAPITAL_ALLOCATION = 0.20
@@ -424,6 +424,8 @@ def _format_scan_summary(
     stop_hit_symbols: list[str],
     skipped_capital_symbols: list[str],
     open_count: int,
+    winning_count: int,
+    losing_count: int,
     available_cash: float,
     net_worth: float,
     starting_capital: float,
@@ -458,7 +460,7 @@ def _format_scan_summary(
         f"{_capped_list(stop_hit_symbols)}",
         f"Signal found but skipped (insufficient capital/risk budget): "
         f"{len(skipped_capital_symbols)}{_capped_list(skipped_capital_symbols)}",
-        f"Open positions now: {open_count}",
+        f"Open positions now: {open_count} ({winning_count} winning, {losing_count} losing)",
         "",
         f"Available Cash: ₹{available_cash:,.2f}",
         f"Net Worth: ₹{net_worth:,.2f} (started at ₹{starting_capital:,.2f})",
@@ -725,6 +727,22 @@ def run(
     )
     net_worth = round(net_worth, 2)
 
+    # Winning/losing split among open positions that were actually
+    # scanned this run (mark-to-market at today's latest close) — a
+    # position not in this run's symbol list contributes to neither
+    # count, same "only report what was actually checked" rule as
+    # the holding-status message below.
+    winning_count = 0
+    losing_count = 0
+    for sym, pos in open_positions.items():
+        if sym not in latest_close_by_symbol:
+            continue
+        unrealized_pct = _pnl_percent(pos["direction"], pos["entry_price"], latest_close_by_symbol[sym])
+        if unrealized_pct > 0:
+            winning_count += 1
+        elif unrealized_pct < 0:
+            losing_count += 1
+
     scan_summary = _format_scan_summary(
         scanned=len(symbols),
         buy_count=buy_count,
@@ -736,6 +754,8 @@ def run(
         stop_hit_symbols=stop_hit_symbols,
         skipped_capital_symbols=skipped_capital_symbols,
         open_count=len(open_positions),
+        winning_count=winning_count,
+        losing_count=losing_count,
         available_cash=round(available_cash, 2),
         net_worth=net_worth,
         starting_capital=starting_capital,
@@ -757,6 +777,8 @@ def run(
         "stop_losses_hit": len(stop_hit_symbols),
         "skipped_insufficient_capital": len(skipped_capital_symbols),
         "open_positions": len(open_positions),
+        "winning_positions": winning_count,
+        "losing_positions": losing_count,
         "available_cash": round(available_cash, 2),
         "net_worth": net_worth,
     }
