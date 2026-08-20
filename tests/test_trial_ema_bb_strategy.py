@@ -834,15 +834,17 @@ def test_format_scan_summary_basic_counts():
         stop_hit_symbols=[],
         skipped_capital_symbols=[],
         open_count=14,
+        winning_count=9,
+        losing_count=5,
         available_cash=45_000.0,
         net_worth=105_000.0,
-        starting_capital=STARTING_CAPITAL,
+        starting_capital=100_000.0,  # literal, decoupled from STARTING_CAPITAL constant
     )
     assert message.startswith("[TRIAL_SCAN_COMPLETED]")
     assert "500 symbol(s) scanned" in message
     assert "BUY: 101 | SELL: 1 | NO_TRADE: 398" in message
     assert "New positions opened: 5 (5 BUY, 0 SELL)" in message
-    assert "Open positions now: 14" in message
+    assert "Open positions now: 14 (9 winning, 5 losing)" in message
     assert "Available Cash: ₹45,000.00" in message
     assert "Net Worth: ₹1,05,000.00" not in message  # no Indian-style grouping
     assert "Net Worth: ₹105,000.00" in message
@@ -862,6 +864,8 @@ def test_format_scan_summary_caps_long_symbol_lists():
         stop_hit_symbols=[],
         skipped_capital_symbols=[],
         open_count=15,
+        winning_count=0,
+        losing_count=0,
         available_cash=0.0,
         net_worth=STARTING_CAPITAL,
         starting_capital=STARTING_CAPITAL,
@@ -882,9 +886,11 @@ def test_format_scan_summary_negative_pnl():
         stop_hit_symbols=[],
         skipped_capital_symbols=[],
         open_count=0,
+        winning_count=0,
+        losing_count=0,
         available_cash=90_000.0,
         net_worth=90_000.0,
-        starting_capital=STARTING_CAPITAL,
+        starting_capital=100_000.0,  # literal, decoupled from STARTING_CAPITAL constant
     )
     assert "Overall P&L: ₹-10,000.00 (-10.00%)" in message
 
@@ -986,3 +992,39 @@ def test_run_holding_status_message_sent_for_open_position(tmp_path):
     assert len(messages) == 2  # scan summary + one holding-status message
     assert messages[1].startswith("[TRIAL_HOLDING_STATUS]")
     assert "UP.NS (BUY) — HOLD" in messages[1]
+
+
+def test_run_reports_winning_and_losing_open_position_counts(tmp_path):
+    # WIN.NS is well above its entry (winning); LOSS.NS is below its
+    # entry but not yet at stop_loss (losing, still open).
+    win_position = _open_position("BUY", entry_price=100.0, quantity=1)
+    loss_position = _open_position("BUY", entry_price=100.0, quantity=1)
+
+    provider = _FakeProvider(
+        {
+            "WIN.NS": _synthetic_ohlcv([105.0] * 5),
+            # stop_loss for a 100.0 entry is 98.5 — 99.0 is losing but
+            # not yet stopped out, so the position stays open.
+            "LOSS.NS": _synthetic_ohlcv([99.0] * 5),
+        }
+    )
+
+    state_path = tmp_path / "state.json"
+    save_state(
+        {
+            "open_positions": {"WIN.NS": win_position, "LOSS.NS": loss_position},
+            "capital": {"starting_capital": STARTING_CAPITAL, "available_cash": STARTING_CAPITAL},
+        },
+        state_path,
+    )
+
+    summary = run(
+        symbols=["WIN.NS", "LOSS.NS"],
+        state_path=state_path,
+        trade_log_path=tmp_path / "trade_log.csv",
+        market_provider=provider,
+        notify=lambda m: None,
+    )
+
+    assert summary["winning_positions"] == 1
+    assert summary["losing_positions"] == 1
