@@ -4811,6 +4811,430 @@
       "target1_hit": false,
       "highest_price": 108.02999877929688,
       "lowest_price": 108.02999877929688
+    },
+    "AARTIIND.NS": {
+      "trade_id": "trial_AARTIIND_NS_1787248340",
+      "symbol": "AARTIIND.NS",
+      "direction": "BUY",
+      "quantity": 12,
+      "entry_price": 520.0499877929688,
+      "entry_time": "2026-08-20T17:52:20.716822+00:00",
+      "invested_amount": 6240.6,
+      "stop_loss": 512.25,
+      "target1": 535.65,
+      "target1_hit": false,
+      "highest_price": 520.0499877929688,
+      "lowest_price": 520.0499877929688,
+      "sizing": {
+        "allocation_percent": 0.066,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.8
+      }
+    },
+    "ACE.NS": {
+      "trade_id": "trial_ACE_NS_1787248341",
+      "symbol": "ACE.NS",
+      "direction": "BUY",
+      "quantity": 4,
+      "entry_price": 1164.4000244140625,
+      "entry_time": "2026-08-20T17:52:21.645959+00:00",
+      "invested_amount": 4657.6,
+      "stop_loss": 1146.93,
+      "target1": 1199.33,
+      "target1_hit": false,
+      "highest_price": 1164.4000244140625,
+      "lowest_price": 1164.4000244140625,
+      "sizing": {
+        "allocation_percent": 0.0429,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 0.65
+      }
+    },
+    "ATGL.NS": {
+      "trade_id": "trial_ATGL_NS_1787248343",
+      "symbol": "ATGL.NS",
+      "direction": "SELL",
+      "quantity": 8,
+      "entry_price": 657.6500244140625,
+      "entry_time": "2026-08-20T17:52:23.858492+00:00",
+      "invested_amount": 5261.2,
+      "stop_loss": 667.51,
+      "target1": 637.92,
+      "target1_hit": false,
+      "highest_price": 657.6500244140625,
+      "lowest_price": 657.6500244140625,
+      "sizing": {
+        "allocation_percent": 0.066,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.8
+      }
+    },
+    "ABCAPITAL.NS": {
+      "trade_id": "trial_ABCAPITAL_NS_1787248344",
+      "symbol": "ABCAPITAL.NS",
+      "direction": "BUY",
+      "quantity": 15,
+      "entry_price": 409.0,
+      "entry_time": "2026-08-20T17:52:24.155084+00:00",
+      "invested_amount": 6135.0,
+      "stop_loss": 402.87,
+      "target1": 421.27,
+      "target1_hit": false,
+      "highest_price": 409.0,
+      "lowest_price": 409.0,
+      "sizing": {
+        "allocation_percent": 0.0743,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.9
+      }
+    },
+    "ABREL.NS": {
+      "trade_id": "trial_ABREL_NS_1787248345",
+      "symbol": "ABREL.NS",
+      "direction": "BUY",
+      "quantity": 3,
+      "entry_price": 1445.5,
+      "entry_time": "2026-08-20T17:52:25.065015+00:00",
+      "invested_amount": 4336.5,
+      "stop_loss": 1423.82,
+      "target1": 1488.87,
+      "target1_hit": false,
+      "highest_price": 1445.5,
+      "lowest_price": 1445.5,
+      "sizing": {
+        "allocation_percent": 0.033,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.4
+      }
+    },
+    "CPPLUS.NS": {
+      "trade_id": "trial_CPPLUS_NS_1787248345",
+      "symbol": "CPPLUS.NS",
+      "direction": "SELL",
+      "quantity": 1,
+      "entry_price": 3468.60009765625,
+      "entry_time": "2026-08-20T17:52:25.662455+00:00",
+      "invested_amount": 3468.6,
+      "stop_loss": 3520.63,
+      "target1": 3364.54,
+      "target1_hit": false,
+      "highest_price": 3468.60009765625,
+      "lowest_price": 3468.60009765625,
+      "sizing": {
+        "allocation_percent": 0.0264,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 0.4
+      }
+    },
+    "ANTHEM.NS": {
+      "trade_id": "trial_ANTHEM_NS_1787248351",
+      "symbol": "ANTHEM.NS",
+      "direction": "BUY",
+      "quantity": 5,
+      "entry_price": 874.5,
+      "entry_time": "2026-08-20T17:52:31.747668+00:00",
+      "invested_amount": 4372.5,
+      "stop_loss": 861.38,
+      "target1": 900.74,
+      "target1_hit": false,
+      "highest_price": 874.5,
+      "lowest_price": 874.5,
+      "sizing": {
+        "allocation_percent": 0.0536,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.65
+      }
+    },
+    "APOLLOTYRE.NS": {
+      "trade_id": "trial_APOLLOTYRE_NS_1787248353",
+      "symbol": "APOLLOTYRE.NS",
+      "direction": "SELL",
+      "quantity": 11,
+      "entry_price": 429.29998779296875,
+      "entry_time": "2026-08-20T17:52:33.330667+00:00",
+      "invested_amount": 4722.3,
+      "stop_loss": 435.74,
+      "target1": 416.42,
+      "target1_hit": false,
+      "highest_price": 429.29998779296875,
+      "lowest_price": 429.29998779296875,
+      "sizing": {
+        "allocation_percent": 0.0644,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.9,
+        "liquidity_adjustment": 0.65
+      }
+    },
+    "BANDHANBNK.NS": {
+      "trade_id": "trial_BANDHANBNK_NS_1787248361",
+      "symbol": "BANDHANBNK.NS",
+      "direction": "SELL",
+      "quantity": 28,
+      "entry_price": 174.16000366210938,
+      "entry_time": "2026-08-20T17:52:41.040581+00:00",
+      "invested_amount": 4876.48,
+      "stop_loss": 176.77,
+      "target1": 168.94,
+      "target1_hit": false,
+      "highest_price": 174.16000366210938,
+      "lowest_price": 174.16000366210938,
+      "sizing": {
+        "allocation_percent": 0.066,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 1.0
+      }
+    },
+    "BERGEPAINT.NS": {
+      "trade_id": "trial_BERGEPAINT_NS_1787248364",
+      "symbol": "BERGEPAINT.NS",
+      "direction": "BUY",
+      "quantity": 9,
+      "entry_price": 528.5499877929688,
+      "entry_time": "2026-08-20T17:52:44.229346+00:00",
+      "invested_amount": 4756.95,
+      "stop_loss": 520.62,
+      "target1": 544.41,
+      "target1_hit": false,
+      "highest_price": 528.5499877929688,
+      "lowest_price": 528.5499877929688,
+      "sizing": {
+        "allocation_percent": 0.0264,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 0.4
+      }
+    },
+    "BDL.NS": {
+      "trade_id": "trial_BDL_NS_1787248364",
+      "symbol": "BDL.NS",
+      "direction": "BUY",
+      "quantity": 3,
+      "entry_price": 1317.0,
+      "entry_time": "2026-08-20T17:52:44.597437+00:00",
+      "invested_amount": 3951.0,
+      "stop_loss": 1297.24,
+      "target1": 1356.51,
+      "target1_hit": false,
+      "highest_price": 1317.0,
+      "lowest_price": 1317.0,
+      "sizing": {
+        "allocation_percent": 0.066,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.8
+      }
+    },
+    "BHEL.NS": {
+      "trade_id": "trial_BHEL_NS_1787248365",
+      "symbol": "BHEL.NS",
+      "direction": "SELL",
+      "quantity": 12,
+      "entry_price": 413.5,
+      "entry_time": "2026-08-20T17:52:45.598380+00:00",
+      "invested_amount": 4962.0,
+      "stop_loss": 419.7,
+      "target1": 401.09,
+      "target1_hit": false,
+      "highest_price": 413.5,
+      "lowest_price": 413.5,
+      "sizing": {
+        "allocation_percent": 0.0825,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 1.0
+      }
+    },
+    "BLUEJET.NS": {
+      "trade_id": "trial_BLUEJET_NS_1787248368",
+      "symbol": "BLUEJET.NS",
+      "direction": "BUY",
+      "quantity": 8,
+      "entry_price": 595.2999877929688,
+      "entry_time": "2026-08-20T17:52:48.374753+00:00",
+      "invested_amount": 4762.4,
+      "stop_loss": 586.37,
+      "target1": 613.16,
+      "target1_hit": false,
+      "highest_price": 595.2999877929688,
+      "lowest_price": 595.2999877929688,
+      "sizing": {
+        "allocation_percent": 0.0528,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 0.8
+      }
+    },
+    "CESC.NS": {
+      "trade_id": "trial_CESC_NS_1787248371",
+      "symbol": "CESC.NS",
+      "direction": "SELL",
+      "quantity": 31,
+      "entry_price": 156.61000061035156,
+      "entry_time": "2026-08-20T17:52:51.285101+00:00",
+      "invested_amount": 4854.91,
+      "stop_loss": 158.96,
+      "target1": 151.91,
+      "target1_hit": false,
+      "highest_price": 156.61000061035156,
+      "lowest_price": 156.61000061035156,
+      "sizing": {
+        "allocation_percent": 0.066,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.8
+      }
+    },
+    "CHALET.NS": {
+      "trade_id": "trial_CHALET_NS_1787248376",
+      "symbol": "CHALET.NS",
+      "direction": "BUY",
+      "quantity": 5,
+      "entry_price": 852.9000244140625,
+      "entry_time": "2026-08-20T17:52:56.448111+00:00",
+      "invested_amount": 4264.5,
+      "stop_loss": 840.11,
+      "target1": 878.49,
+      "target1_hit": false,
+      "highest_price": 852.9000244140625,
+      "lowest_price": 852.9000244140625,
+      "sizing": {
+        "allocation_percent": 0.033,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.4
+      }
+    },
+    "CROMPTON.NS": {
+      "trade_id": "trial_CROMPTON_NS_1787248383",
+      "symbol": "CROMPTON.NS",
+      "direction": "SELL",
+      "quantity": 19,
+      "entry_price": 252.0,
+      "entry_time": "2026-08-20T17:53:03.667297+00:00",
+      "invested_amount": 4788.0,
+      "stop_loss": 255.78,
+      "target1": 244.44,
+      "target1_hit": false,
+      "highest_price": 252.0,
+      "lowest_price": 252.0,
+      "sizing": {
+        "allocation_percent": 0.0743,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.9
+      }
+    },
+    "DALBHARAT.NS": {
+      "trade_id": "trial_DALBHARAT_NS_1787248386",
+      "symbol": "DALBHARAT.NS",
+      "direction": "BUY",
+      "quantity": 2,
+      "entry_price": 1897.0,
+      "entry_time": "2026-08-20T17:53:06.852863+00:00",
+      "invested_amount": 3794.0,
+      "stop_loss": 1868.55,
+      "target1": 1953.91,
+      "target1_hit": false,
+      "highest_price": 1897.0,
+      "lowest_price": 1897.0,
+      "sizing": {
+        "allocation_percent": 0.033,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.4
+      }
+    },
+    "ELECON.NS": {
+      "trade_id": "trial_ELECON_NS_1787248391",
+      "symbol": "ELECON.NS",
+      "direction": "BUY",
+      "quantity": 11,
+      "entry_price": 451.70001220703125,
+      "entry_time": "2026-08-20T17:53:11.567578+00:00",
+      "invested_amount": 4968.7,
+      "stop_loss": 444.92,
+      "target1": 465.25,
+      "target1_hit": false,
+      "highest_price": 451.70001220703125,
+      "lowest_price": 451.70001220703125,
+      "sizing": {
+        "allocation_percent": 0.0264,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 0.4
+      }
+    },
+    "EMAMILTD.NS": {
+      "trade_id": "trial_EMAMILTD_NS_1787248392",
+      "symbol": "EMAMILTD.NS",
+      "direction": "BUY",
+      "quantity": 12,
+      "entry_price": 407.3999938964844,
+      "entry_time": "2026-08-20T17:53:12.223872+00:00",
+      "invested_amount": 4888.8,
+      "stop_loss": 401.29,
+      "target1": 419.62,
+      "target1_hit": false,
+      "highest_price": 407.3999938964844,
+      "lowest_price": 407.3999938964844,
+      "sizing": {
+        "allocation_percent": 0.0536,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.65
+      }
+    },
+    "ENGINERSIN.NS": {
+      "trade_id": "trial_ENGINERSIN_NS_1787248394",
+      "symbol": "ENGINERSIN.NS",
+      "direction": "BUY",
+      "quantity": 21,
+      "entry_price": 237.2100067138672,
+      "entry_time": "2026-08-20T17:53:14.291001+00:00",
+      "invested_amount": 4981.41,
+      "stop_loss": 233.65,
+      "target1": 244.33,
+      "target1_hit": false,
+      "highest_price": 237.2100067138672,
+      "lowest_price": 237.2100067138672,
+      "sizing": {
+        "allocation_percent": 0.066,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 0.8
+      }
+    },
+    "NYKAA.NS": {
+      "trade_id": "trial_NYKAA_NS_1787248395",
+      "symbol": "NYKAA.NS",
+      "direction": "BUY",
+      "quantity": 15,
+      "entry_price": 330.3500061035156,
+      "entry_time": "2026-08-20T17:53:15.475754+00:00",
+      "invested_amount": 4955.25,
+      "stop_loss": 325.39,
+      "target1": 340.26,
+      "target1_hit": false,
+      "highest_price": 330.3500061035156,
+      "lowest_price": 330.3500061035156,
+      "sizing": {
+        "allocation_percent": 0.0825,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.75,
+        "liquidity_adjustment": 1.0
+      }
     }
+  },
+  "capital": {
+    "starting_capital": 100000.0,
+    "available_cash": 1.3
   }
 }
