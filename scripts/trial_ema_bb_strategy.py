@@ -132,12 +132,13 @@ import csv
 import json
 import math
 import os
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pandas as pd
 
 from core.logger import get_logger
+from core.trading_calendar import is_trading_day, skip_reason
 from data.market_data import MarketDataProvider
 from data.watchlist import WatchlistManager
 from features.indicators.smoothing import wilders_smoothing
@@ -1043,7 +1044,33 @@ def main() -> None:
             "target1), never opens new positions."
         ),
     )
+    parser.add_argument(
+        "--force", action="store_true",
+        help="Bypass the NSE-trading-day check (testing only — e.g. to verify "
+        "a fix on a market holiday). Normal scheduled runs never pass this.",
+    )
     args = parser.parse_args()
+
+    # BUG FIX (found 2026-08-24): this script had NO trading-day gate at
+    # all — unlike morning_executor.py / generate_full_report.py, which
+    # both call is_trading_day() before doing anything. Both GitHub
+    # Actions crons for this script (trial_ema_bb_strategy.yml,
+    # trial_position_monitor.yml) use "* * *" for day-of-week, so they
+    # fire every single day including weekends/NSE holidays — and this
+    # script would happily scan/monitor on those days too (yfinance
+    # just returns stale/repeated data), wasting runs and risking
+    # misleading signals or Telegram spam on non-trading days.
+    today_date = date.today()
+    if not args.force and not is_trading_day(today_date):
+        reason = skip_reason(today_date) or "Non-trading day"
+        logger.info("Not an NSE trading day — exiting before any scan/monitor begins.")
+        print(f"Not an NSE trading day ({reason}). No {args.mode} performed.")
+        send_telegram(
+            f"⏸️ [TRIAL_EMA_BB_STRATEGY] Skipped ({args.mode})\n"
+            f"Reason: {reason}\n"
+            f"No scan/monitor was executed today."
+        )
+        return
 
     if args.mode == "monitor":
         summary = monitor_open_positions()
