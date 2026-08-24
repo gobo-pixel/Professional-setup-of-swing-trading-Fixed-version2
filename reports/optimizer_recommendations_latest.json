@@ -1,31 +1,31 @@
 [
   {
     "category": "RULE (redundant)",
-    "finding": "'market_trend' and 'market_score' agree 100.0% of the time (n=1500).",
+    "finding": "'market_trend' and 'market_score' agree 100.0% of the time (n=2000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'squeeze_breakout' and 'breadth' agree 100.0% of the time (n=1500).",
+    "finding": "'squeeze_breakout' and 'breadth' agree 100.0% of the time (n=2000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'squeeze_breakout' and 'sector' agree 100.0% of the time (n=1500).",
+    "finding": "'squeeze_breakout' and 'sector' agree 100.0% of the time (n=2000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'breadth' and 'sector' agree 100.0% of the time (n=1500).",
+    "finding": "'breadth' and 'sector' agree 100.0% of the time (n=2000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'ema_fresh_cross' and 'squeeze_breakout' agree 98.6% of the time (n=1500).",
+    "finding": "'ema_fresh_cross' and 'squeeze_breakout' agree 98.75% of the time (n=2000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   }
