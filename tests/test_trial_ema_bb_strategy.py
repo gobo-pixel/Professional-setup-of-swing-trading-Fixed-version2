@@ -1,10 +1,10 @@
 """
 Tests for scripts/trial_ema_bb_strategy.py — the TEMPORARY trial
-strategy (EMA26/70/240 trend-alignment, fixed-percent risk
-management). Covers the pure logic functions directly and the two
-orchestration entry points — scan_new_signals() (daily, EOD, opens new
-positions only) and monitor_open_positions() (intraday, current price,
-checks existing positions only) — with a mocked market-data provider /
+strategy (EMA(50/200) fresh-cross, fixed-percent risk management).
+Covers the pure logic functions directly and the two orchestration
+entry points — scan_new_signals() (daily, EOD, opens new positions
+only) and monitor_open_positions() (intraday, current price, checks
+existing positions only) — with a mocked market-data provider /
 Telegram sender, so no real network calls happen in tests.
 """
 
@@ -17,7 +17,6 @@ import pytest
 
 from scripts.trial_ema_bb_strategy import (
     EMA_FAST,
-    EMA_MID,
     EMA_SLOW,
     STARTING_CAPITAL,
     STOP_LOSS_PERCENT,
@@ -59,6 +58,33 @@ def _synthetic_ohlcv(closes: list[float]) -> pd.DataFrame:
     )
 
 
+def _fresh_buy_series() -> list[float]:
+    """A real (not hand-waved) fresh BUY setup: a long enough uptrend to
+    get price genuinely above ema_200, a pullback that dips price below
+    ema_50 for several days (so "previous close <= previous ema_50" is
+    true), then one sharp breakout day that pushes close back above
+    ema_50 while still comfortably above ema_200. Verified by actually
+    running compute_emas()/evaluate_signal() over this exact series —
+    not asserted from theory alone."""
+    phase1 = [100.0 + i * 1.5 for i in range(80)]  # steady uptrend
+    phase2 = [phase1[-1] - i * 3 for i in range(1, 11)]  # pullback below ema_50
+    phase3 = [phase2[-1] + 10]  # fresh breakout day
+    return phase1 + phase2 + phase3
+
+
+def _fresh_sell_series() -> list[float]:
+    """Mirror of _fresh_buy_series(): a downtrend that drags price below
+    ema_200, a bounce long/strong enough to lift price back above
+    ema_200 (so "previous close >= previous ema_200" is true), then one
+    sharp drop day that pushes close back below ema_200 AND below
+    ema_50 (the SELL-side confirmation). Also verified by actually
+    running the real functions over this exact series."""
+    phase1 = [300.0 - i * 1.0 for i in range(60)]  # steady downtrend
+    phase2 = [phase1[-1] + i * 3 for i in range(1, 16)]  # bounce above ema_200
+    phase3 = [phase2[-1] - 25]  # fresh drop day
+    return phase1 + phase2 + phase3
+
+
 # ---------------------------------------------------------------------
 # compute_emas
 # ---------------------------------------------------------------------
@@ -69,7 +95,6 @@ def test_compute_emas_adds_expected_columns():
     result = compute_emas(df)
 
     assert f"ema_{EMA_FAST}" in result.columns
-    assert f"ema_{EMA_MID}" in result.columns
     assert f"ema_{EMA_SLOW}" in result.columns
     # original dataframe must not be mutated in place
     assert f"ema_{EMA_FAST}" not in df.columns
@@ -89,31 +114,63 @@ def test_compute_emas_no_nan_even_with_short_history():
 # ---------------------------------------------------------------------
 
 
-def test_evaluate_signal_buy_when_all_three_agree():
-    latest = pd.Series({"close": 110.0, "ema_26": 100.0, "ema_70": 95.0, "ema_240": 90.0})
-    assert evaluate_signal(latest) == "BUY"
+def test_evaluate_signal_buy_on_fresh_cross_above_fast_with_slow_confirmation():
+    # yesterday at/below ema_50 (fresh trigger), today above ema_50 AND
+    # above ema_200 (confirmation the longer-term trend already agrees).
+    previous = pd.Series({"close": 99.0, "ema_50": 100.0, "ema_200": 90.0})
+    latest = pd.Series({"close": 101.0, "ema_50": 100.0, "ema_200": 90.0})
+    assert evaluate_signal(latest, previous) == "BUY"
 
 
-def test_evaluate_signal_sell_when_all_three_agree():
-    latest = pd.Series({"close": 80.0, "ema_26": 90.0, "ema_70": 95.0, "ema_240": 100.0})
-    assert evaluate_signal(latest) == "SELL"
+def test_evaluate_signal_sell_on_fresh_cross_below_slow_with_fast_confirmation():
+    # mirror, roles swapped: yesterday at/above ema_200 (fresh trigger),
+    # today below ema_200 AND below ema_50 (confirmation).
+    previous = pd.Series({"close": 101.0, "ema_50": 95.0, "ema_200": 100.0})
+    latest = pd.Series({"close": 94.0, "ema_50": 95.0, "ema_200": 100.0})
+    assert evaluate_signal(latest, previous) == "SELL"
 
 
-def test_evaluate_signal_no_trade_when_mixed():
-    latest = pd.Series({"close": 95.0, "ema_26": 100.0, "ema_70": 90.0, "ema_240": 92.0})
-    assert evaluate_signal(latest) == "NO_TRADE"
+def test_evaluate_signal_no_trade_when_no_previous_candle():
+    # first row of a series — no yesterday to compare against, so
+    # "fresh" cannot be evaluated either way.
+    latest = pd.Series({"close": 110.0, "ema_50": 100.0, "ema_200": 90.0})
+    assert evaluate_signal(latest, None) == "NO_TRADE"
+
+
+def test_evaluate_signal_no_trade_when_above_fast_but_not_confirmed_by_slow():
+    # fresh cross above ema_50, but NOT above ema_200 — confirmation
+    # fails, must not fire BUY on the trigger alone.
+    previous = pd.Series({"close": 99.0, "ema_50": 100.0, "ema_200": 110.0})
+    latest = pd.Series({"close": 101.0, "ema_50": 100.0, "ema_200": 110.0})
+    assert evaluate_signal(latest, previous) == "NO_TRADE"
+
+
+def test_evaluate_signal_no_trade_when_already_above_fast_yesterday():
+    # already above ema_50 yesterday too (and above ema_200) — real,
+    # but NOT a fresh cross, so must not fire BUY every day it stays up.
+    previous = pd.Series({"close": 101.0, "ema_50": 100.0, "ema_200": 90.0})
+    latest = pd.Series({"close": 102.0, "ema_50": 100.0, "ema_200": 90.0})
+    assert evaluate_signal(latest, previous) == "NO_TRADE"
 
 
 def test_evaluate_signal_no_trade_when_ema_is_nan():
-    latest = pd.Series({"close": 110.0, "ema_26": 100.0, "ema_70": 95.0, "ema_240": float("nan")})
-    assert evaluate_signal(latest) == "NO_TRADE"
+    previous = pd.Series({"close": 99.0, "ema_50": 100.0, "ema_200": 90.0})
+    latest = pd.Series({"close": 101.0, "ema_50": 100.0, "ema_200": float("nan")})
+    assert evaluate_signal(latest, previous) == "NO_TRADE"
 
 
-def test_evaluate_signal_no_trade_at_exact_equality():
-    # close exactly equal to an EMA is neither strictly above nor
-    # below it — must not count as agreement either way.
-    latest = pd.Series({"close": 100.0, "ema_26": 100.0, "ema_70": 90.0, "ema_240": 80.0})
-    assert evaluate_signal(latest) == "NO_TRADE"
+def test_evaluate_signal_no_trade_when_previous_ema_is_nan():
+    previous = pd.Series({"close": 99.0, "ema_50": float("nan"), "ema_200": 90.0})
+    latest = pd.Series({"close": 101.0, "ema_50": 100.0, "ema_200": 90.0})
+    assert evaluate_signal(latest, previous) == "NO_TRADE"
+
+
+def test_evaluate_signal_buy_boundary_previous_close_exactly_at_fast_ema():
+    # previous close exactly equal to ema_50 counts as "at/below" (<=)
+    # — the boundary is inclusive on the not-yet-crossed side.
+    previous = pd.Series({"close": 100.0, "ema_50": 100.0, "ema_200": 90.0})
+    latest = pd.Series({"close": 101.0, "ema_50": 100.0, "ema_200": 90.0})
+    assert evaluate_signal(latest, previous) == "BUY"
 
 
 # ---------------------------------------------------------------------
@@ -614,7 +671,7 @@ def test_scan_sends_exactly_one_scan_summary_message(tmp_path):
 
 
 def test_scan_opens_new_position_on_buy_signal(tmp_path):
-    uptrend = _synthetic_ohlcv([100.0 + i * 2 for i in range(30)])
+    uptrend = _synthetic_ohlcv(_fresh_buy_series())
     provider = _FakeProvider({"UP.NS": uptrend})
     messages = []
 
@@ -649,7 +706,7 @@ def test_scan_opens_new_position_on_buy_signal(tmp_path):
 
 
 def test_scan_opens_new_position_on_sell_signal(tmp_path):
-    downtrend = _synthetic_ohlcv([200.0 - i * 2 for i in range(30)])
+    downtrend = _synthetic_ohlcv(_fresh_sell_series())
     provider = _FakeProvider({"DOWN.NS": downtrend})
     messages = []
 
@@ -670,7 +727,7 @@ def test_scan_opens_new_position_on_sell_signal(tmp_path):
 
 
 def test_scan_skips_new_position_when_capital_exhausted(tmp_path):
-    uptrend = _synthetic_ohlcv([100.0 + i * 2 for i in range(30)])
+    uptrend = _synthetic_ohlcv(_fresh_buy_series())
     provider = _FakeProvider({"UP.NS": uptrend})
 
     state_path = tmp_path / "state.json"
@@ -697,8 +754,8 @@ def test_scan_skips_new_position_when_capital_exhausted(tmp_path):
 
 
 def test_scan_reports_buy_sell_no_trade_counts_across_all_scanned_symbols(tmp_path):
-    uptrend = _synthetic_ohlcv([100.0 + i * 2 for i in range(30)])
-    downtrend = _synthetic_ohlcv([200.0 - i * 2 for i in range(30)])
+    uptrend = _synthetic_ohlcv(_fresh_buy_series())
+    downtrend = _synthetic_ohlcv(_fresh_sell_series())
     flat = _synthetic_ohlcv([100.0] * 30)
     provider = _FakeProvider({"UP.NS": uptrend, "DOWN.NS": downtrend, "FLAT.NS": flat})
 
@@ -731,10 +788,10 @@ def test_scan_no_signal_when_flat(tmp_path):
 
 
 def test_scan_skips_fresh_signal_check_when_position_already_open(tmp_path):
-    # price still uptrending (would qualify for a fresh BUY signal) but
+    # a genuine fresh BUY signal is present (see _fresh_buy_series()) but
     # a position is already open for this symbol — must not open a
     # second position for the same symbol.
-    uptrend = _synthetic_ohlcv([100.0 + i * 2 for i in range(30)])
+    uptrend = _synthetic_ohlcv(_fresh_buy_series())
     provider = _FakeProvider({"UP.NS": uptrend})
 
     state_path = tmp_path / "state.json"
