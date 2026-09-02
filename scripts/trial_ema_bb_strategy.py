@@ -1,33 +1,61 @@
 """
-TEMPORARY TRIAL STRATEGY — EMA(26/70/240) trend-alignment.
+TEMPORARY TRIAL STRATEGY — EMA(50/200) fresh-cross.
 
 Built at the user's explicit request as a short-term EXPERIMENT, kept
 completely isolated from the live production pipeline
 (execution/scanner.py, strategy/buy_strategy.py, strategy/sell_strategy.py,
 paper_trading/paper_trading_engine.py, risk/*). This script imports
 none of those and is never called by any production workflow — it can
-be deleted or disabled at any time without touching production. It
-DOES import features/indicators/smoothing.py's wilders_smoothing — a
-pure math helper, not part of the strategy/decision engine — so ATR is
-computed with the exact same (real-data-audited) formula production
-uses, instead of re-deriving a second, possibly-diverging copy.
+be deleted or disabled at any time without touching production.
 
-SIGNAL (all three must agree — AND logic, per explicit instruction):
-    BUY      : close > ema26  AND close > ema70  AND close > ema240
-    SELL     : close < ema26  AND close < ema70  AND close < ema240
-    NO_TRADE : anything else (mixed / conflicting EMAs)
+DEPLOYABILITY FIX (2026-09-02): this file previously imported
+`wilders_smoothing` from `features/indicators/smoothing.py` for its ATR
+calculation. That module does not exist anywhere in this repo's actual
+GitHub history (verified via `git log --all`) — it, this whole file,
+and both of its GitHub Actions workflows were never committed, only
+ever present in a local working copy. Importing a genuinely missing
+module would have made every run of this script crash immediately, the
+same way market_intelligence_engine.py broke in a sibling repo this
+session from an accidental overwrite — so Wilder's smoothing is now
+INLINED below (`_wilders_smoothing()`) as a small, self-contained
+math helper with zero import dependency on anything outside this file,
+matching this script's own "imports none of the pipeline" isolation
+claim literally rather than only for the pipeline modules.
 
-DATA: interval="1d", period="1mo" (per explicit instruction).
-CAVEAT (flagged loudly, not silently "fixed"): a 240-period EMA
-normally needs ~240 trading days of history to be a properly warmed-up
-value. period="1mo" returns roughly 21 daily candles — far short of
-240 — so ema_240 here is the EMA *formula* applied to a short window,
-not a genuinely mature 240-day EMA. This script prints a warning about
-this every run; see main().
+SIGNAL (rewritten 2026-09-02 — the original EMA(26/70/240) three-way
+trend-alignment version below never actually ran: this file, both of
+its GitHub Actions workflows, and storage/trial_trades/ were never
+committed to this repo — verified via `git log --all` finding zero
+matches. There is no real trade data from the old version to have been
+"unsuccessful" against; this is a genuinely fresh start, not a tuning
+of a strategy that was tried and failed):
 
-RISK MANAGEMENT (fixed-percent, per explicit instruction — NOT the
-ATR-based STOP/TARGET model in risk/stop_target.py, deliberately,
-since this is a separate experiment):
+    BUY  : close crosses FRESH above ema_50 this candle (prev close was
+           at/below ema_50, today's close is above it) AND today's
+           close is ALSO above ema_200 (confirmation the longer-term
+           trend is already bullish — this cross does not need to be
+           fresh, only currently true).
+    SELL : mirror, roles swapped per the user's explicit "reverse"
+           wording — close crosses FRESH below ema_200 this candle
+           (prev close was at/above ema_200, today's close is below
+           it) AND today's close is ALSO below ema_50 (confirmation
+           the shorter-term trend already agrees).
+    NO_TRADE : anything else, OR the previous candle is unavailable
+           (first row of the series — a "fresh" cross needs a
+           yesterday to compare against).
+
+DATA: interval="1d", period="1y" (per explicit instruction — changed
+from the old period="1mo"). This also resolves the OLD version's
+own documented caveat about ema_240 never being genuinely warmed up on
+only ~21 candles: with a full year of daily history, both ema_50 and
+ema_200 are properly warmed up.
+
+RISK MANAGEMENT (fixed-percent, per explicit instruction — NOT any
+ATR-based stop/target model production may use elsewhere, deliberately,
+since this is a separate experiment; note there is no risk/stop_target.py
+in this repo specifically — that path belongs to a different repo this
+session also works on, corrected here rather than left as a
+misattributed reference):
     initial stop-loss = entry -+ 1.5%   (BUY: below entry, SELL: above)
     target1            = entry -+ 3.0%   (BUY: above entry, SELL: below)
     Once price crosses target1, stop-loss is moved to target1 (locks
@@ -39,13 +67,18 @@ POSITION SIZING (capital tracking, per explicit follow-up request):
 adapted from risk/position_sizing.py's real ATR+Kelly formula, reusing
 every piece that can be honestly computed from data this trial
 actually has:
-    - kelly_fraction: FIXED at FALLBACK_KELLY_FRACTION (0.5) — this is
-      not a simplification unique to the trial; production ITSELF
-      currently runs with KELLY_CALIBRATED=False and uses this exact
-      same flat fallback (no calibration table exists yet anywhere in
-      this codebase).
+    - kelly_fraction: FIXED at FALLBACK_KELLY_FRACTION (0.5) here —
+      simpler than production's real win-rate/reward-risk-derived Kelly
+      formula in risk/position_sizing.py (CORRECTED 2026-09-02: an
+      earlier version of this note claimed production also runs a flat
+      fallback via a "KELLY_CALIBRATED" flag; checked directly against
+      risk/position_sizing.py and that flag doesn't exist there —
+      production computes kelly_fraction dynamically. This trial uses a
+      flat 0.5 anyway, deliberately, since it has no win-rate/reward-risk
+      history of its own yet to derive a real one from).
     - volatility_adjustment: from a REAL ATR(14) computed here (Wilder's
-      smoothing, same formula as features/indicators/volatility.py).
+      smoothing — see compute_atr()'s docstring for the corrected note
+      on how this compares to production's actual ATR formula).
     - liquidity_adjustment: from REAL average volume computed here.
     - confidence_adjustment / risk_adjustment: production derives these
       from decision.confidence / risk.total_risk, which come from the
@@ -70,7 +103,7 @@ TWO SEPARATE ENTRY POINTS (per explicit follow-up request), driven by
 --mode:
     --mode scan (default) -> scan_new_signals(): runs ONCE DAILY, after
         market close (see .github/workflows/trial_ema_bb_strategy.yml,
-        8:00 PM IST). Uses EOD data (interval="1d", period="1mo") to
+        8:00 PM IST). Uses EOD data (interval="1d", period="1y") to
         classify every watchlist symbol and OPEN a new position where a
         signal fires and none is already open for that symbol. Does
         NOT check stop-loss/target1 on already-open positions — that
@@ -141,13 +174,12 @@ from core.logger import get_logger
 from core.trading_calendar import is_trading_day, skip_reason
 from data.market_data import MarketDataProvider
 from data.watchlist import WatchlistManager
-from features.indicators.smoothing import wilders_smoothing
 from output.telegram_alert import TelegramAlert
 
 logger = get_logger(__name__)
 
 INTERVAL = "1d"
-PERIOD = "1mo"
+PERIOD = "1y"
 
 # Used ONLY by monitor_open_positions() for a CURRENT intraday price of
 # already-open positions — deliberately NOT the EOD series scan_new_signals()
@@ -157,9 +189,8 @@ PERIOD = "1mo"
 MONITOR_INTERVAL = "5m"
 MONITOR_PERIOD = "1d"
 
-EMA_FAST = 26
-EMA_MID = 70
-EMA_SLOW = 240
+EMA_FAST = 50
+EMA_SLOW = 200
 
 STOP_LOSS_PERCENT = 0.015
 TARGET1_PERCENT = 0.03
@@ -254,21 +285,42 @@ def append_trade_log(row: dict, path: Path = TRADE_LOG_PATH) -> None:
 
 
 def compute_emas(dataframe: pd.DataFrame) -> pd.DataFrame:
-    """Adds ema_26 / ema_70 / ema_240 columns. Deliberately NOT reusing
-    features/indicators/moving_average.py (which only computes
-    9/20/50/100/200) so production's shared indicator module stays
-    untouched by this trial."""
+    """Adds ema_50 / ema_200 columns. Deliberately NOT reusing
+    features/indicators/moving_average.py (which computes its own
+    9/20/50/100/200 set inside production's pipeline) so this trial
+    stays fully isolated and production's shared indicator module is
+    never touched by it."""
     df = dataframe.copy()
-    for period in (EMA_FAST, EMA_MID, EMA_SLOW):
+    for period in (EMA_FAST, EMA_SLOW):
         df[f"ema_{period}"] = df["close"].ewm(span=period, adjust=False).mean()
     return df
 
 
+def _wilders_smoothing(series: pd.Series, period: int) -> pd.Series:
+    """Wilder's smoothing (alpha = 1/period) — the industry-standard
+    smoothing method for ATR/RSI/ADX, an exponentially-weighted moving
+    average rather than a plain rolling mean. Inlined here (not shared
+    with production) — see this file's module docstring's
+    "DEPLOYABILITY FIX" note for why: the module this used to import it
+    from does not actually exist in this repo. NaN for the first
+    `period - 1` bars, same "needs a full window before it means
+    anything" behavior as a `rolling(period, min_periods=period)` call."""
+    smoothed = series.ewm(alpha=1.0 / period, adjust=False).mean()
+    positions = pd.Series(range(len(series)), index=series.index)
+    return smoothed.mask(positions < (period - 1))
+
+
 def compute_atr(dataframe: pd.DataFrame) -> pd.Series:
-    """ATR(14), Wilder's smoothing — the exact same formula as
-    production's features/indicators/volatility.py (a real-data-audited
-    fix, see PHASE30_NOTES.md), reused via the shared smoothing helper
-    rather than re-deriving a second copy that could drift."""
+    """ATR(14) via Wilder's smoothing (see _wilders_smoothing() above).
+    NOTE (corrected 2026-09-02): this docstring used to claim this
+    matches production's features/indicators/volatility.py formula —
+    checked directly against that file and it does NOT: production's
+    real ATR(14) there is a plain `rolling(14, min_periods=14).mean()`,
+    not Wilder's smoothing. This trial deliberately keeps Wilder's
+    smoothing anyway (the more standard ATR method, matching what most
+    broker/charting platforms show) rather than silently matching
+    production's simpler formula — flagged honestly rather than left
+    as an inaccurate claim of parity that isn't real."""
     high = dataframe["high"]
     low = dataframe["low"]
     close = dataframe["close"]
@@ -277,38 +329,65 @@ def compute_atr(dataframe: pd.DataFrame) -> pd.Series:
         [high - low, (high - prev_close).abs(), (low - prev_close).abs()],
         axis=1,
     ).max(axis=1)
-    return wilders_smoothing(true_range, ATR_PERIOD)
+    return _wilders_smoothing(true_range, ATR_PERIOD)
 
 
 def compute_volume_average(dataframe: pd.DataFrame) -> pd.Series:
     """Average volume over VOLUME_AVG_PERIOD bars. Uses min_periods=1
-    (NOT production's min_periods=20) deliberately — period="1mo"
-    typically returns ~21 rows, barely enough for a full 20-bar window
-    at the latest row and not enough earlier. This is an honest
-    "average of whatever real history is actually available", clearly
-    weaker than a true 20-day average early on — flagged here rather
-    than silently matching production's stricter requirement (which
-    would make liquidity data NaN this trial almost never has time to
-    fill in a 21-candle window)."""
+    (a deliberately relaxed floor, kept from the old period="1mo"
+    version even though period="1y" now gives plenty of history) so an
+    early row in a short series is still an honest "average of
+    whatever real history is actually available" rather than NaN,
+    consistent with this trial's existing convention of not fabricating
+    a value it doesn't have."""
     return dataframe["volume"].rolling(VOLUME_AVG_PERIOD, min_periods=1).mean()
 
 
-def evaluate_signal(latest: pd.Series) -> str:
-    """Returns 'BUY', 'SELL', or 'NO_TRADE'. All three EMAs must agree
-    with price direction (AND logic) — this is intentionally strict
-    (fewer, higher-conviction signals), per explicit instruction."""
-    close = latest["close"]
-    ema_fast = latest[f"ema_{EMA_FAST}"]
-    ema_mid = latest[f"ema_{EMA_MID}"]
-    ema_slow = latest[f"ema_{EMA_SLOW}"]
+def evaluate_signal(latest: pd.Series, previous: pd.Series | None) -> str:
+    """Returns 'BUY', 'SELL', or 'NO_TRADE'.
 
-    if pd.isna(ema_fast) or pd.isna(ema_mid) or pd.isna(ema_slow):
+    REWRITTEN 2026-09-02 (see module docstring for the full rationale
+    and the user's exact wording this implements) — a FRESH-CROSS rule,
+    not the old three-EMA static alignment:
+
+        BUY  : close crosses fresh above ema_50 THIS candle (previous
+               close was at/below ema_50, today's close is above it)
+               AND today's close is also above ema_200 (confirms the
+               longer-term trend is already bullish — this one is NOT
+               required to be fresh, only currently true).
+        SELL : mirror, with which EMA is the "fresh trigger" swapped —
+               close crosses fresh below ema_200 THIS candle (previous
+               close was at/above ema_200, today's close is below it)
+               AND today's close is also below ema_50 (confirms the
+               shorter-term trend already agrees).
+
+    `previous` is None for the very first row of a series (no
+    yesterday to compare against) — returns NO_TRADE rather than
+    guessing a direction with no real "fresh" evidence either way.
+    """
+    if previous is None:
         return "NO_TRADE"
 
-    if close > ema_fast and close > ema_mid and close > ema_slow:
+    close = latest["close"]
+    ema_fast = latest[f"ema_{EMA_FAST}"]
+    ema_slow = latest[f"ema_{EMA_SLOW}"]
+    prev_close = previous["close"]
+    prev_ema_fast = previous[f"ema_{EMA_FAST}"]
+    prev_ema_slow = previous[f"ema_{EMA_SLOW}"]
+
+    if (
+        pd.isna(ema_fast) or pd.isna(ema_slow)
+        or pd.isna(prev_ema_fast) or pd.isna(prev_ema_slow)
+    ):
+        return "NO_TRADE"
+
+    fresh_break_above_fast = prev_close <= prev_ema_fast and close > ema_fast
+    fresh_break_below_slow = prev_close >= prev_ema_slow and close < ema_slow
+
+    if fresh_break_above_fast and close > ema_slow:
         return "BUY"
 
-    if close < ema_fast and close < ema_mid and close < ema_slow:
+    if fresh_break_below_slow and close < ema_fast:
         return "SELL"
 
     return "NO_TRADE"
@@ -725,10 +804,14 @@ def scan_new_signals(
 
         dataframe = compute_emas(dataframe)
         latest = dataframe.iloc[-1]
+        # "Fresh cross" needs yesterday's row too — None when this
+        # symbol's fetch returned only a single candle (evaluate_signal()
+        # correctly treats that as NO_TRADE rather than guessing).
+        previous = dataframe.iloc[-2] if len(dataframe) >= 2 else None
         latest_close = float(latest["close"])
         latest_close_by_symbol[symbol] = latest_close
 
-        signal = evaluate_signal(latest)
+        signal = evaluate_signal(latest, previous)
         if signal == "BUY":
             buy_count += 1
         elif signal == "SELL":
@@ -1091,12 +1174,12 @@ def main() -> None:
         return
 
     print(
-        f"NOTE: interval={INTERVAL!r} period={PERIOD!r} — ema_{EMA_SLOW} "
-        f"needs ~{EMA_SLOW} trading days of history to be a genuinely "
-        f"warmed-up {EMA_SLOW}-day EMA; period={PERIOD!r} returns far fewer "
-        f"candles than that, so ema_{EMA_SLOW} here is NOT a mature "
-        f"long-term EMA value (this is exactly what was requested — "
-        f"flagging it loudly rather than silently changing the period)."
+        f"NOTE: interval={INTERVAL!r} period={PERIOD!r} — this now reuses "
+        f"data/market_data.py's own period='1y' buffer fix (a genuine "
+        f"~400 calendar-day lookback, not yfinance's raw period='1y' "
+        f"string, which alone would land right at the warm-up threshold "
+        f"— see that file's NOTE), so ema_{EMA_SLOW} here IS a genuinely "
+        f"mature {EMA_SLOW}-day EMA, unlike the old period='1mo' version."
     )
     print(f"Scanning {len(symbols)} symbol(s)...")
 
