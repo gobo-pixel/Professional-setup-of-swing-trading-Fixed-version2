@@ -1,4 +1,4 @@
-name: Trial EMA(26/70/240) Strategy — Daily Scan (temporary experiment)
+name: Trial EMA(50/200) Strategy — Daily Scan (temporary experiment)
 
 # TEMPORARY — separate from Daily Scan / Paper Trading. Does not call
 # scripts/run_paper_trading.py or scripts/generate_full_report.py, so
@@ -20,8 +20,18 @@ on:
         required: false
         default: ""
 
+# BUG FIX (2026-08-25): this used to share "repo-write-lock" with the
+# ENTIRE production pipeline (daily_scan/morning_executor/paper_trading/
+# market_intelligence). GitHub Actions only keeps ONE pending run per
+# concurrency group — a NEW trigger queued behind a busy group CANCELS
+# whichever run was already waiting. Near market-open, this trial
+# workflow's own schedule collided with morning_executor/paper_trading's
+# schedule often enough that production runs were getting silently
+# cancelled (no error, just never ran) — exactly what "TEMPORARY —
+# ...completely unaffected..." above promised would NOT happen. Own,
+# separate group restores that isolation for real.
 concurrency:
-  group: repo-write-lock
+  group: trial-strategy-write-lock
   cancel-in-progress: false
 
 permissions:
@@ -42,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run trial EMA(26/70/240) strategy
+      - name: Run trial EMA(50/200) strategy
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
