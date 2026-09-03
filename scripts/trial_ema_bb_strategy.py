@@ -99,33 +99,34 @@ capital defaults to STARTING_CAPITAL only the very first time this
 runs (no state file yet) — every run after that reads/writes the real
 persisted available_cash, it is never re-defaulted.
 
-TWO SEPARATE ENTRY POINTS (per explicit follow-up request), driven by
---mode:
-    --mode scan (default) -> scan_new_signals(): runs ONCE DAILY, after
-        market close (see .github/workflows/trial_ema_bb_strategy.yml,
-        8:00 PM IST). Uses EOD data (interval="1d", period="1y") to
-        classify every watchlist symbol and OPEN a new position where a
-        signal fires and none is already open for that symbol. Does
-        NOT check stop-loss/target1 on already-open positions — that
-        is monitor_open_positions()'s job alone.
-    --mode monitor -> monitor_open_positions(): runs INTRADAY, ~4x/day
-        during market hours (see
-        .github/workflows/trial_position_monitor.yml — 9:30, 11:30,
-        13:30, 14:30 IST). Fetches a CURRENT price (interval="5m",
-        period="1d" — MONITOR_INTERVAL/MONITOR_PERIOD, deliberately
-        NOT the EOD series scan uses) for every EXISTING open position
-        only, and applies the exact same rule either way: stop-loss
-        hit -> close (FULL exit); neither hit -> hold, unchanged;
-        target1 hit -> stop-loss shifts to target1 (locks in the 3%
-        gain), position keeps running. NEVER opens a new position.
-NOTE (rate limits, not yet solved, flagging honestly): with several
-hundred open positions, monitor_open_positions() makes one fetch per
-open position, 4x/day, on top of scan's own ~500 daily fetches —
-data/market_data.py's own comments already document that Yahoo
-Finance silently throttles/returns fewer rows under sustained request
-volume. Worth watching for slowdowns/failures as the position count
-grows; not addressed here beyond MarketDataProvider's existing
-built-in retry-once-on-suspiciously-low-rows behavior.
+ONE ENTRY POINT, ONCE PER NIGHT (CHANGED 2026-09-03, per explicit
+request — the strategy is EOD-based now, so checking positions
+intraday made no sense; running 4x/day during market hours was a
+leftover from the OLD intraday-style design):
+    scan_new_signals(): runs ONCE DAILY, after market close (see
+        .github/workflows/trial_ema_bb_strategy.yml, 8:00 PM IST).
+        Uses EOD data (interval="1d", period="1y") to, for every
+        watchlist symbol, in the SAME pass:
+          (a) if a position is already open for that symbol — monitor
+              it against TODAY's EOD close (stop-loss hit -> close,
+              FULL exit, logged to trade_log; target1 hit -> stop-loss
+              shifts to target1, locks in the 3% gain, position keeps
+              running; neither -> hold, unchanged). This is the exact
+              same monitor_position() check the old separate
+              monitor_open_positions() function ran — it is now called
+              inline, against the EOD close scan already fetched for
+              this symbol, instead of a second intraday fetch.
+          (b) otherwise — classify the signal and OPEN a new position
+              if BUY/SELL fires.
+    There is no longer a separate --mode or a second workflow: the old
+    monitor_open_positions() / fetch_current_price() (5m intraday
+    fetch, MONITOR_INTERVAL/MONITOR_PERIOD) are REMOVED entirely, and
+    .github/workflows/trial_position_monitor.yml (the 4x/day intraday
+    cron) should be deleted from the repo — its job is now done inside
+    the single nightly scan. This also incidentally removes the old
+    NOTE about rate-limit risk from running a second intraday fetch
+    pass per open position 4x/day on top of scan's own ~2400 daily
+    fetches — there is now only ever one fetch per symbol per day.
 
 Capital is tracked in the SAME state.json (see below): starting
 capital defaults to STARTING_CAPITAL only the very first time this
@@ -135,12 +136,12 @@ state.json (and trade_log.csv, to also clear trade history) makes the
 NEXT run start completely fresh from STARTING_CAPITAL automatically —
 no code change needed to "reset".
 
-Every position also carries last_known_price/last_checked_at, updated
-by BOTH scan (EOD, passively — no action taken) and monitor
-(intraday, the live check) — so open_positions in state.json always
-has a genuine, timestamped last-seen price for ad-hoc analysis (e.g.
-computing real unrealized P&L from the committed state.json alone),
-never a stale/fabricated value.
+Every position carries last_known_price/last_checked_at, updated once
+per night (EOD close) whether or not it triggered a stop/target event
+— so open_positions in state.json always has a genuine, timestamped
+last-seen price for ad-hoc analysis (e.g. computing real unrealized
+P&L from the committed state.json alone), never a stale/fabricated
+value.
 
 STATE / HISTORY: storage/trial_trades/state.json (open positions +
 capital) and storage/trial_trades/trade_log.csv (closed trades) —
@@ -152,10 +153,11 @@ anywhere in that code).
 
 TELEGRAM: reuses output/telegram_alert.py and the same
 TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID secrets already configured for
-the production workflows — no new bot/setup needed. scan_new_signals()
-sends exactly ONE message (scan summary). monitor_open_positions()
-sends exactly TWO kinds (a monitor summary, and one-or-few
-holding-status messages) — never one message per signal/position.
+the production workflows — no new bot/setup needed. Each nightly run
+sends ONE consolidated scan+monitor summary message (new signals,
+target1 shifts, stop-losses hit — all in one message, since it is all
+one run now), plus one-or-few holding-status messages listing every
+still-open position — never one message per signal/position.
 """
 
 from __future__ import annotations
@@ -180,14 +182,6 @@ logger = get_logger(__name__)
 
 INTERVAL = "1d"
 PERIOD = "1y"
-
-# Used ONLY by monitor_open_positions() for a CURRENT intraday price of
-# already-open positions — deliberately NOT the EOD series scan_new_signals()
-# uses. Reads only "close" (never volume/CMF/MFI), which sidesteps the
-# documented yfinance NSE bug where the FIRST hourly candle of the day gets
-# volume=0 — that bug only corrupts volume-derived indicators, not raw close.
-MONITOR_INTERVAL = "5m"
-MONITOR_PERIOD = "1d"
 
 EMA_FAST = 50
 EMA_SLOW = 200
@@ -477,24 +471,6 @@ def compute_position_size(
     }
 
 
-def fetch_current_price(symbol: str, provider: MarketDataProvider) -> float | None:
-    """Best-effort CURRENT price for intraday monitoring (MONITOR_INTERVAL /
-    MONITOR_PERIOD — 5m candles, today only). Returns None (NEVER a
-    fabricated price) if the fetch fails, comes back empty, or the API
-    errors — the caller must skip that symbol this cycle rather than guess
-    a price, per the standing "never fabricate" rule."""
-    try:
-        dataframe = provider.fetch(symbol=symbol, interval=MONITOR_INTERVAL, period=MONITOR_PERIOD)
-    except Exception as exc:
-        logger.warning("Current-price fetch failed for %s: %s", symbol, exc)
-        return None
-
-    if dataframe is None or dataframe.empty:
-        return None
-
-    return float(dataframe.iloc[-1]["close"])
-
-
 def monitor_position(position: dict, latest_close: float) -> tuple[dict, list[tuple[str, float]]]:
     """Checks one open position against the latest close. Returns the
     (possibly mutated) position and a list of (event_type, level)
@@ -605,13 +581,14 @@ def _format_scan_summary(
     net_worth: float,
     starting_capital: float,
 ) -> str:
-    """ONE consolidated message per DAILY scan run (scan_new_signals) —
+    """ONE consolidated message per NIGHTLY run (scan_new_signals) —
     replaces the old one-message-per-signal spam. Only counts + short
     (capped) symbol lists for the event types, so length stays bounded
-    regardless of how many symbols were scanned. Does NOT report
-    target1-shift/stop-hit events — scan_new_signals() never checks
-    existing positions, that is monitor_open_positions()'s job (see
-    _format_monitor_summary)."""
+    regardless of how many symbols were scanned. CHANGED 2026-09-03:
+    scan_new_signals() now also monitors already-open positions inline
+    (against the same EOD close it fetches for every symbol), so
+    target1-shift/stop-hit events are real here too, not always empty
+    lists — the old separate monitor run/message is gone."""
 
     lines = [
         "[TRIAL_SCAN_COMPLETED]",
@@ -626,39 +603,6 @@ def _format_scan_summary(
         f"{_capped_symbol_list(stop_hit_symbols)}",
         f"Signal found but skipped (insufficient capital/risk budget): "
         f"{len(skipped_capital_symbols)}{_capped_symbol_list(skipped_capital_symbols)}",
-        f"Open positions now: {open_count} ({winning_count} winning, {losing_count} losing)",
-        "",
-        *_overall_pnl_line(available_cash, net_worth, starting_capital),
-    ]
-    return "\n".join(lines)
-
-
-def _format_monitor_summary(
-    checked_count: int,
-    target1_shift_symbols: list[str],
-    stop_hit_symbols: list[str],
-    open_count: int,
-    winning_count: int,
-    losing_count: int,
-    available_cash: float,
-    net_worth: float,
-    starting_capital: float,
-) -> str:
-    """ONE consolidated message per INTRADAY monitoring run
-    (monitor_open_positions) — reports what changed for ALREADY-OPEN
-    positions only (stop-loss hits / target1 shifts). Never opens new
-    positions, so there is no BUY/SELL/NO_TRADE universe breakdown or
-    "new positions opened" line here — those only apply to
-    scan_new_signals()'s message (_format_scan_summary)."""
-
-    lines = [
-        "[TRIAL_POSITION_MONITOR]",
-        f"Position monitor run completed — {checked_count} open position(s) checked.",
-        "",
-        f"Target1 hit, stop-loss shifted: {len(target1_shift_symbols)}"
-        f"{_capped_symbol_list(target1_shift_symbols)}",
-        f"Stop-loss hit, closed: {len(stop_hit_symbols)}"
-        f"{_capped_symbol_list(stop_hit_symbols)}",
         f"Open positions now: {open_count} ({winning_count} winning, {losing_count} losing)",
         "",
         *_overall_pnl_line(available_cash, net_worth, starting_capital),
@@ -753,21 +697,33 @@ def scan_new_signals(
     market_provider: MarketDataProvider | None = None,
     notify=send_telegram,
 ) -> dict:
-    """DAILY scan — runs ONCE, after market close (EOD data). For every
-    symbol, classifies its current signal (for the scan-summary stats)
-    and, if none is already open for that symbol, sizes + opens a fresh
-    BUY/SELL position (skipping it if the capital/risk budget can't
-    afford even 1 share).
+    """NIGHTLY run — runs ONCE, after market close (EOD data). CHANGED
+    2026-09-03: this now does BOTH jobs the old two separate
+    scan/monitor entry points did, in one pass per symbol, since the
+    strategy is EOD-based and there is no more "intraday current
+    price" to check against:
+      - a symbol with NO open position: classify its signal, and open
+        a fresh BUY/SELL position if one fires (skipped if the
+        capital/risk budget can't afford even 1 share).
+      - a symbol WITH an open position: monitor it against TODAY's EOD
+        close (stop-loss hit -> close, full exit, logged to
+        trade_log; target1 hit -> stop-loss shifts to target1; neither
+        -> hold) — the exact same monitor_position() check the old
+        separate monitor_open_positions() ran 4x/day intraday, now run
+        once/night against the same EOD close already fetched here.
 
-    Does NOT check stop-loss/target1 on already-open positions — that
-    is monitor_open_positions()'s job alone. A symbol that already has
-    an open position is still fetched here (for BUY/SELL/NO_TRADE
-    stats) but its position is left untouched except for a passive
-    last_known_price/last_checked_at update (useful for ad-hoc P&L
-    analysis between monitor runs — never used to trigger an exit).
+    NOTE (accepted minor imprecision, documented rather than silently
+    left unexplained): total_capital_cost_basis below is computed once
+    up front, before this loop opens/closes anything, purely as the 2%
+    risk-budget reference for sizing NEW positions opened during this
+    same run. If an earlier symbol in this same run hits its stop-loss
+    and closes, that freed-up capital is reflected in available_cash
+    immediately but not in this risk-budget reference until the NEXT
+    run — a one-run-lagged reference, not a fabricated number.
 
-    Sends exactly ONE Telegram message per run (the scan summary) — no
-    holding-status messages, that is monitor_open_positions()'s job."""
+    Sends ONE consolidated Telegram message per run (new signals +
+    target1 shifts + stop-losses hit, all in one summary now), plus
+    one-or-few holding-status messages for still-open positions."""
     provider = market_provider or MarketDataProvider()
     state = load_state(state_path)
     open_positions = state["open_positions"]
@@ -775,11 +731,6 @@ def scan_new_signals(
     available_cash = float(capital["available_cash"])
     starting_capital = float(capital["starting_capital"])
 
-    # Cost-basis net worth, used ONLY as the risk-budget reference
-    # (2% of this) for sizing a fresh trade this run. Algebraically
-    # unchanged by opening a new position at cost (cash decreases by
-    # exactly what the position's cost-basis increases by), so it is
-    # computed once up front rather than recomputed every iteration.
     total_capital_cost_basis = available_cash + sum(
         pos["entry_price"] * pos.get("quantity", 0) for pos in open_positions.values()
     )
@@ -789,6 +740,8 @@ def scan_new_signals(
     no_trade_count = 0
     new_buy_count = 0
     new_sell_count = 0
+    target1_shift_symbols: list[str] = []
+    stop_hit_symbols: list[str] = []
     skipped_capital_symbols: list[str] = []
     latest_close_by_symbol: dict[str, float] = {}
 
@@ -820,10 +773,47 @@ def scan_new_signals(
             no_trade_count += 1
 
         if symbol in open_positions:
-            # Passive only — scan_new_signals() never acts on an
-            # existing position (no stop-loss/target1 check here).
+            # Monitor the existing position against TODAY's EOD close
+            # (the same close just fetched above — no second fetch).
             open_positions[symbol]["last_known_price"] = latest_close
             open_positions[symbol]["last_checked_at"] = _now_iso()
+
+            position, events = monitor_position(open_positions[symbol], latest_close)
+            closed = False
+            for event_type, level in events:
+                if event_type == "TARGET1_HIT_SL_SHIFTED":
+                    target1_shift_symbols.append(symbol)
+                elif event_type == "STOP_LOSS_HIT":
+                    stop_hit_symbols.append(symbol)
+                    entry_price = position["entry_price"]
+                    quantity = position.get("quantity", 0)
+                    invested_amount = position.get("invested_amount", 0.0)
+                    pnl_percent = _pnl_percent(position["direction"], entry_price, latest_close)
+                    pnl_amount = _pnl_amount(invested_amount, pnl_percent)
+                    available_cash += invested_amount + pnl_amount
+                    append_trade_log(
+                        {
+                            "trade_id": position["trade_id"],
+                            "symbol": symbol,
+                            "direction": position["direction"],
+                            "quantity": quantity,
+                            "entry_price": entry_price,
+                            "entry_time": position["entry_time"],
+                            "invested_amount": invested_amount,
+                            "exit_price": latest_close,
+                            "exit_time": _now_iso(),
+                            "exit_reason": "STOP_LOSS_HIT",
+                            "target1_hit": position["target1_hit"],
+                            "pnl_percent": round(pnl_percent, 2),
+                            "pnl_amount": pnl_amount,
+                        },
+                        path=trade_log_path,
+                    )
+                    del open_positions[symbol]
+                    closed = True
+
+            if not closed:
+                open_positions[symbol] = position
             continue
 
         if signal == "NO_TRADE":
@@ -925,8 +915,8 @@ def scan_new_signals(
         no_trade_count=no_trade_count,
         new_buy_count=new_buy_count,
         new_sell_count=new_sell_count,
-        target1_shift_symbols=[],
-        stop_hit_symbols=[],
+        target1_shift_symbols=target1_shift_symbols,
+        stop_hit_symbols=stop_hit_symbols,
         skipped_capital_symbols=skipped_capital_symbols,
         open_count=len(open_positions),
         winning_count=winning_count,
@@ -937,6 +927,9 @@ def scan_new_signals(
     )
     notify(scan_summary)
 
+    for holding_message in _format_holding_status_messages(open_positions, latest_close_by_symbol):
+        notify(holding_message)
+
     summary = {
         "scanned": len(symbols),
         "buy_count": buy_count,
@@ -945,6 +938,8 @@ def scan_new_signals(
         "new_signals": new_buy_count + new_sell_count,
         "new_buy_count": new_buy_count,
         "new_sell_count": new_sell_count,
+        "target1_shifts": len(target1_shift_symbols),
+        "stop_losses_hit": len(stop_hit_symbols),
         "skipped_insufficient_capital": len(skipped_capital_symbols),
         "open_positions": len(open_positions),
         "winning_positions": winning_count,
@@ -953,138 +948,6 @@ def scan_new_signals(
         "net_worth": net_worth,
     }
     logger.info("Trial scan complete: %s", summary)
-    return summary
-
-
-def monitor_open_positions(
-    state_path: Path = STATE_PATH,
-    trade_log_path: Path = TRADE_LOG_PATH,
-    market_provider: MarketDataProvider | None = None,
-    notify=send_telegram,
-) -> dict:
-    """INTRADAY position monitoring — runs ~4x/day during market hours
-    (9:30, 11:30, 13:30, 14:30 IST). Checks ONLY already-open positions
-    against a CURRENT price (MONITOR_INTERVAL/MONITOR_PERIOD): stop-loss
-    hit -> close (full exit, logged to trade_log); neither hit -> hold,
-    unchanged; target1 hit -> stop-loss shifts to target1 (locks in the
-    3% gain), position keeps running. NEVER opens a new position — that
-    is scan_new_signals()'s job alone.
-
-    Sends exactly TWO kinds of Telegram message per run — one monitor
-    summary, and one (or a few, chunked) holding-status message."""
-    provider = market_provider or MarketDataProvider()
-    state = load_state(state_path)
-    open_positions = state["open_positions"]
-    capital = state["capital"]
-    available_cash = float(capital["available_cash"])
-    starting_capital = float(capital["starting_capital"])
-
-    target1_shift_symbols: list[str] = []
-    stop_hit_symbols: list[str] = []
-    latest_close_by_symbol: dict[str, float] = {}
-    checked_count = 0
-
-    for symbol in list(open_positions.keys()):
-        current_price = fetch_current_price(symbol, provider)
-        if current_price is None:
-            logger.warning(
-                "Current-price fetch failed/empty for %s — skipping this "
-                "monitoring cycle, position left untouched.",
-                symbol,
-            )
-            continue
-
-        checked_count += 1
-        latest_close_by_symbol[symbol] = current_price
-        open_positions[symbol]["last_known_price"] = current_price
-        open_positions[symbol]["last_checked_at"] = _now_iso()
-
-        position, events = monitor_position(open_positions[symbol], current_price)
-
-        closed = False
-        for event_type, level in events:
-            if event_type == "TARGET1_HIT_SL_SHIFTED":
-                target1_shift_symbols.append(symbol)
-            elif event_type == "STOP_LOSS_HIT":
-                stop_hit_symbols.append(symbol)
-                entry_price = position["entry_price"]
-                quantity = position.get("quantity", 0)
-                invested_amount = position.get("invested_amount", 0.0)
-                pnl_percent = _pnl_percent(position["direction"], entry_price, current_price)
-                pnl_amount = _pnl_amount(invested_amount, pnl_percent)
-                available_cash += invested_amount + pnl_amount
-                append_trade_log(
-                    {
-                        "trade_id": position["trade_id"],
-                        "symbol": symbol,
-                        "direction": position["direction"],
-                        "quantity": quantity,
-                        "entry_price": entry_price,
-                        "entry_time": position["entry_time"],
-                        "invested_amount": invested_amount,
-                        "exit_price": current_price,
-                        "exit_time": _now_iso(),
-                        "exit_reason": "STOP_LOSS_HIT",
-                        "target1_hit": position["target1_hit"],
-                        "pnl_percent": round(pnl_percent, 2),
-                        "pnl_amount": pnl_amount,
-                    },
-                    path=trade_log_path,
-                )
-                del open_positions[symbol]
-                closed = True
-
-        if not closed:
-            open_positions[symbol] = position
-
-    capital["available_cash"] = round(available_cash, 2)
-    state["capital"] = capital
-    save_state(state, state_path)
-
-    net_worth = available_cash + sum(
-        pos.get("quantity", 0) * latest_close_by_symbol.get(sym, pos["entry_price"])
-        for sym, pos in open_positions.items()
-    )
-    net_worth = round(net_worth, 2)
-
-    winning_count = 0
-    losing_count = 0
-    for sym, pos in open_positions.items():
-        if sym not in latest_close_by_symbol:
-            continue
-        unrealized_pct = _pnl_percent(pos["direction"], pos["entry_price"], latest_close_by_symbol[sym])
-        if unrealized_pct > 0:
-            winning_count += 1
-        elif unrealized_pct < 0:
-            losing_count += 1
-
-    monitor_summary = _format_monitor_summary(
-        checked_count=checked_count,
-        target1_shift_symbols=target1_shift_symbols,
-        stop_hit_symbols=stop_hit_symbols,
-        open_count=len(open_positions),
-        winning_count=winning_count,
-        losing_count=losing_count,
-        available_cash=round(available_cash, 2),
-        net_worth=net_worth,
-        starting_capital=starting_capital,
-    )
-    notify(monitor_summary)
-
-    for holding_message in _format_holding_status_messages(open_positions, latest_close_by_symbol):
-        notify(holding_message)
-
-    summary = {
-        "checked": checked_count,
-        "target1_shifts": len(target1_shift_symbols),
-        "stop_losses_hit": len(stop_hit_symbols),
-        "open_positions": len(open_positions),
-        "winning_positions": winning_count,
-        "losing_positions": losing_count,
-        "available_cash": round(available_cash, 2),
-        "net_worth": net_worth,
-    }
-    logger.info("Trial position monitor complete: %s", summary)
     return summary
 
 
@@ -1097,10 +960,13 @@ def _load_symbols(symbols_arg: str, symbols_file: str) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "TEMPORARY TRIAL: EMA(26/70/240) trend-alignment strategy, fixed"
+            "TEMPORARY TRIAL: EMA(50/200) fresh-cross strategy, fixed"
             "-percent risk management (1.5% stop / 3% target-then-trail), "
             "real capital tracking, Telegram alerts. Fully isolated from "
-            "the production pipeline."
+            "the production pipeline. Runs ONCE PER NIGHT (CHANGED "
+            "2026-09-03: no more separate --mode/intraday monitor pass — "
+            "see module docstring) — scans for new signals AND monitors "
+            "already-open positions in the same run, all against EOD data."
         )
     )
     parser.add_argument(
@@ -1117,17 +983,6 @@ def main() -> None:
         help=f"Watchlist JSON path (default: {WATCHLIST_PATH}).",
     )
     parser.add_argument(
-        "--mode",
-        choices=["scan", "monitor"],
-        default="scan",
-        help=(
-            "'scan' (default): DAILY, after market close — EOD data, opens "
-            "new positions only. 'monitor': INTRADAY, ~4x/day — current "
-            "price, checks existing open positions only (stop-loss/"
-            "target1), never opens new positions."
-        ),
-    )
-    parser.add_argument(
         "--force", action="store_true",
         help="Bypass the NSE-trading-day check (testing only — e.g. to verify "
         "a fix on a market holiday). Normal scheduled runs never pass this.",
@@ -1136,35 +991,22 @@ def main() -> None:
 
     # BUG FIX (found 2026-08-24): this script had NO trading-day gate at
     # all — unlike morning_executor.py / generate_full_report.py, which
-    # both call is_trading_day() before doing anything. Both GitHub
-    # Actions crons for this script (trial_ema_bb_strategy.yml,
-    # trial_position_monitor.yml) use "* * *" for day-of-week, so they
-    # fire every single day including weekends/NSE holidays — and this
-    # script would happily scan/monitor on those days too (yfinance
-    # just returns stale/repeated data), wasting runs and risking
-    # misleading signals or Telegram spam on non-trading days.
+    # both call is_trading_day() before doing anything. The GitHub
+    # Actions cron for this script (trial_ema_bb_strategy.yml) uses
+    # "* * *" for day-of-week, so it fires every single day including
+    # weekends/NSE holidays — and this script would happily run on
+    # those days too (yfinance just returns stale/repeated data),
+    # wasting runs and risking misleading signals or Telegram spam on
+    # non-trading days.
     today_date = date.today()
     if not args.force and not is_trading_day(today_date):
         reason = skip_reason(today_date) or "Non-trading day"
-        logger.info("Not an NSE trading day — exiting before any scan/monitor begins.")
-        print(f"Not an NSE trading day ({reason}). No {args.mode} performed.")
+        logger.info("Not an NSE trading day — exiting before any run begins.")
+        print(f"Not an NSE trading day ({reason}). No run performed.")
         send_telegram(
-            f"⏸️ [TRIAL_EMA_BB_STRATEGY] Skipped ({args.mode})\n"
+            f"⏸️ [TRIAL_EMA_BB_STRATEGY] Skipped\n"
             f"Reason: {reason}\n"
             f"No scan/monitor was executed today."
-        )
-        return
-
-    if args.mode == "monitor":
-        summary = monitor_open_positions()
-        print(
-            f"Done. Checked: {summary['checked']}. "
-            f"Target1 stop-shifts: {summary['target1_shifts']}, "
-            f"Stop-losses hit: {summary['stop_losses_hit']}, "
-            f"Open positions now: {summary['open_positions']} "
-            f"({summary['winning_positions']} winning, {summary['losing_positions']} losing). "
-            f"Available Cash: ₹{summary['available_cash']:,.2f}, "
-            f"Net Worth: ₹{summary['net_worth']:,.2f}."
         )
         return
 
@@ -1190,8 +1032,11 @@ def main() -> None:
         f"NO_TRADE: {summary['no_trade_count']}. "
         f"New positions: {summary['new_signals']} "
         f"({summary['new_buy_count']} BUY, {summary['new_sell_count']} SELL). "
+        f"Target1 stop-shifts: {summary['target1_shifts']}, "
+        f"Stop-losses hit: {summary['stop_losses_hit']}. "
         f"Skipped (insufficient capital): {summary['skipped_insufficient_capital']}, "
-        f"Open positions now: {summary['open_positions']}. "
+        f"Open positions now: {summary['open_positions']} "
+        f"({summary['winning_positions']} winning, {summary['losing_positions']} losing). "
         f"Available Cash: ₹{summary['available_cash']:,.2f}, "
         f"Net Worth: ₹{summary['net_worth']:,.2f}."
     )
