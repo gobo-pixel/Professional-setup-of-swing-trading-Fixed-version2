@@ -46,6 +46,21 @@ pipeline actually writes today:
      alongside fresh post-reset ones (confirmed live on GitHub: 170+
      such files present, many pre-dating the last clean-slate run).
      Now swept via FILE_GLOBS_TO_DELETE below.
+
+BUGFIX (2026-09-03), found investigating "clean slate ran but data
+didn't clear": this script never covered scripts/trial_ema_bb_strategy.py's
+OWN state — storage/trial_trades/state.json (open positions + capital)
+and storage/trial_trades/trade_log.csv (closed trades). Confirmed live
+on GitHub: the most recent --confirm run (2026-09-02 23:44 UTC)
+correctly reset every production file above, but state.json still had
+137 open positions dated back to 2026-08-20 — opened under the OLD
+EMA(26/70/240) strategy, before the 2026-09-02 rewrite to EMA(50/200)
+fresh-cross — sitting there mixed in with anything the NEW strategy
+opens. Added below. Deleting state.json makes the trial's next run
+start completely fresh from STARTING_CAPITAL with zero open positions
+(see that file's load_state()/_default_state() — this is its own
+documented, intentional reset mechanism, not a side effect); deleting
+trade_log.csv clears its trade history too.
 """
 
 from __future__ import annotations
@@ -84,6 +99,12 @@ FILES_TO_DELETE = [
     "storage/reports/mi_last_summary_state.json",
     "storage/reports/telegram_dedup.json",
     "storage/reports/macro_headlines_cache.json",
+    # Trial strategy (scripts/trial_ema_bb_strategy.py) — ADDED
+    # 2026-09-03, see module docstring's BUGFIX note above. Isolated
+    # from all the production paths above; resetting it never touches
+    # production trades/reports and vice versa.
+    "storage/trial_trades/state.json",
+    "storage/trial_trades/trade_log.csv",
 ]
 
 # Loose per-trade detail files written directly into storage/trades/ by
