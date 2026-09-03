@@ -1,11 +1,12 @@
 """
 Tests for scripts/trial_ema_bb_strategy.py — the TEMPORARY trial
 strategy (EMA(50/200) fresh-cross, fixed-percent risk management).
-Covers the pure logic functions directly and the two orchestration
-entry points — scan_new_signals() (daily, EOD, opens new positions
-only) and monitor_open_positions() (intraday, current price, checks
-existing positions only) — with a mocked market-data provider /
-Telegram sender, so no real network calls happen in tests.
+Covers the pure logic functions directly and the single orchestration
+entry point — scan_new_signals() (runs ONCE PER NIGHT, EOD data,
+CHANGED 2026-09-03: opens new positions AND monitors/closes existing
+ones in the same pass — see module docstring) — with a mocked
+market-data provider / Telegram sender, so no real network calls
+happen in tests.
 """
 
 from __future__ import annotations
@@ -24,7 +25,6 @@ from scripts.trial_ema_bb_strategy import (
     _default_state,
     _format_holding_entry,
     _format_holding_status_messages,
-    _format_monitor_summary,
     _format_scan_summary,
     _load_symbols,
     _pnl_amount,
@@ -36,9 +36,7 @@ from scripts.trial_ema_bb_strategy import (
     compute_position_size,
     compute_volume_average,
     evaluate_signal,
-    fetch_current_price,
     load_state,
-    monitor_open_positions,
     monitor_position,
     save_state,
     scan_new_signals,
@@ -306,7 +304,7 @@ def test_pnl_amount_matches_percent_of_invested():
 
 
 # ---------------------------------------------------------------------
-# fetch_current_price
+# _FakeProvider — shared mock market-data provider used throughout
 # ---------------------------------------------------------------------
 
 
@@ -316,33 +314,6 @@ class _FakeProvider:
 
     def fetch(self, symbol, interval, period):
         return self._frames[symbol]
-
-
-def test_fetch_current_price_returns_latest_close():
-    provider = _FakeProvider({"TEST.NS": _synthetic_ohlcv([100.0, 101.0, 102.5])})
-    price = fetch_current_price("TEST.NS", provider)
-    assert price == pytest.approx(102.5)
-
-
-def test_fetch_current_price_returns_none_on_fetch_exception():
-    class ExplodingProvider:
-        def fetch(self, symbol, interval, period):
-            raise RuntimeError("yfinance down")
-
-    assert fetch_current_price("BAD.NS", ExplodingProvider()) is None
-
-
-def test_fetch_current_price_returns_none_on_empty_dataframe():
-    provider = _FakeProvider({"EMPTY.NS": pd.DataFrame()})
-    assert fetch_current_price("EMPTY.NS", provider) is None
-
-
-def test_fetch_current_price_returns_none_when_dataframe_is_none():
-    class NoneProvider:
-        def fetch(self, symbol, interval, period):
-            return None
-
-    assert fetch_current_price("NONE.NS", NoneProvider()) is None
 
 
 # ---------------------------------------------------------------------
@@ -664,8 +635,8 @@ def test_scan_sends_exactly_one_scan_summary_message(tmp_path):
     )
 
     # No open positions -> only the scan-summary message, never one
-    # message per symbol/signal, and NEVER a holding-status message
-    # (that is monitor_open_positions()'s job).
+    # message per symbol/signal, and no holding-status message either
+    # (that only gets sent when at least one position is open).
     assert len(messages) == 1
     assert messages[0].startswith("[TRIAL_SCAN_COMPLETED]")
 
@@ -810,33 +781,11 @@ def test_scan_skips_fresh_signal_check_when_position_already_open(tmp_path):
     assert summary["open_positions"] == 1  # still just the one pre-existing position
 
 
-def test_scan_never_checks_stop_loss_or_target1_on_existing_position(tmp_path):
-    # Even though this price would trip the stop-loss if scan checked
-    # it, scan_new_signals() must NOT act on existing positions at
-    # all — that is monitor_open_positions()'s job alone.
-    position = _open_position("BUY", entry_price=1000.0, quantity=10)
-    crash_price = position["stop_loss"] - 5.0
-    crash = _synthetic_ohlcv([crash_price] * 5)
-    provider = _FakeProvider({"OPEN.NS": crash})
-
-    state_path = tmp_path / "state.json"
-    save_state({"open_positions": {"OPEN.NS": position}}, state_path)
-
-    summary = scan_new_signals(
-        symbols=["OPEN.NS"],
-        state_path=state_path,
-        trade_log_path=tmp_path / "trade_log.csv",
-        market_provider=provider,
-        notify=lambda m: None,
-    )
-
-    assert summary["open_positions"] == 1  # left open, untouched
-    final_state = load_state(state_path)
-    assert "OPEN.NS" in final_state["open_positions"]
-    assert final_state["open_positions"]["OPEN.NS"]["stop_loss"] == position["stop_loss"]
-
-
-def test_scan_passively_updates_last_known_price_on_existing_position(tmp_path):
+def test_scan_updates_last_known_price_on_existing_position_when_no_event(tmp_path):
+    # Price moved but hit neither stop-loss nor target1 — position stays
+    # open, untouched apart from the last_known_price/last_checked_at
+    # bookkeeping update (see test_scan_closes_position_on_stop_loss_...
+    # and test_scan_shifts_stop_loss_on_target1_... for the event cases).
     position = _open_position("BUY", entry_price=1000.0, quantity=10)
     flat = _synthetic_ohlcv([1010.0] * 5)
     provider = _FakeProvider({"OPEN.NS": flat})
@@ -855,6 +804,7 @@ def test_scan_passively_updates_last_known_price_on_existing_position(tmp_path):
     final_state = load_state(state_path)
     assert final_state["open_positions"]["OPEN.NS"]["last_known_price"] == 1010.0
     assert final_state["open_positions"]["OPEN.NS"]["last_checked_at"]
+    assert final_state["open_positions"]["OPEN.NS"]["stop_loss"] == position["stop_loss"]
 
 
 def test_scan_handles_fetch_failure_gracefully(tmp_path):
@@ -922,26 +872,15 @@ def test_scan_reports_winning_and_losing_open_position_counts(tmp_path):
 
 
 # ---------------------------------------------------------------------
-# monitor_open_positions() — intraday monitor orchestration, mocked
-# provider/notifier
+# scan_new_signals() — monitor/exit checks on ALREADY-OPEN positions,
+# now run inline against the same EOD close (CHANGED 2026-09-03: this
+# used to be the separate monitor_open_positions() orchestration,
+# intraday, 4x/day — that function is gone, merged into the one
+# nightly scan_new_signals() run; see module docstring).
 # ---------------------------------------------------------------------
 
 
-def test_monitor_never_opens_a_new_position(tmp_path):
-    # Even with zero open positions and an empty state, monitoring must
-    # do nothing — opening positions is scan_new_signals()'s job alone.
-    provider = _FakeProvider({})
-    summary = monitor_open_positions(
-        state_path=tmp_path / "state.json",
-        trade_log_path=tmp_path / "trade_log.csv",
-        market_provider=provider,
-        notify=lambda m: None,
-    )
-    assert summary["checked"] == 0
-    assert summary["open_positions"] == 0
-
-
-def test_monitor_shifts_stop_loss_on_target1_and_reports_it(tmp_path):
+def test_scan_shifts_stop_loss_on_target1_and_reports_it(tmp_path):
     # 1035 > target1 (1030) but does not also touch the newly-shifted
     # stop_loss (1030) — isolates the shift event from a same-bar close.
     provider = _FakeProvider({"OPEN.NS": _synthetic_ohlcv([1035.0] * 5)})
@@ -951,7 +890,8 @@ def test_monitor_shifts_stop_loss_on_target1_and_reports_it(tmp_path):
     save_state({"open_positions": {"OPEN.NS": position}}, state_path)
 
     messages = []
-    summary = monitor_open_positions(
+    summary = scan_new_signals(
+        symbols=["OPEN.NS"],
         state_path=state_path,
         trade_log_path=tmp_path / "trade_log.csv",
         market_provider=provider,
@@ -959,7 +899,7 @@ def test_monitor_shifts_stop_loss_on_target1_and_reports_it(tmp_path):
     )
 
     assert summary["target1_shifts"] == 1
-    assert messages[0].startswith("[TRIAL_POSITION_MONITOR]")
+    assert messages[0].startswith("[TRIAL_SCAN_COMPLETED]")
     assert "Target1 hit, stop-loss shifted: 1 (OPEN.NS)" in messages[0]
     # and the holding-status message reflects the shift too
     holding_message = next(m for m in messages if m.startswith("[TRIAL_HOLDING_STATUS]"))
@@ -969,7 +909,7 @@ def test_monitor_shifts_stop_loss_on_target1_and_reports_it(tmp_path):
     assert final_state["open_positions"]["OPEN.NS"]["target1_hit"] is True
 
 
-def test_monitor_closes_position_on_stop_loss_and_writes_trade_log(tmp_path):
+def test_scan_closes_position_on_stop_loss_and_writes_trade_log(tmp_path):
     position = _open_position("BUY", entry_price=1000.0, quantity=10)
     crash_price = position["stop_loss"] - 5.0
     provider = _FakeProvider({"OPEN.NS": _synthetic_ohlcv([crash_price] * 5)})
@@ -989,7 +929,8 @@ def test_monitor_closes_position_on_stop_loss_and_writes_trade_log(tmp_path):
     )
 
     messages = []
-    summary = monitor_open_positions(
+    summary = scan_new_signals(
+        symbols=["OPEN.NS"],
         state_path=state_path,
         trade_log_path=trade_log_path,
         market_provider=provider,
@@ -1018,7 +959,7 @@ def test_monitor_closes_position_on_stop_loss_and_writes_trade_log(tmp_path):
     assert "pnl_amount" in log_lines[0]
 
 
-def test_monitor_holds_position_when_neither_stop_nor_target_hit(tmp_path):
+def test_scan_holds_position_when_neither_stop_nor_target_hit(tmp_path):
     position = _open_position("BUY", entry_price=1000.0)
     midpoint = (position["stop_loss"] + position["target1"]) / 2
     provider = _FakeProvider({"OPEN.NS": _synthetic_ohlcv([midpoint] * 5)})
@@ -1026,7 +967,8 @@ def test_monitor_holds_position_when_neither_stop_nor_target_hit(tmp_path):
     state_path = tmp_path / "state.json"
     save_state({"open_positions": {"OPEN.NS": position}}, state_path)
 
-    summary = monitor_open_positions(
+    summary = scan_new_signals(
+        symbols=["OPEN.NS"],
         state_path=state_path,
         trade_log_path=tmp_path / "trade_log.csv",
         market_provider=provider,
@@ -1040,7 +982,7 @@ def test_monitor_holds_position_when_neither_stop_nor_target_hit(tmp_path):
     assert final_state["open_positions"]["OPEN.NS"]["stop_loss"] == position["stop_loss"]
 
 
-def test_monitor_sends_holding_status_for_open_position(tmp_path):
+def test_scan_sends_holding_status_for_open_position(tmp_path):
     position = _open_position("BUY", entry_price=1000.0)
     provider = _FakeProvider({"OPEN.NS": _synthetic_ohlcv([1010.0] * 5)})
 
@@ -1048,38 +990,20 @@ def test_monitor_sends_holding_status_for_open_position(tmp_path):
     save_state({"open_positions": {"OPEN.NS": position}}, state_path)
 
     messages = []
-    monitor_open_positions(
+    scan_new_signals(
+        symbols=["OPEN.NS"],
         state_path=state_path,
         trade_log_path=tmp_path / "trade_log.csv",
         market_provider=provider,
         notify=messages.append,
     )
 
-    assert len(messages) == 2  # monitor summary + one holding-status message
+    assert len(messages) == 2  # scan summary + one holding-status message
     assert messages[1].startswith("[TRIAL_HOLDING_STATUS]")
     assert "OPEN.NS (BUY) — HOLD" in messages[1]
 
 
-def test_monitor_updates_last_known_price_on_checked_position(tmp_path):
-    position = _open_position("BUY", entry_price=1000.0)
-    provider = _FakeProvider({"OPEN.NS": _synthetic_ohlcv([1010.0] * 5)})
-
-    state_path = tmp_path / "state.json"
-    save_state({"open_positions": {"OPEN.NS": position}}, state_path)
-
-    monitor_open_positions(
-        state_path=state_path,
-        trade_log_path=tmp_path / "trade_log.csv",
-        market_provider=provider,
-        notify=lambda m: None,
-    )
-
-    final_state = load_state(state_path)
-    assert final_state["open_positions"]["OPEN.NS"]["last_known_price"] == 1010.0
-    assert final_state["open_positions"]["OPEN.NS"]["last_checked_at"]
-
-
-def test_monitor_leaves_position_untouched_when_price_fetch_fails(tmp_path):
+def test_scan_leaves_existing_position_untouched_when_fetch_fails(tmp_path):
     position = _open_position("BUY", entry_price=1000.0)
 
     class ExplodingProvider:
@@ -1089,14 +1013,14 @@ def test_monitor_leaves_position_untouched_when_price_fetch_fails(tmp_path):
     state_path = tmp_path / "state.json"
     save_state({"open_positions": {"OPEN.NS": position}}, state_path)
 
-    summary = monitor_open_positions(
+    summary = scan_new_signals(
+        symbols=["OPEN.NS"],
         state_path=state_path,
         trade_log_path=tmp_path / "trade_log.csv",
         market_provider=ExplodingProvider(),
         notify=lambda m: None,
     )
 
-    assert summary["checked"] == 0
     assert summary["open_positions"] == 1
     final_state = load_state(state_path)
     assert final_state["open_positions"]["OPEN.NS"]["stop_loss"] == position["stop_loss"]
@@ -1178,53 +1102,6 @@ def test_format_scan_summary_negative_pnl():
         starting_capital=100_000.0,  # literal, decoupled from STARTING_CAPITAL constant
     )
     assert "Overall P&L: ₹-10,000.00 (-10.00%)" in message
-
-
-# ---------------------------------------------------------------------
-# _format_monitor_summary
-# ---------------------------------------------------------------------
-
-
-def test_format_monitor_summary_basic_counts():
-    message = _format_monitor_summary(
-        checked_count=87,
-        target1_shift_symbols=["A.NS", "B.NS"],
-        stop_hit_symbols=["C.NS"],
-        open_count=86,
-        winning_count=50,
-        losing_count=36,
-        available_cash=45_000.0,
-        net_worth=105_000.0,
-        starting_capital=100_000.0,
-    )
-    assert message.startswith("[TRIAL_POSITION_MONITOR]")
-    assert "87 open position(s) checked" in message
-    assert "Target1 hit, stop-loss shifted: 2 (A.NS, B.NS)" in message
-    assert "Stop-loss hit, closed: 1 (C.NS)" in message
-    assert "Open positions now: 86 (50 winning, 36 losing)" in message
-    assert "Available Cash: ₹45,000.00" in message
-    assert "Net Worth: ₹105,000.00" in message
-    assert "Overall P&L: ₹5,000.00 (+5.00%)" in message
-    # scan-only fields must never appear in the monitor message
-    assert "BUY:" not in message
-    assert "New positions opened" not in message
-
-
-def test_format_monitor_summary_caps_long_symbol_lists():
-    symbols = [f"SYM{i}.NS" for i in range(15)]
-    message = _format_monitor_summary(
-        checked_count=15,
-        target1_shift_symbols=symbols,
-        stop_hit_symbols=[],
-        open_count=15,
-        winning_count=0,
-        losing_count=0,
-        available_cash=0.0,
-        net_worth=STARTING_CAPITAL,
-        starting_capital=STARTING_CAPITAL,
-    )
-    assert "+5 more" in message
-    assert "SYM14.NS" not in message  # beyond the cap of 10
 
 
 # ---------------------------------------------------------------------
