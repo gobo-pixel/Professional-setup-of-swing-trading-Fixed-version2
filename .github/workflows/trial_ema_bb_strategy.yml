@@ -1,14 +1,18 @@
-name: Trial EMA(50/200) Strategy — Daily Scan (temporary experiment)
+name: Trial EMA(50/200) Strategy — Nightly Run (temporary experiment)
 
 # TEMPORARY — separate from Daily Scan / Paper Trading. Does not call
 # scripts/run_paper_trading.py or scripts/generate_full_report.py, so
 # the live production pipeline's own schedule is completely unaffected
 # by this workflow existing or running.
 #
-# This is the DAILY SCAN half only (--mode scan) — opens NEW positions
-# after market close using EOD data. Existing open positions are
-# checked separately, intraday, by trial_position_monitor.yml
-# (9:30/11:30/13:30/14:30 IST) — NOT here.
+# CHANGED 2026-09-03 (per explicit request): this is now the ONLY run,
+# once per night, after market close, using EOD data — it opens NEW
+# positions AND monitors/closes already-open ones in the same pass
+# (see scripts/trial_ema_bb_strategy.py's module docstring). There is
+# no more --mode flag and no more separate intraday monitor workflow —
+# trial_position_monitor.yml (the old 4x/day 9:30/11:30/13:30/14:30 IST
+# cron) is RETIRED and should be deleted from the repo; its job is done
+# here now.
 
 on:
   schedule:
@@ -57,7 +61,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          PYTHONPATH=. python scripts/trial_ema_bb_strategy.py --mode scan \
+          PYTHONPATH=. python scripts/trial_ema_bb_strategy.py \
             ${{ inputs.symbols != '' && format('--symbols "{0}"', inputs.symbols) || '' }}
 
       - name: Commit updated trial state back to repo
@@ -65,7 +69,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A -- storage/trial_trades/
-          git diff --staged --quiet || git commit -m "Trial EMA strategy daily scan: $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git diff --staged --quiet || git commit -m "Trial EMA strategy nightly run: $(date -u +'%Y-%m-%d %H:%M UTC')"
           PUSH_OK=false
           for i in 1 2 3 4 5; do
             if git push; then
