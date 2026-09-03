@@ -1,5 +1,22 @@
 name: Clean Slate (Reset Trading Data)
 
+# BUG FIX (2026-09-03, found from a real failed reset — user reported
+# stale trial positions/capital still showing in Telegram right after
+# a --confirm run): the commit step below used to run
+# `git add -A -- reports/ storage/trades/ storage/reports/` — three
+# hardcoded paths that do NOT include storage/trial_trades/ (added to
+# scripts/clean_slate.py's FILES_TO_DELETE the same day). The script
+# itself correctly deleted state.json/trade_log.csv on the runner's
+# disk, but the commit step never staged that deletion (wrong
+# directory scope), so it was never pushed — the files silently
+# reappeared as soon as the ephemeral runner was torn down, and the
+# repo on GitHub kept the old, unreset state.json (137 stale
+# positions, old capital) forever. Confirmed by diffing the actual
+# "Clean slate" commit's tree against its parent: storage/trial_trades/
+# was byte-for-byte identical, while every other listed file was
+# genuinely gone. Added storage/trial_trades/ to the git add scope
+# below so a real --confirm run's deletions actually get committed.
+
 on:
   workflow_dispatch:
     inputs:
@@ -44,7 +61,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A -- reports/ storage/trades/ storage/reports/
+          git add -A -- reports/ storage/trades/ storage/reports/ storage/trial_trades/
           git diff --staged --quiet || git commit -m "Clean slate: reset trading/analysis data $(date -u +'%Y-%m-%d %H:%M UTC')"
           PUSH_OK=false
           for i in $(seq 1 12); do
