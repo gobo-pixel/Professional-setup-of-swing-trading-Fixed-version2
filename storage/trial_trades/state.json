@@ -14,7 +14,7 @@
       "highest_price": 1424.5,
       "lowest_price": 1241.800048828125,
       "last_known_price": 1424.5,
-      "last_checked_at": "2026-09-22T18:14:18.074990+00:00",
+      "last_checked_at": "2026-09-23T18:34:34.162997+00:00",
       "sizing": {
         "allocation_percent": 0.0352,
         "kelly_fraction": 0.5,
@@ -36,7 +36,7 @@
       "highest_price": 7474.0,
       "lowest_price": 6930.0,
       "last_known_price": 7000.0,
-      "last_checked_at": "2026-09-22T18:14:19.150148+00:00",
+      "last_checked_at": "2026-09-23T18:34:35.825990+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -58,7 +58,7 @@
       "highest_price": 175.08999633789062,
       "lowest_price": 170.64999389648438,
       "last_known_price": 171.83999633789062,
-      "last_checked_at": "2026-09-22T18:14:57.668868+00:00",
+      "last_checked_at": "2026-09-23T18:35:12.639373+00:00",
       "sizing": {
         "allocation_percent": 0.0825,
         "kelly_fraction": 0.5,
@@ -80,7 +80,7 @@
       "highest_price": 683.5999755859375,
       "lowest_price": 617.5999755859375,
       "last_known_price": 617.5999755859375,
-      "last_checked_at": "2026-09-22T18:15:28.317030+00:00",
+      "last_checked_at": "2026-09-23T18:35:47.386156+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -102,7 +102,7 @@
       "highest_price": 81.5,
       "lowest_price": 79.41999816894531,
       "last_known_price": 80.83000183105469,
-      "last_checked_at": "2026-09-22T18:15:51.112874+00:00",
+      "last_checked_at": "2026-09-23T18:36:19.921645+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -124,7 +124,7 @@
       "highest_price": 2248.800048828125,
       "lowest_price": 1904.300048828125,
       "last_known_price": 2185.39990234375,
-      "last_checked_at": "2026-09-22T18:16:42.584519+00:00",
+      "last_checked_at": "2026-09-23T18:37:13.712605+00:00",
       "sizing": {
         "allocation_percent": 0.0429,
         "kelly_fraction": 0.5,
@@ -146,7 +146,7 @@
       "highest_price": 4850.0,
       "lowest_price": 4500.0,
       "last_known_price": 4575.0,
-      "last_checked_at": "2026-09-22T18:15:30.199027+00:00",
+      "last_checked_at": "2026-09-23T18:35:48.876486+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -168,7 +168,7 @@
       "highest_price": 8400.0,
       "lowest_price": 8121.5,
       "last_known_price": 8350.0,
-      "last_checked_at": "2026-09-22T18:16:07.191236+00:00",
+      "last_checked_at": "2026-09-23T18:36:37.111916+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -190,7 +190,7 @@
       "highest_price": 1110.0,
       "lowest_price": 1045.5999755859375,
       "last_known_price": 1073.5,
-      "last_checked_at": "2026-09-22T18:14:14.120295+00:00",
+      "last_checked_at": "2026-09-23T18:34:28.643822+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -212,7 +212,7 @@
       "highest_price": 1257.0,
       "lowest_price": 1222.9000244140625,
       "last_known_price": 1242.699951171875,
-      "last_checked_at": "2026-09-22T18:14:22.962069+00:00",
+      "last_checked_at": "2026-09-23T18:34:39.985336+00:00",
       "sizing": {
         "allocation_percent": 0.0891,
         "kelly_fraction": 0.5,
@@ -234,7 +234,7 @@
       "highest_price": 454.8999938964844,
       "lowest_price": 420.5,
       "last_known_price": 430.75,
-      "last_checked_at": "2026-09-22T18:14:48.363503+00:00",
+      "last_checked_at": "2026-09-23T18:35:03.824604+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -256,7 +256,7 @@
       "highest_price": 486.70001220703125,
       "lowest_price": 451.95001220703125,
       "last_known_price": 457.5,
-      "last_checked_at": "2026-09-22T18:16:16.654017+00:00",
+      "last_checked_at": "2026-09-23T18:36:47.475857+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -278,7 +278,7 @@
       "highest_price": 1474.800048828125,
       "lowest_price": 1379.5999755859375,
       "last_known_price": 1381.5999755859375,
-      "last_checked_at": "2026-09-22T18:14:21.953443+00:00",
+      "last_checked_at": "2026-09-23T18:34:38.798554+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -300,7 +300,7 @@
       "highest_price": 975.9000244140625,
       "lowest_price": 899.0,
       "last_known_price": 907.2000122070312,
-      "last_checked_at": "2026-09-22T18:16:07.876161+00:00",
+      "last_checked_at": "2026-09-23T18:36:37.811185+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -322,7 +322,7 @@
       "highest_price": 4116.2998046875,
       "lowest_price": 3805.800048828125,
       "last_known_price": 3923.39990234375,
-      "last_checked_at": "2026-09-22T18:14:14.881811+00:00",
+      "last_checked_at": "2026-09-23T18:34:29.603696+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -344,7 +344,7 @@
       "highest_price": 653.0999755859375,
       "lowest_price": 611.4500122070312,
       "last_known_price": 647.9000244140625,
-      "last_checked_at": "2026-09-22T18:14:18.883516+00:00",
+      "last_checked_at": "2026-09-23T18:34:35.272363+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -366,7 +366,7 @@
       "highest_price": 155.36000061035156,
       "lowest_price": 151.77999877929688,
       "last_known_price": 153.39999389648438,
-      "last_checked_at": "2026-09-22T18:14:38.625106+00:00",
+      "last_checked_at": "2026-09-23T18:34:55.651704+00:00",
       "sizing": {
         "allocation_percent": 0.0528,
         "kelly_fraction": 0.5,
@@ -388,7 +388,7 @@
       "highest_price": 1136.5,
       "lowest_price": 1099.5999755859375,
       "last_known_price": 1099.5999755859375,
-      "last_checked_at": "2026-09-22T18:15:00.521555+00:00",
+      "last_checked_at": "2026-09-23T18:35:16.026130+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -410,7 +410,7 @@
       "highest_price": 1668.199951171875,
       "lowest_price": 1564.9000244140625,
       "last_known_price": 1564.9000244140625,
-      "last_checked_at": "2026-09-22T18:15:01.814188+00:00",
+      "last_checked_at": "2026-09-23T18:35:17.118401+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -432,7 +432,7 @@
       "highest_price": 3310.0,
       "lowest_price": 3235.0,
       "last_known_price": 3235.0,
-      "last_checked_at": "2026-09-22T18:14:23.382974+00:00",
+      "last_checked_at": "2026-09-23T18:34:40.586657+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -454,7 +454,7 @@
       "highest_price": 1859.199951171875,
       "lowest_price": 1823.4000244140625,
       "last_known_price": 1823.4000244140625,
-      "last_checked_at": "2026-09-22T18:14:23.920398+00:00",
+      "last_checked_at": "2026-09-23T18:34:41.081738+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -476,7 +476,7 @@
       "highest_price": 1065.5999755859375,
       "lowest_price": 1050.0,
       "last_known_price": 1050.0,
-      "last_checked_at": "2026-09-22T18:14:34.376093+00:00",
+      "last_checked_at": "2026-09-23T18:34:51.175276+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -498,7 +498,7 @@
       "highest_price": 1358.800048828125,
       "lowest_price": 1338.9000244140625,
       "last_known_price": 1339.5999755859375,
-      "last_checked_at": "2026-09-22T18:15:07.979170+00:00",
+      "last_checked_at": "2026-09-23T18:35:22.801659+00:00",
       "sizing": {
         "allocation_percent": 0.099,
         "kelly_fraction": 0.5,
@@ -520,7 +520,7 @@
       "highest_price": 840.7999877929688,
       "lowest_price": 836.75,
       "last_known_price": 840.7999877929688,
-      "last_checked_at": "2026-09-22T18:15:14.939461+00:00",
+      "last_checked_at": "2026-09-23T18:35:29.201273+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -542,7 +542,7 @@
       "highest_price": 1304.0,
       "lowest_price": 1251.199951171875,
       "last_known_price": 1304.0,
-      "last_checked_at": "2026-09-22T18:15:16.741459+00:00",
+      "last_checked_at": "2026-09-23T18:35:32.649008+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -564,7 +564,7 @@
       "highest_price": 1141.4000244140625,
       "lowest_price": 1120.199951171875,
       "last_known_price": 1120.800048828125,
-      "last_checked_at": "2026-09-22T18:15:30.016679+00:00",
+      "last_checked_at": "2026-09-23T18:35:48.559886+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -586,7 +586,7 @@
       "highest_price": 94.43000030517578,
       "lowest_price": 90.41000366210938,
       "last_known_price": 90.41000366210938,
-      "last_checked_at": "2026-09-22T18:16:10.416702+00:00",
+      "last_checked_at": "2026-09-23T18:36:41.247579+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -608,7 +608,7 @@
       "highest_price": 479.54998779296875,
       "lowest_price": 469.29998779296875,
       "last_known_price": 473.6499938964844,
-      "last_checked_at": "2026-09-22T18:15:07.312569+00:00",
+      "last_checked_at": "2026-09-23T18:35:21.806252+00:00",
       "sizing": {
         "allocation_percent": 0.0429,
         "kelly_fraction": 0.5,
@@ -630,7 +630,7 @@
       "highest_price": 1824.0,
       "lowest_price": 1738.300048828125,
       "last_known_price": 1795.0,
-      "last_checked_at": "2026-09-22T18:14:16.828037+00:00",
+      "last_checked_at": "2026-09-23T18:34:31.911035+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -652,7 +652,7 @@
       "highest_price": 439.8999938964844,
       "lowest_price": 425.79998779296875,
       "last_known_price": 425.79998779296875,
-      "last_checked_at": "2026-09-22T18:14:26.634596+00:00",
+      "last_checked_at": "2026-09-23T18:34:44.549899+00:00",
       "sizing": {
         "allocation_percent": 0.0825,
         "kelly_fraction": 0.5,
@@ -674,7 +674,7 @@
       "highest_price": 1841.0,
       "lowest_price": 1793.0,
       "last_known_price": 1803.0,
-      "last_checked_at": "2026-09-22T18:14:43.545062+00:00",
+      "last_checked_at": "2026-09-23T18:34:59.929514+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -696,7 +696,7 @@
       "highest_price": 1387.5999755859375,
       "lowest_price": 1357.9000244140625,
       "last_known_price": 1357.9000244140625,
-      "last_checked_at": "2026-09-22T18:14:45.981039+00:00",
+      "last_checked_at": "2026-09-23T18:35:01.600093+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -718,7 +718,7 @@
       "highest_price": 3020.0,
       "lowest_price": 2997.0,
       "last_known_price": 2997.0,
-      "last_checked_at": "2026-09-22T18:14:16.566212+00:00",
+      "last_checked_at": "2026-09-23T18:34:31.566728+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -740,7 +740,7 @@
       "highest_price": 1603.5,
       "lowest_price": 1592.300048828125,
       "last_known_price": 1592.300048828125,
-      "last_checked_at": "2026-09-22T18:14:18.467371+00:00",
+      "last_checked_at": "2026-09-23T18:34:34.668242+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -762,7 +762,7 @@
       "highest_price": 610.0999755859375,
       "lowest_price": 606.1500244140625,
       "last_known_price": 610.0999755859375,
-      "last_checked_at": "2026-09-22T18:14:19.639660+00:00",
+      "last_checked_at": "2026-09-23T18:34:36.468640+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -784,7 +784,7 @@
       "highest_price": 83.54000091552734,
       "lowest_price": 82.4000015258789,
       "last_known_price": 82.4000015258789,
-      "last_checked_at": "2026-09-22T18:14:25.284666+00:00",
+      "last_checked_at": "2026-09-23T18:34:42.604242+00:00",
       "sizing": {
         "allocation_percent": 0.0825,
         "kelly_fraction": 0.5,
@@ -806,7 +806,7 @@
       "highest_price": 244.74000549316406,
       "lowest_price": 240.17999267578125,
       "last_known_price": 244.74000549316406,
-      "last_checked_at": "2026-09-22T18:14:25.808192+00:00",
+      "last_checked_at": "2026-09-23T18:34:43.251851+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -828,7 +828,7 @@
       "highest_price": 587.2999877929688,
       "lowest_price": 575.25,
       "last_known_price": 587.2999877929688,
-      "last_checked_at": "2026-09-22T18:14:31.912522+00:00",
+      "last_checked_at": "2026-09-23T18:34:49.620828+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -850,7 +850,7 @@
       "highest_price": 896.0999755859375,
       "lowest_price": 892.0,
       "last_known_price": 896.0999755859375,
-      "last_checked_at": "2026-09-22T18:14:34.716425+00:00",
+      "last_checked_at": "2026-09-23T18:34:51.604656+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -872,7 +872,7 @@
       "highest_price": 1211.300048828125,
       "lowest_price": 1124.4000244140625,
       "last_known_price": 1211.300048828125,
-      "last_checked_at": "2026-09-22T18:14:39.105307+00:00",
+      "last_checked_at": "2026-09-23T18:34:56.255904+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -894,7 +894,7 @@
       "highest_price": 872.3499755859375,
       "lowest_price": 865.6500244140625,
       "last_known_price": 872.3499755859375,
-      "last_checked_at": "2026-09-22T18:14:40.570256+00:00",
+      "last_checked_at": "2026-09-23T18:34:57.605244+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -916,7 +916,7 @@
       "highest_price": 609.5499877929688,
       "lowest_price": 608.9500122070312,
       "last_known_price": 608.9500122070312,
-      "last_checked_at": "2026-09-22T18:14:50.450945+00:00",
+      "last_checked_at": "2026-09-23T18:35:06.146749+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -938,7 +938,7 @@
       "highest_price": 339.75,
       "lowest_price": 328.0,
       "last_known_price": 339.75,
-      "last_checked_at": "2026-09-22T18:14:53.912560+00:00",
+      "last_checked_at": "2026-09-23T18:35:09.720356+00:00",
       "sizing": {
         "allocation_percent": 0.0528,
         "kelly_fraction": 0.5,
@@ -960,7 +960,7 @@
       "highest_price": 435.8500061035156,
       "lowest_price": 429.70001220703125,
       "last_known_price": 429.70001220703125,
-      "last_checked_at": "2026-09-22T18:14:55.217204+00:00",
+      "last_checked_at": "2026-09-23T18:35:10.938376+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -982,7 +982,7 @@
       "highest_price": 333.54998779296875,
       "lowest_price": 332.1499938964844,
       "last_known_price": 333.54998779296875,
-      "last_checked_at": "2026-09-22T18:14:55.319951+00:00",
+      "last_checked_at": "2026-09-23T18:35:11.094055+00:00",
       "sizing": {
         "allocation_percent": 0.0743,
         "kelly_fraction": 0.5,
@@ -1004,7 +1004,7 @@
       "highest_price": 1869.199951171875,
       "lowest_price": 1779.9000244140625,
       "last_known_price": 1869.199951171875,
-      "last_checked_at": "2026-09-22T18:15:18.055334+00:00",
+      "last_checked_at": "2026-09-23T18:35:34.969673+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -1026,7 +1026,7 @@
       "highest_price": 367.6000061035156,
       "lowest_price": 348.25,
       "last_known_price": 367.6000061035156,
-      "last_checked_at": "2026-09-22T18:15:23.155956+00:00",
+      "last_checked_at": "2026-09-23T18:35:41.160883+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -1048,7 +1048,7 @@
       "highest_price": 289.5,
       "lowest_price": 286.45001220703125,
       "last_known_price": 286.45001220703125,
-      "last_checked_at": "2026-09-22T18:15:27.488816+00:00",
+      "last_checked_at": "2026-09-23T18:35:46.008092+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -1070,7 +1070,7 @@
       "highest_price": 2165.0,
       "lowest_price": 2160.10009765625,
       "last_known_price": 2165.0,
-      "last_checked_at": "2026-09-22T18:15:31.610493+00:00",
+      "last_checked_at": "2026-09-23T18:35:51.790737+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -1092,7 +1092,7 @@
       "highest_price": 423.20001220703125,
       "lowest_price": 421.3500061035156,
       "last_known_price": 421.3500061035156,
-      "last_checked_at": "2026-09-22T18:15:35.756331+00:00",
+      "last_checked_at": "2026-09-23T18:35:56.981442+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -1114,7 +1114,7 @@
       "highest_price": 352.20001220703125,
       "lowest_price": 350.5,
       "last_known_price": 352.20001220703125,
-      "last_checked_at": "2026-09-22T18:15:49.877092+00:00",
+      "last_checked_at": "2026-09-23T18:36:17.152442+00:00",
       "sizing": {
         "allocation_percent": 0.0594,
         "kelly_fraction": 0.5,
@@ -1136,7 +1136,7 @@
       "highest_price": 1133.0999755859375,
       "lowest_price": 1125.5999755859375,
       "last_known_price": 1125.5999755859375,
-      "last_checked_at": "2026-09-22T18:15:54.491843+00:00",
+      "last_checked_at": "2026-09-23T18:36:24.411934+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -1158,7 +1158,7 @@
       "highest_price": 155.6199951171875,
       "lowest_price": 154.1699981689453,
       "last_known_price": 154.1699981689453,
-      "last_checked_at": "2026-09-22T18:15:55.181016+00:00",
+      "last_checked_at": "2026-09-23T18:36:25.338353+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -1180,7 +1180,7 @@
       "highest_price": 503.3500061035156,
       "lowest_price": 499.8999938964844,
       "last_known_price": 503.3500061035156,
-      "last_checked_at": "2026-09-22T18:16:12.258272+00:00",
+      "last_checked_at": "2026-09-23T18:36:43.460065+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -1202,7 +1202,7 @@
       "highest_price": 3913.89990234375,
       "lowest_price": 3858.0,
       "last_known_price": 3858.0,
-      "last_checked_at": "2026-09-22T18:16:14.889955+00:00",
+      "last_checked_at": "2026-09-23T18:36:45.176280+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -1224,7 +1224,7 @@
       "highest_price": 531.2999877929688,
       "lowest_price": 507.20001220703125,
       "last_known_price": 531.2999877929688,
-      "last_checked_at": "2026-09-22T18:16:40.487101+00:00",
+      "last_checked_at": "2026-09-23T18:37:10.767737+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -1246,7 +1246,7 @@
       "highest_price": 2387.0,
       "lowest_price": 2362.199951171875,
       "last_known_price": 2362.199951171875,
-      "last_checked_at": "2026-09-22T18:16:43.287862+00:00",
+      "last_checked_at": "2026-09-23T18:37:14.194242+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -1268,7 +1268,7 @@
       "highest_price": 596.0,
       "lowest_price": 590.5,
       "last_known_price": 590.5,
-      "last_checked_at": "2026-09-22T18:15:06.897993+00:00",
+      "last_checked_at": "2026-09-23T18:35:21.227961+00:00",
       "sizing": {
         "allocation_percent": 0.0825,
         "kelly_fraction": 0.5,
@@ -1290,7 +1290,7 @@
       "highest_price": 750.9500122070312,
       "lowest_price": 743.4500122070312,
       "last_known_price": 743.4500122070312,
-      "last_checked_at": "2026-09-22T18:15:27.735993+00:00",
+      "last_checked_at": "2026-09-23T18:35:46.321378+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -1312,7 +1312,7 @@
       "highest_price": 3649.5,
       "lowest_price": 3649.5,
       "last_known_price": 3649.5,
-      "last_checked_at": "2026-09-22T18:14:17.905594+00:00",
+      "last_checked_at": "2026-09-23T18:34:33.916088+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -1334,7 +1334,7 @@
       "highest_price": 616.5499877929688,
       "lowest_price": 616.5499877929688,
       "last_known_price": 616.5499877929688,
-      "last_checked_at": "2026-09-22T18:14:33.838560+00:00",
+      "last_checked_at": "2026-09-23T18:34:50.606383+00:00",
       "sizing": {
         "allocation_percent": 0.0429,
         "kelly_fraction": 0.5,
@@ -1356,7 +1356,7 @@
       "highest_price": 1319.300048828125,
       "lowest_price": 1319.300048828125,
       "last_known_price": 1319.300048828125,
-      "last_checked_at": "2026-09-22T18:14:39.731264+00:00",
+      "last_checked_at": "2026-09-23T18:34:57.051116+00:00",
       "sizing": {
         "allocation_percent": 0.0264,
         "kelly_fraction": 0.5,
@@ -1378,7 +1378,7 @@
       "highest_price": 4962.5,
       "lowest_price": 4962.5,
       "last_known_price": 4962.5,
-      "last_checked_at": "2026-09-22T18:14:46.332066+00:00",
+      "last_checked_at": "2026-09-23T18:35:01.971311+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -1400,7 +1400,7 @@
       "highest_price": 1471.4000244140625,
       "lowest_price": 1471.4000244140625,
       "last_known_price": 1471.4000244140625,
-      "last_checked_at": "2026-09-22T18:14:58.120338+00:00",
+      "last_checked_at": "2026-09-23T18:35:13.196133+00:00",
       "sizing": {
         "allocation_percent": 0.0429,
         "kelly_fraction": 0.5,
@@ -1422,7 +1422,7 @@
       "highest_price": 221.05999755859375,
       "lowest_price": 221.05999755859375,
       "last_known_price": 221.05999755859375,
-      "last_checked_at": "2026-09-22T18:15:04.786490+00:00",
+      "last_checked_at": "2026-09-23T18:35:19.257517+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -1444,7 +1444,7 @@
       "highest_price": 2101.0,
       "lowest_price": 2101.0,
       "last_known_price": 2101.0,
-      "last_checked_at": "2026-09-22T18:15:07.780719+00:00",
+      "last_checked_at": "2026-09-23T18:35:22.594518+00:00",
       "sizing": {
         "allocation_percent": 0.0536,
         "kelly_fraction": 0.5,
@@ -1466,7 +1466,7 @@
       "highest_price": 1857.4000244140625,
       "lowest_price": 1857.4000244140625,
       "last_known_price": 1857.4000244140625,
-      "last_checked_at": "2026-09-22T18:15:40.636833+00:00",
+      "last_checked_at": "2026-09-23T18:36:03.536739+00:00",
       "sizing": {
         "allocation_percent": 0.033,
         "kelly_fraction": 0.5,
@@ -1488,7 +1488,7 @@
       "highest_price": 1363.9000244140625,
       "lowest_price": 1363.9000244140625,
       "last_known_price": 1363.9000244140625,
-      "last_checked_at": "2026-09-22T18:15:50.368043+00:00",
+      "last_checked_at": "2026-09-23T18:36:18.277109+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -1510,7 +1510,7 @@
       "highest_price": 341.1000061035156,
       "lowest_price": 341.1000061035156,
       "last_known_price": 341.1000061035156,
-      "last_checked_at": "2026-09-22T18:16:23.080857+00:00",
+      "last_checked_at": "2026-09-23T18:36:53.186710+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
@@ -1532,7 +1532,7 @@
       "highest_price": 187.41000366210938,
       "lowest_price": 187.41000366210938,
       "last_known_price": 187.41000366210938,
-      "last_checked_at": "2026-09-22T18:16:32.995655+00:00",
+      "last_checked_at": "2026-09-23T18:37:03.181304+00:00",
       "sizing": {
         "allocation_percent": 0.044,
         "kelly_fraction": 0.5,
@@ -1554,7 +1554,7 @@
       "highest_price": 4928.5,
       "lowest_price": 4928.5,
       "last_known_price": 4928.5,
-      "last_checked_at": "2026-09-22T18:16:33.790342+00:00",
+      "last_checked_at": "2026-09-23T18:37:04.172941+00:00",
       "sizing": {
         "allocation_percent": 0.0644,
         "kelly_fraction": 0.5,
@@ -1576,17 +1576,61 @@
       "highest_price": 14.270000457763672,
       "lowest_price": 14.270000457763672,
       "last_known_price": 14.270000457763672,
-      "last_checked_at": "2026-09-22T18:16:41.372641+00:00",
+      "last_checked_at": "2026-09-23T18:37:12.061409+00:00",
       "sizing": {
         "allocation_percent": 0.066,
         "kelly_fraction": 0.5,
         "volatility_adjustment": 0.6,
         "liquidity_adjustment": 1.0
       }
+    },
+    "ATGL.NS": {
+      "trade_id": "trial_ATGL_NS_1790188472",
+      "symbol": "ATGL.NS",
+      "direction": "SELL",
+      "quantity": 20,
+      "entry_price": 626.25,
+      "entry_time": "2026-09-23T18:34:32.244018+00:00",
+      "invested_amount": 12525.0,
+      "stop_loss": 635.64,
+      "target1": 607.46,
+      "target1_hit": false,
+      "highest_price": 626.25,
+      "lowest_price": 626.25,
+      "last_known_price": 626.25,
+      "last_checked_at": "2026-09-23T18:34:32.244018+00:00",
+      "sizing": {
+        "allocation_percent": 0.0594,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.6,
+        "liquidity_adjustment": 0.9
+      }
+    },
+    "COALINDIA.NS": {
+      "trade_id": "trial_COALINDIA_NS_1790188499",
+      "symbol": "COALINDIA.NS",
+      "direction": "BUY",
+      "quantity": 47,
+      "entry_price": 428.0,
+      "entry_time": "2026-09-23T18:34:59.447482+00:00",
+      "invested_amount": 20116.0,
+      "stop_loss": 421.58,
+      "target1": 440.84,
+      "target1_hit": false,
+      "highest_price": 428.0,
+      "lowest_price": 428.0,
+      "last_known_price": 428.0,
+      "last_checked_at": "2026-09-23T18:34:59.447482+00:00",
+      "sizing": {
+        "allocation_percent": 0.099,
+        "kelly_fraction": 0.5,
+        "volatility_adjustment": 0.9,
+        "liquidity_adjustment": 1.0
+      }
     }
   },
   "capital": {
     "starting_capital": 1000000.0,
-    "available_cash": 216726.47
+    "available_cash": 184085.47
   }
 }
