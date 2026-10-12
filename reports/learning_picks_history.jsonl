@@ -42,3 +42,5 @@
 {"date": "2026-10-08", "symbol": "HYUNDAI.NS", "direction": "SELL", "entry_price": 1989.0}
 {"date": "2026-10-09", "symbol": "KOTAKBANK.NS", "direction": "BUY", "entry_price": 440.0}
 {"date": "2026-10-09", "symbol": "TIINDIA.NS", "direction": "SELL", "entry_price": 2388.0}
+{"date": "2026-10-12", "symbol": "KOTAKBANK.NS", "direction": "BUY", "entry_price": 435.0}
+{"date": "2026-10-12", "symbol": "AMBER.NS", "direction": "SELL", "entry_price": 6555.0}
