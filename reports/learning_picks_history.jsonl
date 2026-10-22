@@ -56,3 +56,5 @@
 {"date": "2026-10-19", "symbol": "HYUNDAI.NS", "direction": "SELL", "entry_price": 1985.0}
 {"date": "2026-10-21", "symbol": "SUNTV.NS", "direction": "BUY", "entry_price": 638.0}
 {"date": "2026-10-21", "symbol": "HYUNDAI.NS", "direction": "SELL", "entry_price": 1987.0}
+{"date": "2026-10-22", "symbol": "SUNTV.NS", "direction": "BUY", "entry_price": 639.95}
+{"date": "2026-10-22", "symbol": "HYUNDAI.NS", "direction": "SELL", "entry_price": 1955.0}
