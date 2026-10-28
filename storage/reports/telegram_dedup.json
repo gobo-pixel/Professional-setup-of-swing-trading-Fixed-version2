@@ -1,6 +1,11 @@
 {
   "2026-10-28": [
     "mi_summary_empty::2026-10-28 06:07:00.005526",
-    "mi_summary_empty::2026-10-28 14:44:58.801593"
+    "mi_summary_empty::2026-10-28 14:44:58.801593",
+    "paper_trading_started::2026-10-28::15:31:06.305999",
+    "monitoring_summary_empty::2026-10-28::15:31:06.983491",
+    "portfolio_summary::2026-10-28::15:31:07.503905",
+    "analysis_summary::2026-10-28::15:31:08.906462",
+    "learning_summary::2026-10-28::15:31:13.301113"
   ]
 }
