@@ -72,3 +72,5 @@
 {"date": "2026-10-30", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1732.8}
 {"date": "2026-11-02", "symbol": "GESHIP.NS", "direction": "BUY", "entry_price": 1618.8}
 {"date": "2026-11-02", "symbol": "HYUNDAI.NS", "direction": "SELL", "entry_price": 1922.0}
+{"date": "2026-11-03", "symbol": "GESHIP.NS", "direction": "BUY", "entry_price": 1593.6}
+{"date": "2026-11-03", "symbol": "RECLTD.NS", "direction": "SELL", "entry_price": 285.6}
