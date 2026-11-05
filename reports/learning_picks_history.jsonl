@@ -76,3 +76,5 @@
 {"date": "2026-11-03", "symbol": "RECLTD.NS", "direction": "SELL", "entry_price": 285.6}
 {"date": "2026-11-04", "symbol": "GESHIP.NS", "direction": "BUY", "entry_price": 1600.4}
 {"date": "2026-11-04", "symbol": "SOBHA.NS", "direction": "SELL", "entry_price": 1135.3}
+{"date": "2026-11-05", "symbol": "BSE.NS", "direction": "BUY", "entry_price": 3665.7}
+{"date": "2026-11-05", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1785.1}
