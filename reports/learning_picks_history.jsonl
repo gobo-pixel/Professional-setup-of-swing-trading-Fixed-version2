@@ -85,3 +85,5 @@
 {"date": "2026-11-11", "symbol": "WELSPUNLIV.NS", "direction": "BUY", "entry_price": 252.21}
 {"date": "2026-11-12", "symbol": "MAHABANK.NS", "direction": "BUY", "entry_price": 87.68}
 {"date": "2026-11-12", "symbol": "PIIND.NS", "direction": "SELL", "entry_price": 1712.9}
+{"date": "2026-11-13", "symbol": "MAHABANK.NS", "direction": "BUY", "entry_price": 90.2}
+{"date": "2026-11-13", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1890.0}
