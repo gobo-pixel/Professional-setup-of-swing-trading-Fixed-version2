@@ -8,7 +8,7 @@
   "risk_score": 0.0,
   "peak_equity": 500000.0,
   "day_start_equity": 500000.0,
-  "current_trading_day": "2026-11-16",
+  "current_trading_day": "2026-11-17",
   "week_start_equity": 500000.0,
   "current_trading_week": "2026-W47",
   "month_start_equity": 500000.0,
@@ -16,5 +16,5 @@
   "open_positions": {},
   "closed_positions": [],
   "symbol_sector": {},
-  "saved_at": 1794830552.275058
+  "saved_at": 1794918438.6239443
 }
