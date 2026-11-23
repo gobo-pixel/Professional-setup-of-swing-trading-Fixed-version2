@@ -96,3 +96,5 @@
 {"date": "2026-11-19", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1847.0}
 {"date": "2026-11-20", "symbol": "ACE.NS", "direction": "BUY", "entry_price": 1189.2}
 {"date": "2026-11-20", "symbol": "POLYCAB.NS", "direction": "SELL", "entry_price": 7307.5}
+{"date": "2026-11-23", "symbol": "TMCV.NS", "direction": "BUY", "entry_price": 445.85}
+{"date": "2026-11-23", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1850.0}
