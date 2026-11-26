@@ -100,3 +100,5 @@
 {"date": "2026-11-23", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1850.0}
 {"date": "2026-11-25", "symbol": "TMCV.NS", "direction": "BUY", "entry_price": 445.85}
 {"date": "2026-11-25", "symbol": "MAZDOCK.NS", "direction": "SELL", "entry_price": 1850.0}
+{"date": "2026-11-26", "symbol": "IDFCFIRSTB.NS", "direction": "BUY", "entry_price": 85.4}
+{"date": "2026-11-26", "symbol": "THERMAX.NS", "direction": "SELL", "entry_price": 2705.5}
