@@ -1,31 +1,31 @@
 [
   {
     "category": "RULE (redundant)",
-    "finding": "'breadth' and 'sector' agree 100.0% of the time (n=26500).",
+    "finding": "'breadth' and 'sector' agree 100.0% of the time (n=27000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'squeeze_breakout' and 'breadth' agree 99.97% of the time (n=26500).",
+    "finding": "'squeeze_breakout' and 'breadth' agree 99.97% of the time (n=27000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'squeeze_breakout' and 'sector' agree 99.97% of the time (n=26500).",
+    "finding": "'squeeze_breakout' and 'sector' agree 99.97% of the time (n=27000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'breakout' and 'confirmed_breakout' agree 98.15% of the time (n=26500).",
+    "finding": "'breakout' and 'confirmed_breakout' agree 98.13% of the time (n=27000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   },
   {
     "category": "RULE (redundant)",
-    "finding": "'not_overextended' and 'not_stale_entry' agree 97.96% of the time (n=26500).",
+    "finding": "'not_overextended' and 'not_stale_entry' agree 97.93% of the time (n=27000).",
     "suggestion": "These two rules likely measure the same thing \u2014 consider dropping one to simplify the checklist without losing signal.",
     "confidence": "HIGH"
   }
